@@ -3,24 +3,32 @@ local utils = require('pytest.utils')
 
 local settings = config.settings
 
-local M = {}
+local core = {}
 
 local ns = vim.api.nvim_create_namespace('django_test')
-local status = {
+core.status = {
    last_stdout = nil,
    lines = {},
    dependencies_verified = false,
    working = false,
+   filename = nil
 }
 
-local function get_error_detail(stdout, index)
+
+---Get the line and error message of the failed test for the current file
+---@param stdout string[]
+---@param index number
+---@return table
+function core._get_error_detail(stdout, index)
    local detail = { line = 0, error = '' }
 
-   vim.print(index)
+   if not core.status.filename then
+      core.status.filename = vim.fn.expand('%:t')
+   end
 
    local count = 1
    for _, line in ipairs(stdout) do
-      local error = line:match('E   (.*)')
+      local error = line:match('E%s+(.*)')
       if error and detail.error == '' then
          if count == index then
             detail.error = error
@@ -29,8 +37,8 @@ local function get_error_detail(stdout, index)
          end
       end
 
-      local linenr = line:match('.*%.py:(%d+)')
-      if linenr and detail.line == 0 and detail.error ~= '' then
+      local linenr = line:match(core.status.filename:gsub('%.', '%%.') .. ':(%d+)')
+      if linenr and detail.line == 0 then
          if count == index then
             detail.line = tonumber(linenr) - 1
          end
@@ -44,6 +52,11 @@ local function get_error_detail(stdout, index)
    return detail
 end
 
+
+---Get the lines of test functions for the current file
+---@param stdout string[]
+---@param bufnr number
+---@return table?
 local function get_tests_lines(stdout, bufnr)
    local tests = {}
 
@@ -54,6 +67,10 @@ local function get_tests_lines(stdout, bufnr)
    end
 
    local parser = vim.treesitter.get_parser(bufnr, "python")
+   if not parser then
+      print("Parser not found")
+      return
+   end
    local tree = parser:parse()[1]
    local root = tree:root()
 
@@ -84,8 +101,10 @@ local function get_tests_lines(stdout, bufnr)
    return lines
 end
 
-M.test = function()
-   if status.working then
+
+---Main function to run the tests for the current file
+core.test_file = function()
+   if core.status.working then
       vim.notify('Tests are already running', vim.log.levels.INFO)
       return
    end
@@ -95,6 +114,8 @@ M.test = function()
    local bufnr = vim.api.nvim_get_current_buf()
 
    local docker_command = {}
+
+   core.status.filename = vim.fn.expand('%:t')
 
    if settings.docker.enabled then
       local docker_path = settings.docker.docker_path
@@ -112,30 +133,30 @@ M.test = function()
    vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
    vim.diagnostic.reset(ns, bufnr)
 
-   status.working = true
+   core.status.working = true
 
    vim.fn.jobstart(
       command, {
          stdout_buffered = true,
          on_stdout = function(_, stdout)
             if stdout then
-               status.lines = get_tests_lines(stdout, bufnr)
-               for _, line in ipairs(status.lines) do
+               core.status.lines = get_tests_lines(stdout, bufnr)
+               for _, line in ipairs(core.status.lines) do
                   local lineno, stat = next(line)
                   local text = stat == 'passed' and '\t✅' or '\t❌'
                   vim.api.nvim_buf_set_extmark(bufnr, ns, lineno, 0, { virt_text = { { text } } })
                end
-               status.last_stdout = stdout
+               core.status.last_stdout = stdout
             end
          end,
          on_exit = function(_, _)
             local failed = {}
             local i = 1
-            for _, line in ipairs(status.lines) do
+            for _, line in ipairs(core.status.lines) do
                local _, outcome = next(line)
 
                if outcome == 'failed' then
-                  local error = get_error_detail(status.last_stdout, i)
+                  local error = core._get_error_detail(core.status.last_stdout, i)
 
                   table.insert(failed, {
                      bufnr = bufnr,
@@ -156,19 +177,21 @@ M.test = function()
             vim.notify(message, vim.log.levels.INFO)
             vim.diagnostic.set(ns, bufnr, failed, {})
 
-            status.working = false
+            core.status.working = false
          end
       })
 end
 
-M.show_last_stdout = function()
-   if status.last_stdout then
+
+---Display the last stdout output in a new buffer
+core.show_last_stdout = function()
+   if core.status.last_stdout then
       local bufnr = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, status.last_stdout)
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, core.status.last_stdout)
       vim.cmd.split()
       vim.api.nvim_set_current_buf(bufnr)
    end
 end
 
-return M
+return core
 

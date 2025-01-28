@@ -2,6 +2,11 @@ local settings = require('pytest.config').settings
 
 local utils = {}
 
+
+---Extend a list with another list, from left to right
+---@param list table
+---@param extension table
+---@return table
 function utils.list_extend(list, extension)
    local new_list = {}
    for _, value in ipairs(list) do
@@ -13,6 +18,9 @@ function utils.list_extend(list, extension)
    return new_list
 end
 
+
+---Verify if pytest-django is available in local or docker according to the settings
+---@param callback function
 function utils.is_pytest_django_available(callback)
    local docker_command = {}
    if settings.docker.enabled then
@@ -40,6 +48,9 @@ function utils.is_pytest_django_available(callback)
    end)
 end
 
+
+---Verify if the container is running according to the settings
+---@param callback function
 function utils.is_container_running(callback)
    local command = { "docker", "ps", "--format", "{{.Names}}" }
    local container = settings.docker.container
@@ -64,6 +75,8 @@ function utils.is_container_running(callback)
    end):wait()
 end
 
+
+---Verify if the dependencies are available
 function utils.verify_dependencies()
    if settings.docker.enabled then
       utils.is_container_running(function(container_runnings, message)

@@ -3,6 +3,7 @@ local core = require('pytest.core')
 
 local M = {}
 
+
 ---Main settings for pytest.nvim
 ---@param opts? table
 M.setup = function(opts)
@@ -10,7 +11,10 @@ M.setup = function(opts)
    config.settings = vim.tbl_deep_extend('force', config.settings, opts)
 end
 
-M.test = core.test
+
+-- API functions
+M.test_file = core.test_file
+
 
 local group = vim.api.nvim_create_augroup('DjangoTest', { clear = true })
 
@@ -21,7 +25,7 @@ vim.api.nvim_create_autocmd('FileType', {
       local bufnr = vim.api.nvim_get_current_buf()
 
       vim.api.nvim_buf_create_user_command(bufnr, 'DjangoTest', function()
-         core.test()
+         core.test_file()
       end, {
          nargs = 0,
       })
