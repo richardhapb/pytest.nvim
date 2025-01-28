@@ -123,6 +123,85 @@ describe("Get failed details", function()
       assert.is.equal('ZeroDivisionError: division by zero', error.error)
    end)
 
+   it('Execution error message on test', function()
+      local error_message = {
+         '========================================== test session starts ==========================================',
+         'platform linux -- Python 3.12.4, pytest-8.3.4, pluggy-1.5.0 -- /usr/local/bin/python',
+         'cachedir: .pytest_cache',
+         'django: version: 5.0.6, settings: dirtystroke.settings (from env)',
+         'rootdir: /usr/src/app',
+         'configfile: pyproject.toml',
+         'testpaths: apps, dirtystroke',
+         'plugins: django-4.9.0',
+         'collected 5 items / 2 errors',
+         '',
+         '================================================ ERRORS =================================================',
+         '____________________ ERROR collecting apps/memory_usage/tests/test_memory_pofiler.py ____________________',
+         'ImportError while importing test module "/usr/src/app/apps/memory_usage/tests/test_memory_pofiler.py".',
+         'Hint: make sure your test modules/packages have valid Python names.',
+         'Traceback:',
+         '/usr/local/lib/python3.12/site-packages/_pytest/python.py:493: in importtestmodule',
+         '    mod = import_path(',
+         '/usr/local/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path',
+         '    importlib.import_module(module_name)',
+         '/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module',
+         '    return _bootstrap._gcd_import(name[level:], package, level)',
+         '<frozen importlib._bootstrap>:1387: in _gcd_import',
+         '    ???',
+         '<frozen importlib._bootstrap>:1360: in _find_and_load',
+         '    ???',
+         '<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked',
+         '    ???',
+         '<frozen importlib._bootstrap>:935: in _load_unlocked',
+         '    ???',
+         '/usr/local/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:184: in exec_module',
+         '    exec(co, module.__dict__)',
+         'apps/memory_usage/tests/test_memory_pofiler.py:7: in <module>',
+         '    from memory_usage.middlewares import AppMemoryProfiler, AppUsage',
+         'apps/memory_usage/middlewares.py:6: in <module>',
+         '    import psutil',
+         'E   ModuleNotFoundError: No module named "psutil"',
+         '_____________________ ERROR collecting apps/memory_usage/tests/test_middlewares.py ______________________',
+         'ImportError while importing test module "/usr/src/app/apps/memory_usage/tests/test_middlewares.py".',
+         'Hint: make sure your test modules/packages have valid Python names.',
+         'Traceback:',
+         '/usr/local/lib/python3.12/site-packages/_pytest/python.py:493: in importtestmodule',
+         '    mod = import_path(',
+         '/usr/local/lib/python3.12/site-packages/_pytest/pathlib.py:587: in import_path',
+         '    importlib.import_module(module_name)',
+         '/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module',
+         '    return _bootstrap._gcd_import(name[level:], package, level)',
+         '<frozen importlib._bootstrap>:1387: in _gcd_import',
+         '    ???',
+         '<frozen importlib._bootstrap>:1360: in _find_and_load',
+         '    ???',
+         '<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked',
+         '    ???',
+         '<frozen importlib._bootstrap>:935: in _load_unlocked',
+         '    ???',
+         '/usr/local/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:184: in exec_module',
+         '    exec(co, module.__dict__)',
+         'apps/memory_usage/tests/test_middlewares.py:4: in <module>',
+         '    from memory_usage.middlewares import AppMemoryMiddleware',
+         'apps/memory_usage/middlewares.py:6: in <module>',
+         '    import psutil',
+         'E   ModuleNotFoundError: No module named "psutil"',
+         '======================================== short test summary info ========================================',
+         'ERROR apps/memory_usage/tests/test_memory_pofiler.py',
+         'ERROR apps/memory_usage/tests/test_middlewares.py',
+         '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
+      }
+
+      core.status.filename = nil
+      fake_expand('test_memory_profiler.py')
+
+      local error = core._get_error_detail(error_message, 1)
+
+      assert.is.equal(0, error.line)
+      assert.is.equal('ModuleNotFoundError: No module named "psutil"', error.error)
+   end
+   )
+
    vim.fn.expand = expand
 end)
 
