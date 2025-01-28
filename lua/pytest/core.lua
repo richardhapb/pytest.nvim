@@ -1,4 +1,7 @@
-local ts_utils = require('nvim-treesitter.ts_utils')
+local config = require('pytest.config')
+local utils = require('pytest.utils')
+
+local settings = config.settings
 
 local M = {}
 
@@ -9,80 +12,6 @@ local status = {
    dependencies_verified = false,
    working = false,
 }
-
-M.settings = {
-   docker = {
-      enabled = true,
-      container = 'ddirt-web-1',
-      docker_path = '/usr/src/app',
-   },
-}
-
-M.setup = function(config)
-   M.settings = vim.tbl_deep_extend('force', M.settings, config)
-end
-
-local function list_extend(list, extension)
-   local new_list = {}
-   for _, value in ipairs(list) do
-      table.insert(new_list, value)
-   end
-   for _, value in ipairs(extension) do
-      table.insert(new_list, value)
-   end
-   return new_list
-end
-
-local function is_pytest_django_available(callback)
-   local docker_command = {}
-   if M.settings.docker.enabled then
-      docker_command = { "docker", "exec", M.settings.docker.container }
-   end
-   local command = list_extend(docker_command, { "pytest", "-V", "-V" })
-   vim.system(command, { text = true }, function(result)
-      if result.code == 0 then
-         local output = result.stdout
-         if not output then
-            callback(false, "Error obtaining pytest plugins")
-            return
-         end
-
-         for line in output:gmatch("[^\r\n]+") do
-            if line:match("pytest%-django") then
-               callback(true, "pytest-django available")
-               return
-            end
-         end
-         callback(false, "pytest-django not availabe")
-      else
-         callback(false, "Error executing pytest: " .. result.stderr)
-      end
-   end)
-end
-
-local function is_container_running(callback)
-   local command = { "docker", "ps", "--format", "{{.Names}}" }
-   local container = M.settings.docker.container
-   vim.system(command, { text = true }, function(result)
-      if result.code == 0 then
-         local output = result.stdout
-         if not output then
-            callback(false, "Error obtaining docker containers")
-            return
-         end
-
-         for line in output:gmatch("[^\r\n]+") do
-            if line == container then
-               callback(true, "Container running")
-               return
-            end
-         end
-         callback(false, "Container not running")
-      else
-         callback(false, "Error executing docker ps: " .. result.stderr)
-      end
-   end):wait()
-end
 
 local function get_error_detail(stdout, index)
    local detail = { line = 0, error = '' }
@@ -167,18 +96,18 @@ M.test = function()
 
    local docker_command = {}
 
-   if M.settings.docker.enabled then
-      local docker_path = M.settings.docker.docker_path
+   if settings.docker.enabled then
+      local docker_path = settings.docker.docker_path
       local relative_file = current_file:match(current_dir .. '/(.*)')
       local docker_file_path = docker_path .. '/' .. relative_file
-      local container = M.settings.docker.container
+      local container = settings.docker.container
 
       docker_command = { 'docker', 'exec', container }
 
       current_file = docker_file_path
    end
 
-   local command = list_extend(docker_command, { 'pytest', '-v', current_file })
+   local command = utils.list_extend(docker_command, { 'pytest', '-v', current_file })
 
    vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
    vim.diagnostic.reset(ns, bufnr)
@@ -241,62 +170,5 @@ M.show_last_stdout = function()
    end
 end
 
-local group = vim.api.nvim_create_augroup('DjangoTest', { clear = true })
-
-vim.api.nvim_create_autocmd('FileType', {
-   group = group,
-   pattern = 'python',
-   callback = function()
-      if not status.dependencies_verified then
-         if M.settings.docker.enabled then
-            is_container_running(function(container_runnings, message)
-               if not container_runnings then
-                  vim.print(message)
-                  M.settings.docker.enabled = false
-               end
-            end)
-         end
-
-         is_pytest_django_available(function(pytest_available, _)
-            if not pytest_available then
-               local docker_command = {}
-               if M.settings.docker.enabled then
-                  docker_command = { 'docker', 'exec', M.settings.docker.container }
-               end
-
-               local command = list_extend(docker_command, { 'pip', 'install', 'pytest', 'pytest-django' })
-               vim.system(command, { text = true }, function(stdout)
-                  if stdout.code == 0 then
-                     vim.print('pytest-django installed')
-                  else
-                     vim.print('Error installing pytest-django: ' .. stdout.stderr)
-                  end
-               end)
-            end
-
-            status.dependencies_verified = true
-         end)
-      end
-
-      local bufnr = vim.api.nvim_get_current_buf()
-
-      vim.api.nvim_buf_create_user_command(bufnr, 'DjangoTest', function()
-         M.test()
-      end, {
-         nargs = 0,
-      })
-
-      vim.api.nvim_buf_create_user_command(bufnr, 'DjangoTestOutput', function()
-         if status.last_stdout then
-            M.show_last_stdout()
-         else
-            vim.notify('No output to show', vim.log.levels.INFO)
-         end
-      end, {
-         nargs = 0,
-      })
-
-      vim.keymap.set('n', '<leader>T', '<CMD>DjangoTest<CR>', { buffer = bufnr, desc = 'Run Django tests' })
-   end
-})
+return M
 
