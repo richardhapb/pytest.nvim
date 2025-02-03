@@ -27,7 +27,8 @@ function utils.is_pytest_django_available(callback)
       docker_command = { "docker", "exec", settings.docker.container }
    end
    local command = utils.list_extend(docker_command, { "pytest", "-V", "-V" })
-   vim.system(command, { text = true }, function(result)
+
+   local job = vim.system(command, { text = true }, function(result)
       if result.code == 0 then
          local output = result.stdout
          if not output then
@@ -46,6 +47,8 @@ function utils.is_pytest_django_available(callback)
          callback(false, "Error executing pytest: " .. result.stderr)
       end
    end)
+
+   return job
 end
 
 
@@ -54,7 +57,7 @@ end
 function utils.is_container_running(callback)
    local command = { "docker", "ps", "--format", "{{.Names}}" }
    local container = settings.docker.container
-   vim.system(command, { text = true }, function(result)
+   local job = vim.system(command, { text = true }, function(result)
       if result.code == 0 then
          local output = result.stdout
          if not output then
@@ -72,7 +75,9 @@ function utils.is_container_running(callback)
       else
          callback(false, "Error executing docker ps: " .. result.stderr)
       end
-   end):wait()
+   end)
+
+   return job
 end
 
 
@@ -84,7 +89,7 @@ function utils.verify_dependencies()
             vim.print(message)
             settings.docker.enabled = false
          end
-      end)
+      end):wait()
    end
 
    utils.is_pytest_django_available(function(pytest_available, _)

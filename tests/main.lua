@@ -1,10 +1,48 @@
+---@diagnostic disable: undefined-field, duplicate-set-field
 local core = require 'pytest.core'
+local async = require 'plenary.async'
 
+---@class Mock
+---@field func string
+---@field calls table
+---@field return_values table
 
-local fake_expand = function(return_value)
-   ---@diagnostic disable-next-line: duplicate-set-field
-   vim.fn.expand = function()
-      return return_value
+---Wrap a test function to mock functions
+---@param mocks Mock[]
+---@param test function
+local test_wrapper = function(mocks, test)
+   for _, mock in ipairs(mocks) do
+      mock.calls = mock.calls or {}
+
+      local modules = vim.split(mock.func, '%.')
+
+      Mock_func = function(...)
+         table.insert(mock.calls, { ... })
+         if #mock.return_values == 0 then
+            return nil
+         end
+
+         return table.remove(mock.return_values, 1)
+      end
+
+      if #modules > 1 then
+         local var = '_G["' .. vim.fn.join(modules, '"]["') .. '"]'
+
+         local chunk = loadstring(var .. ' = Mock_func')
+
+         if chunk then
+            chunk()
+         end
+      else
+         _G[mock.func] = Mock_func
+      end
+   end
+
+   test()
+
+   for _, mock in ipairs(mocks) do
+      mock.calls = {}
+      mock.return_values = {}
    end
 end
 
@@ -14,17 +52,28 @@ describe("Get failed details", function()
 
    it("should return the failed details", function()
       core.status.filename = nil
-      fake_expand('test_views.py')
 
-      local error = core._get_error_detail({
-         'E   AssertionError: assert 1 == 2',
-         '',
-         'apps/core/tests/test_views.py:10: AssertionError'
+      local mocks = {
+         {
+            func = 'vim.fn.expand',
+            calls = {},
+            return_values = {
+               'test_views.py'
+            }
+         }
       }
-      , 1)
 
-      assert.is.equal(9, error.line)
-      assert.is.equal('AssertionError: assert 1 == 2', error.error)
+      test_wrapper(mocks, function()
+         local error = core._get_error_detail({
+            'E   AssertionError: assert 1 == 2',
+            '',
+            'apps/core/tests/test_views.py:10: AssertionError'
+         }
+         , 1)
+
+         assert.is.equal(9, error.line)
+         assert.is.equal('AssertionError: assert 1 == 2', error.error)
+      end)
    end)
 
    it("Get details in app exception", function()
@@ -115,12 +164,21 @@ describe("Get failed details", function()
          'ZeroDivisionError: division by zero',
       }
 
-      core.status.filename = nil
-      fake_expand('test_middlewares.py')
+      local mocks = {
+         {
+            func = 'vim.fn.expand',
+            calls = {},
+            return_values = { 'test_middlewares.py' }
+         }
+      }
 
-      local error = core._get_error_detail(error_message, 1)
-      assert.is.equal(73, error.line)
-      assert.is.equal('ZeroDivisionError: division by zero', error.error)
+      core.status.filename = nil
+
+      test_wrapper(mocks, function()
+         local error = core._get_error_detail(error_message, 1)
+         assert.is.equal(73, error.line)
+         assert.is.equal('ZeroDivisionError: division by zero', error.error)
+      end)
    end)
 
    it('Execution error message on test', function()
@@ -192,16 +250,42 @@ describe("Get failed details", function()
          '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
       }
 
+      local mocks = {
+         {
+            func = 'vim.fn.expand',
+            calls = {},
+            return_values = { 'test_memory_profiler.py' }
+         },
+      }
+
       core.status.filename = nil
-      fake_expand('test_memory_profiler.py')
+      test_wrapper(mocks, function()
+         local error = core._get_error_detail(error_message, 1)
 
-      local error = core._get_error_detail(error_message, 1)
-
-      assert.is.equal(0, error.line)
-      assert.is.equal('ModuleNotFoundError: No module named "psutil"', error.error)
+         assert.is.equal(-1, error.line)
+         assert.is.equal('ModuleNotFoundError: No module named "psutil"', error.error)
+      end)
    end
    )
 
    vim.fn.expand = expand
+
+   -- tests/my_plugin_spec.lua
+   async.tests.describe("Test function", function()
+      local calls = {}
+
+      async.tests.it("should call the function", function()
+         test_wrapper({
+            {
+               func = 'vim.notify',
+               calls = calls,
+               return_values = {}
+            }
+         }, function()
+               core.test_file()
+         end)
+         assert.are.same({ { 'Test passed' } }, calls)
+      end)
+   end)
 end)
 

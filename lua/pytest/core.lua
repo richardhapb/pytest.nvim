@@ -20,7 +20,7 @@ core.status = {
 ---@param index number
 ---@return table
 function core._get_error_detail(stdout, index)
-   local detail = { line = 0, error = '' }
+   local detail = { line = -1, error = '' }
 
    if not core.status.filename then
       core.status.filename = vim.fn.expand('%:t')
@@ -38,7 +38,7 @@ function core._get_error_detail(stdout, index)
       end
 
       local linenr = line:match(core.status.filename:gsub('%.', '%%.') .. ':(%d+)')
-      if linenr and detail.line == 0 then
+      if linenr and detail.line == -1 then
          if count == index then
             detail.line = tonumber(linenr) - 1
          end
@@ -51,7 +51,6 @@ function core._get_error_detail(stdout, index)
 
    return detail
 end
-
 
 ---Get the lines of test functions for the current file
 ---@param stdout string[]
@@ -118,14 +117,16 @@ core.test_file = function()
    core.status.filename = vim.fn.expand('%:t')
 
    if settings.docker.enabled then
-      local docker_path = settings.docker.docker_path
-      local relative_file = current_file:match(current_dir .. '/(.*)')
-      local docker_file_path = docker_path .. '/' .. relative_file
-      local container = settings.docker.container
+      utils.is_container_running(function()
+         local docker_path = settings.docker.docker_path
+         local relative_file = current_file:match(current_dir .. '/(.*)')
+         local docker_file_path = docker_path .. '/' .. relative_file
+         local container = settings.docker.container
 
-      docker_command = { 'docker', 'exec', container }
+         docker_command = { 'docker', 'exec', container }
 
-      current_file = docker_file_path
+         current_file = docker_file_path
+      end):wait()
    end
 
    local command = utils.list_extend(docker_command, { 'pytest', '-v', current_file })
