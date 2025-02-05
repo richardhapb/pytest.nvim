@@ -268,24 +268,68 @@ describe("Get failed details", function()
    end
    )
 
+   it('Execution error message with description', function()
+      local error_message = {
+         '__________________________________ TestProfileViews.test_profile_view ___________________________________',
+         '',
+         'self = <apps.users.tests.test_profile_views.TestProfileViews testMethod=test_profile_view>',
+         '',
+         '    def test_profile_view(self):',
+         '        response = self.client.get("/profiles")',
+         '        self.assertEqual(response.status_code, 301)',
+         '>       self.assertTemplateUsed(response, "apps/users/profiles/profiles.html")',
+         '',
+         'apps/users/tests/test_profile_views.py:16:',
+         '_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _',
+         '/usr/local/lib/python3.12/site-packages/django/test/testcases.py:712: in assertTemplateUsed',
+         '    self._assert_template_used(template_name, template_names, msg_prefix, count)',
+         '/usr/local/lib/python3.12/site-packages/django/test/testcases.py:677: in _assert_template_used',
+         '    self.assertTrue(',
+         'E   AssertionError: False is not true : Template "apps/users/profiles/profiles.html" was not a template used to render the response. Actual template(s) used: errors/404.html, base/base_public.html, base/head.html, base/bottom_sources.html, base/bottom_sources.html',
+         '----------------------------------------- Captured stderr setup -----------------------------------------',
+         'Using existing test database for alias "default" ("test_dirtystroke_dev")...',
+         '----------------------------------------- Captured stderr call ------------------------------------------',
+         '------------------------------------------- Captured log call -------------------------------------------',
+         '======================================== short test summary info ========================================',
+         'FAILED apps/users/tests/test_profile_views.py::TestProfileViews::test_profile_view - AssertionError: False is not true : Template "apps/users/profiles/profiles.html" was not a template used to render the response. Actual template(s) used: errors/404.html, base/base_public.html, base/head.html, base/bottom_sources.html, base/bottom_sources.html',
+         '=========================================== 1 failed in 4.85s ===========================================',
+      }
+
+      local mocks = {
+         {
+            func = 'vim.fn.expand',
+            calls = {},
+            return_values = { 'test_profile_views.py' }
+         },
+      }
+
+      core.status.filename = nil
+      test_wrapper(mocks, function()
+         local error = core._get_error_detail(error_message, 1)
+
+         assert.is.equal(15, error.line)
+         assert.is.equal('AssertionError: False is not true : Template "apps/users/profiles/profiles.html" was not a template used to render the response. Actual template(s) used: errors/404.html, base/base_public.html, base/head.html, base/bottom_sources.html, base/bottom_sources.html', error.error)
+      end)
+   end
+   )
+
    vim.fn.expand = expand
 
    -- tests/my_plugin_spec.lua
-   async.tests.describe("Test function", function()
-      local calls = {}
-
-      async.tests.it("should call the function", function()
-         test_wrapper({
-            {
-               func = 'vim.notify',
-               calls = calls,
-               return_values = {}
-            }
-         }, function()
-               core.test_file()
-         end)
-         assert.are.same({ { 'Test passed' } }, calls)
-      end)
-   end)
+   -- async.tests.describe("Test function", function()
+   --    local calls = {}
+   --
+   --    async.tests.it("should call the function", function()
+   --       test_wrapper({
+   --          {
+   --             func = 'vim.notify',
+   --             calls = calls,
+   --             return_values = {}
+   --          }
+   --       }, function()
+   --          core.test_file()
+   --       end)
+   --       assert.are.same({ { 'Test passed' } }, calls)
+   --    end)
+   -- end)
 end)
-

@@ -119,7 +119,7 @@ core.test_file = function()
    if settings.docker.enabled then
       utils.is_container_running(function()
          local docker_path = settings.docker.docker_path
-         local relative_file = current_file:match(current_dir .. '/(.*)')
+         local relative_file = current_file:match(current_dir .. '/app/(.*)')
          local docker_file_path = docker_path .. '/' .. relative_file
          local container = settings.docker.container
 
