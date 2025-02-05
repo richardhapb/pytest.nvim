@@ -274,6 +274,7 @@ describe("Get failed details", function()
          '',
          'self = <apps.users.tests.test_profile_views.TestProfileViews testMethod=test_profile_view>',
          '',
+         '    CONSTANT_WITH_E    This is a fake error that not should be captured',
          '    def test_profile_view(self):',
          '        response = self.client.get("/profiles")',
          '        self.assertEqual(response.status_code, 301)',

@@ -28,7 +28,7 @@ function core._get_error_detail(stdout, index)
 
    local count = 1
    for _, line in ipairs(stdout) do
-      local error = line:match('E%s+(.*)')
+      local error = line:match('^E%s+(.*)')
       if error and detail.error == '' then
          if count == index then
             detail.error = error
@@ -104,10 +104,9 @@ end
 ---Main function to run the tests for the current file
 core.test_file = function()
    if core.status.working then
-      vim.notify('Tests are already running', vim.log.levels.INFO)
+      vim.print('Tests are already running')
       return
    end
-   local current_dir = vim.fn.getcwd()
    local current_file = vim.fn.expand('%:p')
 
    local bufnr = vim.api.nvim_get_current_buf()
@@ -117,9 +116,30 @@ core.test_file = function()
    core.status.filename = vim.fn.expand('%:t')
 
    if settings.docker.enabled then
-      utils.is_container_running(function()
-         local docker_path = settings.docker.docker_path
-         local relative_file = current_file:match(current_dir .. '/app/(.*)')
+      local docker_compose_path = utils.find_docker_compose()
+      local docker_path = settings.docker.docker_path or ''
+
+      utils.is_container_running(function(running, message)
+         if not running then
+            vim.print(message)
+            return
+         end
+         if settings.docker.enable_docker_compose then
+            local volume = utils.get_docker_compose_volume(docker_compose_path)
+            if volume == '' then
+               vim.print('Docker compose / volume not found')
+               return
+            end
+            settings.docker.docker_path = volume
+            docker_path = volume
+         end
+
+         local path_prefix = settings.docker.docker_path_prefix
+         if path_prefix and path_prefix ~= '' then
+            path_prefix = '/' .. path_prefix
+         end
+
+         local relative_file = current_file:match(docker_compose_path .. path_prefix .. '/(.*)')
          local docker_file_path = docker_path .. '/' .. relative_file
          local container = settings.docker.container
 
@@ -127,7 +147,12 @@ core.test_file = function()
 
          current_file = docker_file_path
       end):wait()
+
+      if #docker_command == 0 then
+         return
+      end
    end
+
 
    local command = utils.list_extend(docker_command, { 'pytest', '-v', current_file })
 
@@ -150,7 +175,7 @@ core.test_file = function()
                core.status.last_stdout = stdout
             end
          end,
-         on_exit = function(_, _)
+         on_exit = function(_, exit_code)
             local failed = {}
             local i = 1
             for _, line in ipairs(core.status.lines) do
@@ -174,7 +199,7 @@ core.test_file = function()
                end
             end
 
-            local message = #failed > 0 and 'Tests failed' or 'Tests passed'
+            local message = exit_code == 0 and 'Tests passed 👌' or 'Tests failed 😢'
             vim.notify(message, vim.log.levels.INFO)
             vim.diagnostic.set(ns, bufnr, failed, {})
 
@@ -195,4 +220,3 @@ core.show_last_stdout = function()
 end
 
 return core
-
