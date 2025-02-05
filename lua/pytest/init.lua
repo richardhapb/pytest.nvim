@@ -17,6 +17,7 @@ M.test_file = core.test_file
 
 
 local group = vim.api.nvim_create_augroup('DjangoTest', { clear = true })
+local attach_id = nil
 
 vim.api.nvim_create_autocmd('FileType', {
    group = group,
@@ -39,6 +40,29 @@ vim.api.nvim_create_autocmd('FileType', {
       end, {
          nargs = 0,
       })
+
+      vim.api.nvim_buf_create_user_command(bufnr, 'DjangoAttach', function()
+         local file = vim.fn.expand('%:p')
+         attach_id = vim.api.nvim_create_autocmd('BufWritePost', {
+            group = group,
+            pattern = "*.py",
+            callback = function()
+               core.test_file(file)
+            end,
+         })
+      end, {
+         nargs = 0,
+      })
+
+      vim.api.nvim_buf_create_user_command(bufnr, 'DjangoUnattach', function()
+         if attach_id then
+            vim.api.nvim_del_autocmd(attach_id)
+            attach_id = nil
+         end
+      end, {
+         nargs = 0,
+      })
+
 
       vim.keymap.set('n', '<leader>T', '<CMD>DjangoTest<CR>', { buffer = bufnr, desc = 'Run Django tests' })
    end

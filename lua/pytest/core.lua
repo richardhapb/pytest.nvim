@@ -83,13 +83,16 @@ local function get_tests_lines(stdout, bufnr)
 
    for _, test in ipairs(tests) do
       local function_name, stat = test:match('.*%.py::.*::(.-)%s+(.*)%s+%[')
+      if not function_name then
+         function_name, stat = test:match('.*%.py::.*::(.-)%s+(.*)%s+%[?')
+      end
 
       if function_name then
          for id, node in parsed_query:iter_captures(root, bufnr, 0, -1) do
             local capture_name = parsed_query.captures[id]
             if capture_name == 'function' then
                local range = { node:range() }
-               local line = vim.fn.getline(range[1] + 1)
+               local line = vim.api.nvim_buf_get_lines(bufnr, range[1], range[1] + 1, false)[1]
                if line:match(function_name) then
                   table.insert(lines, { [range[1]] = string.lower(stat) })
                end
@@ -102,18 +105,19 @@ end
 
 
 ---Main function to run the tests for the current file
-core.test_file = function()
+---Test file with pytest
+---@param file? string
+core.test_file = function(file)
    if core.status.working then
       vim.print('Tests are already running')
       return
    end
-   local current_file = vim.fn.expand('%:p')
-
-   local bufnr = vim.api.nvim_get_current_buf()
+   local current_file = file or vim.fn.expand('%:p')
+   local bufnr = utils.get_buffer_from_filepath(current_file) or vim.api.nvim_get_current_buf()
 
    local docker_command = {}
 
-   core.status.filename = vim.fn.expand('%:t')
+   core.status.filename = current_file:match("[^/]+$")
 
    if settings.docker.enabled then
       local docker_compose_path = utils.find_docker_compose()
@@ -181,7 +185,7 @@ core.test_file = function()
             for _, line in ipairs(core.status.lines) do
                local _, outcome = next(line)
 
-               if outcome == 'failed' then
+               if outcome then
                   local error = core._get_error_detail(core.status.last_stdout, i)
 
                   table.insert(failed, {

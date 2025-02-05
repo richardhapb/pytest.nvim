@@ -309,13 +309,130 @@ describe("Get failed details", function()
          local error = core._get_error_detail(error_message, 1)
 
          assert.is.equal(15, error.line)
-         assert.is.equal('AssertionError: False is not true : Template "apps/users/profiles/profiles.html" was not a template used to render the response. Actual template(s) used: errors/404.html, base/base_public.html, base/head.html, base/bottom_sources.html, base/bottom_sources.html', error.error)
+         assert.is.equal(
+         'AssertionError: False is not true : Template "apps/users/profiles/profiles.html" was not a template used to render the response. Actual template(s) used: errors/404.html, base/base_public.html, base/head.html, base/bottom_sources.html, base/bottom_sources.html',
+            error.error)
       end)
-   end
-   )
+   end)
+
+   it('Execution error message with two outputs', function()
+      local error_message = {
+         '============================= test session starts ==============================',
+         'platform linux -- Python 3.12.4, pytest-8.3.4, pluggy-1.5.0 -- /usr/local/bin/python',
+         'cachedir: .pytest_cache',
+         'django: version: 5.0.6, settings: dirtystroke.settings (from env)',
+         'rootdir: /usr/src/app',
+         'configfile: pyproject.toml',
+         'plugins: django-4.9.0',
+         'collecting ... collected 1 item',
+         '',
+         'apps/users/tests/test_profile_views.py::TestProfileViews::test_get_profiles_sorting_with_filter_mixed FAILED',
+         '',
+         '=================================== FAILURES ===================================',
+         '_________ TestProfileViews.test_get_profiles_sorting_with_filter_mixed _________',
+         '',
+         'self = <apps.users.tests.test_profile_views.TestProfileViews testMethod=test_get_profiles_sorting_with_filter_mixed>',
+         'mock_get_online_profiles_ids = <MagicMock name="get_online_profiles_ids" id="133463546688432">',
+         '',
+         '    @patch("users.views.profile_viewing.Profile.get_online_profiles_ids")',
+         '    def test_get_profiles_sorting_with_filter_mixed(self, mock_get_online_profiles_ids: MagicMock):',
+         '        """',
+         '        Test the order and filtering of profiles, including valid values and next page detection',
+         '    ',
+         '        Consider the following behaviors:',
+         '    ',
+         '        - The order of profiles should follow the preset order in get_profiles_display_group_settings',
+         '        - The filtering of profiles should adhere to the filters in get_profiles_display_group_settings',
+         '        - The profile list should contain only Profile instances, excluding None',
+         '        - The has_more_profiles should be True as there are more profiles to display in this test',
+         '        - The next_page should be an integer as there are more profiles to display in this test',
+         '        """',
+         '        # Mock for testing online profiles',
+         '        mock_get_online_profiles_ids.return_value = [103, 90, 125, 71, 100]',
+         '    ',
+         '        page = 1',
+         '        has_more_profiles = True',
+         '        request = MagicMock()',
+         '        request.session = self.client.session',
+         '        profiles_view = profile_viewing.ProfilesView()',
+         '    ',
+         '        matches = Profile.matches.find_matches_for_profile(',
+         '            profile=self.profile,',
+         '            is_guest_user=False',
+         '        ).annotate(',
+         '            distance=Distance("location", self.profile.location)',
+         '        ).order_by("distance")',
+         '    ',
+         '        excluded_profiles = []',
+         '        while page is not None:',
+         '            profiles_list, has_more_profiles, page = profiles_view.get_profiles_sorting_with_filter_mixed(',
+         '                request, matches, page',
+         '            )',
+         '    ',
+         '            # Verify each groups positions contain correct profiles',
+         '            for profiles_display_group_key, settings in (profiles_view.get_profiles_display_group_settings(matches)).items():',
+         '                filters = settings["filters"]',
+         '                order_by_fields = settings["order_by_fields"]',
+         '    ',
+         '                filtered_profiles = (',
+         '                     matches',
+         '                    .filter(**filters)',
+         '                    .exclude(id__in=excluded_profiles)',
+         '                    .order_by(*order_by_fields)',
+         '                    .distinct()',
+         '                )',
+         '    ',
+         '                filtered_profiles_list = list(filtered_profiles)',
+         '                total_positions_out_of_range = len([position for position in settings["positions"] if position >= len(profiles_list)])',
+         '                total_positions_to_extract = min(len(settings["positions"]) - total_positions_out_of_range, len(filtered_profiles_list), len(profiles_list))',
+         '    ',
+         '                filtered_profiles_ids = [profile.id for profile in filtered_profiles_list]',
+         '    ',
+         '                for position, filtered_profile in zip(',
+         '                    settings["positions"][:total_positions_to_extract],',
+         '                    filtered_profiles_list[:total_positions_to_extract],',
+         '                    strict=True',
+         '                ):',
+         '    ',
+         '                    self.assertIn(',
+         '                        profiles_list[position],',
+         '                        filtered_profiles_list,',
+         '                        f"Profile at position {position} should belong to group {profiles_display_group_key}"',
+         '                    )',
+         '    ',
+         '>                   self.assertEqual(',
+         '                        profiles_list[position], filtered_profile,',
+         '                        f"Profile at position {position} should be the same to than filtered profiles in group {profiles_display_group_key}"',
+         '                    )',
+         'E                   AssertionError: <Profile: Profile_366> != <Profile: Profile_438> : Profile at position 0 should be the same to than filtered profiles in group profiles_view_new_with_photo',
+         '',
+         'apps/users/tests/test_profile_views.py:103: AssertionError',
+         '=========================== short test summary info ============================',
+         'FAILED apps/users/tests/test_profile_views.py::TestProfileViews::test_get_profiles_sorting_with_filter_mixed - AssertionError: <Profile: Profile_366> != <Profile: Profile_438> : Profile at position 0 should be the same to than filtered profiles in group profiles_view_new_with_photo',
+         '============================== 1 failed in 1.61s ===============================',
+
+      }
+
+      local mocks = {
+         {
+            func = 'vim.fn.expand',
+            calls = {},
+            return_values = { 'test_profile_views.py' }
+         },
+      }
+
+      core.status.filename = nil
+      test_wrapper(mocks, function()
+         local error = core._get_error_detail(error_message, 1)
+
+         assert.is.equal(102, error.line)
+         assert.is.equal(
+         'AssertionError: <Profile: Profile_366> != <Profile: Profile_438> : Profile at position 0 should be the same to than filtered profiles in group profiles_view_new_with_photo',
+            error.error)
+      end)
+   end)
 
    vim.fn.expand = expand
-
    -- tests/my_plugin_spec.lua
    -- async.tests.describe("Test function", function()
    --    local calls = {}

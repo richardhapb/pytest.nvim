@@ -236,4 +236,15 @@ function utils.get_docker_compose_volume(path)
    return volume
 end
 
+---Get the buffer from the filepath
+---@param filepath string
+---@return nil | number
+function utils.get_buffer_from_filepath(filepath)
+   local buffer = vim.fn.bufnr(filepath, true)
+   if buffer == -1 then
+      return nil
+   end
+   return buffer
+end
+
 return utils
