@@ -38,7 +38,7 @@ function core._get_error_detail(stdout, index)
       end
 
       local linenr = line:match(core.status.filename:gsub('%.', '%%.') .. ':(%d+)')
-      if linenr and detail.line == -1 then
+      if linenr and detail.line == -1 and detail.error ~= '' then
          if count == index then
             detail.line = tonumber(linenr) - 1
          end
@@ -82,19 +82,29 @@ local function get_tests_lines(stdout, bufnr)
    local lines = {}
 
    for _, test in ipairs(tests) do
-      local function_name, stat = test:match('.*%.py::.*::(.-)%s+(.*)%s+%[')
+      local class_name, function_name, stat = test:match('.*%.py::(.*)::(.-)%s+(.*)%s+%[')
       if not function_name then
-         function_name, stat = test:match('.*%.py::.*::(.-)%s+(.*)%s+%[?')
+         class_name, function_name, stat = test:match('.*%.py::(.*)::(.-)%s+(.*)%s+%[?')
       end
 
+      local active_class = ''
       if function_name then
          for id, node in parsed_query:iter_captures(root, bufnr, 0, -1) do
             local capture_name = parsed_query.captures[id]
+            if capture_name == 'class' then
+               local range = { node:range() }
+               local line = vim.api.nvim_buf_get_lines(bufnr, range[1], range[1] + 1, false)[1]
+               if line:match(class_name) then
+                  active_class = class_name
+               end
+            end
+
             if capture_name == 'function' then
                local range = { node:range() }
                local line = vim.api.nvim_buf_get_lines(bufnr, range[1], range[1] + 1, false)[1]
-               if line:match(function_name) then
+               if line:match(function_name) and active_class == class_name then
                   table.insert(lines, { [range[1]] = string.lower(stat) })
+                  active_class = ''
                end
             end
          end
@@ -173,7 +183,8 @@ core.test_file = function(file)
                core.status.lines = get_tests_lines(stdout, bufnr)
                for _, line in ipairs(core.status.lines) do
                   local lineno, stat = next(line)
-                  local text = stat == 'passed' and '\t✅' or '\t❌'
+                  local text = stat == 'passed' and '\t✅' or ''
+                  text = stat == 'failed' and '\t❌' or text
                   vim.api.nvim_buf_set_extmark(bufnr, ns, lineno, 0, { virt_text = { { text } } })
                end
                core.status.last_stdout = stdout
@@ -185,7 +196,7 @@ core.test_file = function(file)
             for _, line in ipairs(core.status.lines) do
                local _, outcome = next(line)
 
-               if outcome then
+               if outcome == 'failed' then
                   local error = core._get_error_detail(core.status.last_stdout, i)
 
                   table.insert(failed, {
