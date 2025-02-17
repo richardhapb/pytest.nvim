@@ -198,11 +198,23 @@ core.test_file = function(file)
 
                if outcome == 'failed' then
                   local error = core._get_error_detail(core.status.last_stdout, i)
+                  local ok, col = pcall(vim.api.nvim_buf_get_lines, bufnr, error.line, error.line + 1, false)
+
+                  -- TODO: Obtain range with treesitter
+                  if ok then
+                     error.col = string.find(col[1], '[^%s]+') - 1
+                     error.end_col = string.len(col[1])
+                  else
+                     error.col = 0
+                     error.end_col = 0
+                  end
 
                   table.insert(failed, {
                      bufnr = bufnr,
                      lnum = error.line,
-                     col = 0,
+                     end_lnum = error.line,
+                     col = error.col,
+                     end_col = error.end_col,
                      text = 'Test failed',
                      severity = vim.diagnostic.severity.ERROR,
                      message = 'Test failed\n' .. error.error,
