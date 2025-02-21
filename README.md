@@ -1,6 +1,8 @@
 
 # Pytest.nvim
 
+<img width="885" alt="image" src="https://github.com/user-attachments/assets/4405219d-1c18-4086-9f84-a47dd60c67c5" />
+
 ## About the project
 
 Testing integrated in neovim with pytest. Include Docker support. This project is in progress, I will be adding more features in the future and I open to contributions.
