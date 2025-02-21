@@ -54,7 +54,7 @@ vim.api.nvim_create_autocmd('FileType', {
          nargs = 0,
       })
 
-      vim.api.nvim_buf_create_user_command(bufnr, 'PytestUnattach', function()
+      vim.api.nvim_buf_create_user_command(bufnr, 'PytestDetach', function()
          if attach_id then
             vim.api.nvim_del_autocmd(attach_id)
             attach_id = nil
