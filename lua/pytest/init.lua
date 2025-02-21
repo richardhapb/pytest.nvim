@@ -16,7 +16,7 @@ end
 M.test_file = core.test_file
 
 
-local group = vim.api.nvim_create_augroup('DjangoTest', { clear = true })
+local group = vim.api.nvim_create_augroup('Pytest', { clear = true })
 local attach_id = nil
 
 vim.api.nvim_create_autocmd('FileType', {
@@ -25,13 +25,13 @@ vim.api.nvim_create_autocmd('FileType', {
    callback = function()
       local bufnr = vim.api.nvim_get_current_buf()
 
-      vim.api.nvim_buf_create_user_command(bufnr, 'DjangoTest', function()
+      vim.api.nvim_buf_create_user_command(bufnr, 'Pytest', function()
          core.test_file()
       end, {
          nargs = 0,
       })
 
-      vim.api.nvim_buf_create_user_command(bufnr, 'DjangoTestOutput', function()
+      vim.api.nvim_buf_create_user_command(bufnr, 'PytestOutput', function()
          if core.status.last_stdout then
             core.show_last_stdout()
          else
@@ -41,7 +41,7 @@ vim.api.nvim_create_autocmd('FileType', {
          nargs = 0,
       })
 
-      vim.api.nvim_buf_create_user_command(bufnr, 'DjangoAttach', function()
+      vim.api.nvim_buf_create_user_command(bufnr, 'PytestAttach', function()
          local file = vim.fn.expand('%:p')
          attach_id = vim.api.nvim_create_autocmd('BufWritePost', {
             group = group,
@@ -54,7 +54,7 @@ vim.api.nvim_create_autocmd('FileType', {
          nargs = 0,
       })
 
-      vim.api.nvim_buf_create_user_command(bufnr, 'DjangoUnattach', function()
+      vim.api.nvim_buf_create_user_command(bufnr, 'PytestUnattach', function()
          if attach_id then
             vim.api.nvim_del_autocmd(attach_id)
             attach_id = nil
@@ -64,9 +64,8 @@ vim.api.nvim_create_autocmd('FileType', {
       })
 
 
-      vim.keymap.set('n', '<leader>T', '<CMD>DjangoTest<CR>', { buffer = bufnr, desc = 'Run Django tests' })
+      vim.keymap.set('n', '<leader>T', '<CMD>Pytest<CR>', { buffer = bufnr, desc = 'Run Pytest' })
    end
 })
 
 return M
-

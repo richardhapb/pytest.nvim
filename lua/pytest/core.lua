@@ -183,6 +183,9 @@ core.test_file = function(file)
                core.status.lines = get_tests_lines(stdout, bufnr)
                for _, line in ipairs(core.status.lines) do
                   local lineno, stat = next(line)
+                  if not lineno then
+                     return
+                  end
                   local text = stat == 'passed' and '\t✅' or ''
                   text = stat == 'failed' and '\t❌' or text
                   vim.api.nvim_buf_set_extmark(bufnr, ns, lineno, 0, { virt_text = { { text } } })
@@ -194,19 +197,24 @@ core.test_file = function(file)
             local failed = {}
             local i = 1
             for _, line in ipairs(core.status.lines) do
-               local _, outcome = next(line)
+               local lineno, outcome = next(line)
 
                if outcome == 'failed' then
                   local error = core._get_error_detail(core.status.last_stdout, i)
                   local ok, col = pcall(vim.api.nvim_buf_get_lines, bufnr, error.line, error.line + 1, false)
 
                   -- TODO: Obtain range with treesitter
-                  if ok then
+                  if ok and #col > 0 then
+                     vim.print(col)
                      error.col = string.find(col[1], '[^%s]+') - 1
                      error.end_col = string.len(col[1])
                   else
                      error.col = 0
                      error.end_col = 0
+                  end
+
+                  if error.line == -1 then
+                     error.line = lineno
                   end
 
                   table.insert(failed, {
