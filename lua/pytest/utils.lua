@@ -1,5 +1,3 @@
-local settings = require('pytest.config').settings
-
 local utils = {}
 
 
@@ -22,6 +20,7 @@ end
 ---@param callback function
 function utils.is_pytest_django_available(callback)
    local docker_command = {}
+   local settings = require('pytest.config').get()
    if settings.docker.enabled then
       docker_command = { "docker", "exec", settings.docker.container }
    end
@@ -53,6 +52,7 @@ end
 ---Verify if the container is running according to the settings
 ---@param callback function
 function utils.is_container_running(callback)
+   local settings = require('pytest.config').get()
    local command = { "docker", "ps", "--format", "{{.Names}}" }
    local container = settings.docker.container
    local job = vim.system(command, { text = true }, function(result)
@@ -80,6 +80,7 @@ end
 
 ---Verify if the dependencies are available
 function utils.verify_dependencies()
+   local settings = require('pytest.config').get()
    if settings.docker.enabled then
       utils.is_container_running(function(container_runnings, message)
          if not container_runnings then
@@ -121,6 +122,7 @@ end
 function utils.find_docker_compose(path)
    local cwd = path or vim.fn.getcwd()
    local git_root = utils.get_git_root()
+   local settings = require('pytest.config').get()
    local docker_compose_name = settings.docker.compose_file_name or 'docker-compose.yml'
 
    for _, dir in ipairs({ cwd, git_root }) do
@@ -139,6 +141,7 @@ end
 ---@return number
 function utils.get_docker_compose_service_line(path)
    local docker_compose_path = ''
+   local settings = require('pytest.config').get()
 
    if not path or path == '' then
       docker_compose_path = utils.find_docker_compose()
@@ -181,6 +184,7 @@ end
 ---@return string
 function utils.get_docker_compose_volume(path)
    local docker_compose_path = ''
+   local settings = require('pytest.config').get()
 
    if not path or path == '' then
       docker_compose_path = utils.find_docker_compose()

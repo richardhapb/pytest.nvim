@@ -12,5 +12,14 @@ config.settings = {
    },
 }
 
+config.update = function(opts)
+   opts = opts or {}
+   config.settings = vim.tbl_deep_extend('force', config.settings, opts)
+end
+
+config.get = function()
+   return config.settings
+end
+
 return config
 

@@ -1,11 +1,10 @@
 local config = require('pytest.config')
 local utils = require('pytest.utils')
 
-local settings = config.settings
 
 local core = {}
 
-local ns = vim.api.nvim_create_namespace('django_test')
+local ns = vim.api.nvim_create_namespace('pytest_test')
 core.status = {
    last_stdout = nil,
    lines = {},
@@ -13,7 +12,6 @@ core.status = {
    working = false,
    filename = nil
 }
-
 
 ---Get the line and error message of the failed test for the current file
 ---@param stdout string[]
@@ -122,6 +120,7 @@ core.test_file = function(file)
       vim.print('Tests are already running')
       return
    end
+   local settings = config.get()
    local current_file = file or vim.fn.expand('%:p')
    local bufnr = utils.get_buffer_from_filepath(current_file) or vim.api.nvim_get_current_buf()
 
@@ -253,5 +252,6 @@ core.show_last_stdout = function()
       vim.api.nvim_set_current_buf(bufnr)
    end
 end
+
 
 return core
