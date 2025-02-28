@@ -16,6 +16,14 @@ function utils.list_extend(list, extension)
    return new_list
 end
 
+function utils.scape_special_chars(str)
+   for _, char in ipairs({ '(', ')', '[', ']', '.', '*', '+', '-', '?', '^', '$' }) do
+      str = str:gsub('%' .. char, '%%' .. char)
+   end
+
+   return str
+end
+
 ---Verify if pytest-django is available in local or docker according to the settings
 ---@param callback function
 function utils.is_pytest_django_available(callback)

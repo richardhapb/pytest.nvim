@@ -152,7 +152,9 @@ core.test_file = function(file)
             path_prefix = '/' .. path_prefix
          end
 
-         local relative_file = current_file:match(docker_compose_path .. path_prefix .. '/(.*)')
+         local relative_file = current_file:match(utils.scape_special_chars(docker_compose_path) ..
+         utils.scape_special_chars(path_prefix) .. '/(.*)')
+
          local docker_file_path = docker_path .. '/' .. relative_file
          local container = settings.docker.container
 
