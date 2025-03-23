@@ -56,7 +56,7 @@ M.setup = function(opts)
          })
 
 
-         vim.keymap.set('n', '<leader>T', '<CMD>Pytest<CR>', { buffer = bufnr, desc = 'Run Pytest' })
+         M.settings.keymaps_callback(bufnr)
       end
    })
 end

@@ -11,6 +11,7 @@ local config = {}
 
 ---@class PytestConfig
 ---@field docker DockerConfig
+---@field keymaps_callback function function for set the keymaps
 
 ---Update the callbacks into a table
 ---@param opts table
@@ -36,6 +37,12 @@ config.settings = {
       docker_compose_file = 'docker-compose.yml',
       docker_compose_service = 'app',
    },
+
+   keymaps_callback = function(bufnr)
+      vim.keymap.set('n', '<leader>TT', '<CMD>Pytest<CR>', { buffer = bufnr, desc = 'Run Pytest' })
+      vim.keymap.set('n', '<leader>Ta', '<CMD>PytestAttach<CR>', { buffer = bufnr, desc = 'Attach Pytest to buffer' })
+      vim.keymap.set('n', '<leader>Td', '<CMD>PytestDetach<CR>', { buffer = bufnr, desc = 'Detach Pytest' })
+   end
 }
 
 ---Update config
@@ -57,4 +64,3 @@ config.get = function()
 end
 
 return config
-

@@ -80,6 +80,17 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
 
 The default keybinding that runs `:Pytest` is `<leader>T`.
 
+## Defaults
+
+The plugin provides the following default keymap:
+
+- `<leader>TT` - Run pytest for the current file (normal mode)
+- `<leader>Ta` - Attach pytest to the current buffer (normal mode)
+- `<leader>Td` - Detach pytest from the current buffer (normal mode)
+
+
+---
+
 Default settings, is not necessary to set up, but you can change the settings in your configuration file.
 
 ```lua
@@ -93,6 +104,14 @@ require 'pytest'.setup {
       docker_compose_service = 'app',  -- This is for looking for the docker path in docker compose
       enable_docker_compose = true,  -- Enable docker compose support
    },
+
+   -- You can overwrite this callback with your custom keymaps,
+   -- this is called when open a Python file and buffer number is passed as an argument
+   keymaps_callback = function(bufnr)
+      vim.keymap.set('n', '<leader>TT', '<CMD>Pytest<CR>', { buffer = bufnr, desc = 'Run Pytest' })
+      vim.keymap.set('n', '<leader>Ta', '<CMD>PytestAttach<CR>', { buffer = bufnr, desc = 'Attach Pytest to buffer' })
+      vim.keymap.set('n', '<leader>Td', '<CMD>PytestDetach<CR>', { buffer = bufnr, desc = 'Detach Pytest' })
+   end
 }
 ```
 
