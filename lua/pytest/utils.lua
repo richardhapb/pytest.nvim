@@ -215,7 +215,7 @@ function utils.get_docker_compose_volume(path)
       return volume
    end
 
-   local path_prefix = settings.docker.docker_path_prefix or ''
+   local path_prefix = settings.docker.local_path_prefix or ''
 
    if path_prefix and path_prefix ~= '' then
       path_prefix = '/' .. path_prefix

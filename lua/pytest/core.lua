@@ -115,11 +115,15 @@ end
 ---Main function to run the tests for the current file
 ---Test file with pytest
 ---@param file? string
-core.test_file = function(file)
+---@param opts? PytestConfig
+core.test_file = function(file, opts)
    if core.status.working then
       vim.print('Tests are already running')
       return
    end
+
+   config.update(opts)
+
    local settings = config.get()
    local current_file = file or vim.fn.expand('%:p')
    local bufnr = utils.get_buffer_from_filepath(current_file) or vim.api.nvim_get_current_buf()
@@ -147,7 +151,7 @@ core.test_file = function(file)
             docker_path = volume
          end
 
-         local path_prefix = settings.docker.docker_path_prefix
+         local path_prefix = settings.docker.local_path_prefix
          if path_prefix and path_prefix ~= '' then
             path_prefix = '/' .. path_prefix
          end

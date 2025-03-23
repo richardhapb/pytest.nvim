@@ -3,11 +3,9 @@ local core = require('pytest.core')
 
 local M = {}
 
-
 ---Main settings for pytest.nvim
----@param opts? table
+---@param opts? PytestConfig
 M.setup = function(opts)
-   config.update(opts)
    M.settings = config.get()
 
    local group = vim.api.nvim_create_augroup('Pytest', { clear = true })
@@ -20,7 +18,7 @@ M.setup = function(opts)
          local bufnr = vim.api.nvim_get_current_buf()
 
          vim.api.nvim_buf_create_user_command(bufnr, 'Pytest', function()
-            core.test_file()
+            core.test_file(nil, opts)
          end, {
             nargs = 0,
          })
@@ -41,7 +39,7 @@ M.setup = function(opts)
                group = group,
                pattern = "*.py",
                callback = function()
-                  core.test_file(file)
+                  core.test_file(file, opts)
                end,
             })
          end, {
