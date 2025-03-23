@@ -39,7 +39,7 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
     }
     ```
 
-   Plugged:
+   Vim-Plug:
 
     ```vim
     Plug 'richardhapb/pytest.nvim'
@@ -96,4 +96,19 @@ require 'pytest'.setup {
 }
 ```
 
+Options can be callbacks, for example:
+```lua
+require 'pytest'.setup {
+   docker = {
+      enabled = function()
+         return vim.fn.getcwd():match(".*/(.*)$") == "work"  -- Only enable docker if the last dir of cwd is "work"
+      end,
+
+      container = function()
+         local app = utils.get_my_awesome_app()
+         return app .. '-version-2'
+      end
+   },
+}
+```
 

@@ -1,11 +1,11 @@
 local config = {}
 
 ---@class DockerConfig
----@field enabled boolean Enable/disable looking for docker container to locate pytest
+---@field enabled boolean | function Enable/disable looking for docker container to locate pytest
 ---@field container string | function Container name or a callback for get it
 ---@field docker_path string | function Internal docker path or a callback for get it
 ---@field local_path_prefix string | function Prefix for matching in local environment from cwd, or a callback for get it
----@field enable_docker_compose boolean Enable/disable the docker compose usage for match the path
+---@field enable_docker_compose boolean | function Enable/disable the docker compose usage for match the path
 ---@field docker_compose_file string | function Docker compose name, for locating and match the docker path and local path prefix or a callback for get it
 ---@field docker_compose_service string | function Name of the service inside docker compose, for locating the path or a callback for get it
 
