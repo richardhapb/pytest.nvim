@@ -77,6 +77,16 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
         ```vim
         :PytestDetach
         ```
+    - Docker enable on the way
+      
+        ```vim
+        :PytestEnableDocker
+        ```
+    - Docker disabled on the way
+      
+        ```vim
+        :PytestDisableDocker
+        ```
 
 The default keybinding that runs `:Pytest` is `<leader>T`.
 

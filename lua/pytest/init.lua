@@ -6,6 +6,7 @@ local M = {}
 ---Main settings for pytest.nvim
 ---@param opts? PytestConfig
 M.setup = function(opts)
+   config.update(opts or {})
    M.settings = config.get()
 
    local group = vim.api.nvim_create_augroup('Pytest', { clear = true })
@@ -18,7 +19,7 @@ M.setup = function(opts)
          local bufnr = vim.api.nvim_get_current_buf()
 
          vim.api.nvim_buf_create_user_command(bufnr, 'Pytest', function()
-            core.test_file(nil, opts)
+            core.test_file()
          end, {
             nargs = 0,
          })
@@ -39,7 +40,7 @@ M.setup = function(opts)
                group = group,
                pattern = "*.py",
                callback = function()
-                  core.test_file(file, opts)
+                  core.test_file(file)
                end,
             })
          end, {
@@ -55,6 +56,17 @@ M.setup = function(opts)
             nargs = 0,
          })
 
+         vim.api.nvim_buf_create_user_command(bufnr, 'PytestEnableDocker', function()
+            config.update({ docker = { enabled = true } })
+         end, {
+            nargs = 0,
+         })
+
+         vim.api.nvim_buf_create_user_command(bufnr, 'PytestDisableDocker', function()
+            config.update({ docker = { enabled = false } })
+         end, {
+            nargs = 0,
+         })
 
          M.settings.keymaps_callback(bufnr)
       end
