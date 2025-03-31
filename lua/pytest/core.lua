@@ -55,11 +55,20 @@ end
 ---@param bufnr number
 ---@return table?
 local function get_tests_lines(stdout, bufnr)
+   -- TODO: Refactor this function
    local tests = {}
 
    for _, line in ipairs(stdout) do
       if line:match('.*%.py::.*::.*') then
          table.insert(tests, line)
+      end
+   end
+
+   if #tests == 0 then
+      for _, line in ipairs(stdout) do
+         if line:match('.*%.py::.*') then
+            table.insert(tests, line)
+         end
       end
    end
 
@@ -80,9 +89,14 @@ local function get_tests_lines(stdout, bufnr)
    local lines = {}
 
    for _, test in ipairs(tests) do
+      -- TODO: Extract this to a function
       local class_name, function_name, stat = test:match('.*%.py::(.*)::(.-)%s+(.*)%s+%[')
       if not function_name then
          class_name, function_name, stat = test:match('.*%.py::(.*)::(.-)%s+(.*)%s+%[?')
+         if not function_name then
+            function_name, stat = test:match('.*%.py::(.-)%s+([^%s]+)%s')
+            class_name = ''
+         end
       end
 
       local active_class = ''
@@ -157,7 +171,7 @@ core.test_file = function(file, opts)
          end
 
          local relative_file = current_file:match(utils.scape_special_chars(docker_compose_path) ..
-         utils.scape_special_chars(path_prefix) .. '/(.*)')
+            utils.scape_special_chars(path_prefix) .. '/(.*)')
 
          local docker_file_path = docker_path .. '/' .. relative_file
          local container = settings.docker.container
@@ -210,7 +224,6 @@ core.test_file = function(file, opts)
 
                   -- TODO: Obtain range with treesitter
                   if ok and #col > 0 then
-                     vim.print(col)
                      error.col = string.find(col[1], '[^%s]+') - 1
                      error.end_col = string.len(col[1])
                   else
