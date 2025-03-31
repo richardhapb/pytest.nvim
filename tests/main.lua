@@ -310,7 +310,7 @@ describe("Get failed details", function()
 
          assert.is.equal(15, error.line)
          assert.is.equal(
-         'AssertionError: False is not true : Template "apps/users/profiles/profiles.html" was not a template used to render the response. Actual template(s) used: errors/404.html, base/base_public.html, base/head.html, base/bottom_sources.html, base/bottom_sources.html',
+            'AssertionError: False is not true : Template "apps/users/profiles/profiles.html" was not a template used to render the response. Actual template(s) used: errors/404.html, base/base_public.html, base/head.html, base/bottom_sources.html, base/bottom_sources.html',
             error.error)
       end)
    end)
@@ -427,7 +427,82 @@ describe("Get failed details", function()
 
          assert.is.equal(102, error.line)
          assert.is.equal(
-         'AssertionError: <Profile: Profile_366> != <Profile: Profile_438> : Profile at position 0 should be the same to than filtered profiles in group profiles_view_new_with_photo',
+            'AssertionError: <Profile: Profile_366> != <Profile: Profile_438> : Profile at position 0 should be the same to than filtered profiles in group profiles_view_new_with_photo',
+            error.error)
+      end)
+   end)
+
+   it("Pytest without docker and Django", function()
+      local error_message = {
+         '============================= test session starts ==============================',
+         'platform darwin -- Python 3.12.4, pytest-8.3.5, pluggy-1.5.0 -- /Users/richard/proj/antof_traffic/client/.venv/bin/python',
+         'cachedir: .pytest_cache',
+         'rootdir: /Users/richard/proj/antof_traffic/client',
+         'configfile: pyproject.toml',
+         'plugins: dash-2.18.2',
+         'collecting ... collected 7 items',
+         '',
+         'tests/test_utils.py::test_get_data PASSED                                [ 14%]',
+         'tests/test_utils.py::test_get_data_multiple FAILED                       [ 28%]',
+         'tests/test_utils.py::test_update_timezone PASSED                         [ 42%]',
+         'tests/test_utils.py::test_separate_coords PASSED                         [ 57%]',
+         'tests/test_utils.py::test_freq_nearby PASSED                             [ 71%]',
+         'tests/test_utils.py::test_hourly_group SKIPPED (unconditional skip)      [ 85%]',
+         'tests/test_utils.py::test_daily_group SKIPPED (unconditional skip)       [100%]',
+         '',
+         '=================================== FAILURES ===================================',
+         '____________________________ test_get_data_multiple ____________________________',
+         '',
+         'mock_alerts = <MagicMock name="Alerts" id="4573593680">',
+         '',
+         '    @patch("utils.utils.Alerts")',
+         '    def test_get_data_multiple(mock_alerts: MagicMock):',
+         '        """',
+         '        Test multiple requests for data in a short period of time',
+         '    ',
+         '        Simulate behavior in the graph when multiple requests are made',
+         '        """',
+         '        now = datetime.datetime.now(pytz.UTC)',
+         '        since = int((now - datetime.timedelta(days=30)).timestamp()) * 1000',
+         '        until = int((now - datetime.timedelta(minutes=MINUTES_BETWEEN_UPDATES_FROM_API)).timestamp()) * 1000',
+         '    ',
+         '        mock_alerts.return_value = Alerts(generate_alerts_data())',
+         '    ',
+         '        calls_when_retrieve_last_instance = 1',
+         '    ',
+         '        for i in range(4):',
+         '            alerts = utils.get_data(since, until)',
+         '            assert isinstance(alerts, Alerts)',
+         '            assert not alerts.is_empty',
+         '            assert alerts.data.shape[0] > 0',
+         '            if i > 0:',
+         '>               assert mock_alerts.call_count == calls_when_retrieve_last_instance',
+         'E               AssertionError: assert 2 == 1',
+         'E                +  where 2 = <MagicMock name="Alerts" id="4573593680">.call_count',
+         '',
+         'tests/test_utils.py:125: AssertionError',
+         '=========================== short test summary info ============================',
+         'FAILED tests/test_utils.py::test_get_data_multiple - AssertionError: assert 2 == 1',
+         ' +  where 2 = <MagicMock name="Alerts" id="4573593680">.call_count',
+         '==================== 1 failed, 4 passed, 2 skipped in 1.40s ====================',
+
+      }
+
+      local mocks = {
+         {
+            func = 'vim.fn.expand',
+            calls = {},
+            return_values = { 'test_utils.py' }
+         },
+      }
+
+      core.status.filename = nil
+      test_wrapper(mocks, function()
+         local error = core._get_error_detail(error_message, 1)
+
+         assert.is.equal(124, error.line)
+         assert.is.equal(
+            'AssertionError: assert 2 == 1',
             error.error)
       end)
    end)
