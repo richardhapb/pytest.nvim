@@ -19,7 +19,7 @@ core.state = {
    current_bufnr = nil
 }
 
----Clear any results and reset status
+---Clear any results and reset state
 ---@param bufnr? number
 local function clear_state(bufnr)
    if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then
@@ -99,7 +99,7 @@ local function get_tests_lines(stdout, bufnr)
 
    local parser = vim.treesitter.get_parser(bufnr, "python")
    if not parser then
-      print("Parser not found")
+      utils.error("Parser not found")
       return
    end
    local tree = parser:parse()[1]
@@ -107,7 +107,7 @@ local function get_tests_lines(stdout, bufnr)
 
    local parsed_query = vim.treesitter.query.get("python", 'custom')
    if not parsed_query then
-      print("Query not found")
+      utils.error("Query not found")
       return
    end
 
@@ -200,9 +200,9 @@ end
 
 function core.run_test(command)
    -- Only update marks in current buffer
-   local bufnr = vim.api.nvim_get_current_buf()
+   local bufnr = core.state.current_bufnr or vim.api.nvim_get_current_buf()
 
-   vim.notify("Running tests...", vim.log.levels.INFO)
+   utils.info("Running tests...")
 
    core.state.job_id = vim.fn.jobstart(
       command, {
@@ -254,7 +254,7 @@ function core.run_test(command)
             end
 
             local message = exit_code == 0 and 'Tests passed 👌' or 'Tests failed 😢'
-            vim.notify(message, vim.log.levels.INFO)
+            utils.info(message)
             vim.diagnostic.set(ns, bufnr, failed, {})
             core.state.working = false
             core.state.job_id = nil
@@ -276,7 +276,7 @@ core.cancel_test = function()
    if core.state.working and core.state.job_id then
       local ok = pcall(vim.fn.jobstop, core.state.job_id)
       if ok then
-         vim.notify("Pytest job cancelled, running the new test", vim.log.levels.INFO)
+         utils.info("Pytest job cancelled, running the new test")
       end
 
       clear_state()

@@ -170,7 +170,7 @@ function docker.build_docker_command(settings, files)
    if settings.docker.enable_docker_compose then
       local volume = docker.get_docker_compose_volume(docker_compose_path)
       if volume == '' then
-         vim.print('Docker compose / volume not found')
+         utils.error('Docker compose / volume not found')
          return {}
       end
       settings.docker.docker_path = volume

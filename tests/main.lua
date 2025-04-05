@@ -51,7 +51,7 @@ describe("Get failed details", function()
    local expand = vim.fn.expand
 
    it("should return the failed details", function()
-      core.status.filename = nil
+      core.state.filename = nil
 
       local mocks = {
          {
@@ -172,7 +172,7 @@ describe("Get failed details", function()
          }
       }
 
-      core.status.filename = nil
+      core.state.filename = nil
 
       test_wrapper(mocks, function()
          local error = core._get_error_detail(error_message, 1)
@@ -258,7 +258,7 @@ describe("Get failed details", function()
          },
       }
 
-      core.status.filename = nil
+      core.state.filename = nil
       test_wrapper(mocks, function()
          local error = core._get_error_detail(error_message, 1)
 
@@ -304,7 +304,7 @@ describe("Get failed details", function()
          },
       }
 
-      core.status.filename = nil
+      core.state.filename = nil
       test_wrapper(mocks, function()
          local error = core._get_error_detail(error_message, 1)
 
@@ -421,7 +421,7 @@ describe("Get failed details", function()
          },
       }
 
-      core.status.filename = nil
+      core.state.filename = nil
       test_wrapper(mocks, function()
          local error = core._get_error_detail(error_message, 1)
 
@@ -496,7 +496,7 @@ describe("Get failed details", function()
          },
       }
 
-      core.status.filename = nil
+      core.state.filename = nil
       test_wrapper(mocks, function()
          local error = core._get_error_detail(error_message, 1)
 

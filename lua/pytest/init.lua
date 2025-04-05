@@ -1,5 +1,6 @@
 local config = require('pytest.config')
 local core = require('pytest.core')
+local utils = require('pytest.utils')
 
 local M = {}
 
@@ -10,7 +11,7 @@ M.setup = function(opts)
       config.opts = vim.deepcopy(opts)
       config.opts.docker = config.opts.docker or {}
    end
-   M.settings = config.get()
+   M.settings = config.get(opts)
 
    local group = vim.api.nvim_create_augroup('Pytest', { clear = true })
    local attach_id = nil
@@ -28,10 +29,10 @@ M.setup = function(opts)
          })
 
          vim.api.nvim_buf_create_user_command(bufnr, 'PytestOutput', function()
-            if core.status.last_stdout then
+            if core.state.last_stdout then
                core.show_last_stdout()
             else
-               vim.notify('No output to show', vim.log.levels.INFO)
+               utils.info('No output to show')
             end
          end, {
             nargs = 0,

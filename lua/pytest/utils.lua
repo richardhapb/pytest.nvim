@@ -29,7 +29,7 @@ function utils.verify_dependencies()
    if settings.docker.enabled then
       utils.is_container_running(function(container_runnings, message)
          if not container_runnings then
-            vim.print(message)
+            utils.warn(message)
             settings.docker.enabled = false
          end
       end):wait()
@@ -45,9 +45,9 @@ function utils.verify_dependencies()
          local command = utils.list_extend(docker_command, { 'pip', 'install', 'pytest', 'pytest-django' })
          vim.system(command, { text = true }, function(stdout)
             if stdout.code == 0 then
-               vim.print('pytest-django installed')
+               utils.info('pytest-django installed')
             else
-               vim.print('Error installing pytest-django: ' .. stdout.stderr)
+               utils.error('Error installing pytest-django: ' .. stdout.stderr)
             end
          end)
       end
@@ -81,6 +81,35 @@ function utils.get_buffer_from_filepath(filepath)
       return nil
    end
    return buffer
+end
+
+
+---Logger helper
+---@param msg string
+---@param log_level number
+---@param opts table
+function utils.notify(msg, log_level, opts)
+   opts = opts or {}
+   opts = utils.list_extend(opts, { title = "Pytest.nvim" })
+   vim.schedule(function() vim.notify(msg, log_level, opts) end)
+end
+
+---Info logging
+---@param msg string
+function utils.info(msg)
+   utils.notify(msg, vim.log.levels.INFO, { timeout = 3000 })
+end
+
+---Warning logging
+---@param msg string
+function utils.warn(msg)
+   utils.notify(msg, vim.log.levels.WARN, { timeout = 3000 })
+end
+
+---Error logging
+---@param msg string
+function utils.error(msg)
+   utils.notify(msg, vim.log.levels.ERROR, { timeout = 3000 })
 end
 
 return utils
