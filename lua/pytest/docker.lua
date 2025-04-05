@@ -42,7 +42,10 @@ function docker.find_docker_compose(path)
    local git_root = utils.get_git_root()
 
    local settings = require('pytest.config').get()
-   local docker_compose_name = settings.docker.compose_file_name or 'docker-compose.yml'
+   local docker_compose_name = settings.docker.docker_compose_file or 'docker-compose.yml'
+   if type(docker_compose_name) == "function" then
+      docker_compose_name = docker_compose_name()
+   end
 
    for _, dir in ipairs({ cwd, git_root }) do
       local docker_compose = vim.fn.findfile(docker_compose_name, cwd .. ';')
@@ -73,7 +76,7 @@ function docker.get_docker_compose_service_line(path)
       return lineno
    end
 
-   local docker_compose_name = settings.docker.compose_file_name or 'docker-compose.yml'
+   local docker_compose_name = settings.docker.docker_compose_file or 'docker-compose.yml'
 
    local docker_compose_file = io.open(docker_compose_path .. '/' .. docker_compose_name, 'r')
    if not docker_compose_file then
@@ -112,7 +115,7 @@ function docker.get_docker_compose_volume(path)
    end
 
 
-   local docker_compose_name = settings.docker.compose_file_name or 'docker-compose.yml'
+   local docker_compose_name = settings.docker.docker_compose_file or 'docker-compose.yml'
 
    local docker_compose_file = io.open(docker_compose_path .. '/' .. docker_compose_name, 'r')
    if not docker_compose_file then

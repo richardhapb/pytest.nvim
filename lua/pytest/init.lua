@@ -61,13 +61,13 @@ M.setup = function(opts)
          })
 
          vim.api.nvim_buf_create_user_command(bufnr, 'PytestEnableDocker', function()
-            config.update({ docker = { enabled = true } })
+            config.settings = config.update({ docker = { enabled = true } })
          end, {
             nargs = 0,
          })
 
          vim.api.nvim_buf_create_user_command(bufnr, 'PytestDisableDocker', function()
-            config.update({ docker = { enabled = false } })
+            config.settings = config.update({ docker = { enabled = false } })
          end, {
             nargs = 0,
          })
