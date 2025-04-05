@@ -5,7 +5,7 @@
 
 ## About the project
 
-Testing integrated in neovim with pytest. Include Docker support. This project is in progress, I will be adding more features in the future and I open to contributions.
+Testing integrated in neovim with `pytest`. Include Docker support. This project is in progress, I will be adding more features in the future and I open to contributions.
 
 ## Getting Started
 
@@ -13,15 +13,14 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
 
 ### Prerequisites
 
-- Neovim 0.5.0 or later
-- pytest in your environment (pip install pytest)
+- Neovim 0.9.0 or later
+- `pytest` in your environment (pip install `pytest`)
 
 ### Installation
 
 1. Install the `pytest.nvim` plugin using your preferred plugin manager:
 
     Lazyvim:
-
 
     ```lua
     {
@@ -37,12 +36,6 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
       "richardhapb/pytest.nvim",
       opt = true
     }
-    ```
-
-   Vim-Plug:
-
-    ```vim
-    Plug 'richardhapb/pytest.nvim'
     ```
 
 ### Usage
@@ -61,18 +54,18 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
         :Pytest
         ```
 
-    - To check the output of the tests:
+    - To check the output of the tests (`pytest` will be show the fail tests output by default)
 
         ```vim
         :PytestOutput
         ```
 
-    - You can attach the test to the current buffer, this runs test on save:
+    - You can attach the test to the current buffer, this runs test on save in any Python file:
       
         ```vim
         :PytestAttach
         ```
-    - You can detach the test from the current buffer:
+    - You can detach the test from the last attached buffer:
       
         ```vim
         :PytestDetach
@@ -88,7 +81,7 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
         :PytestDisableDocker
         ```
 
-The default keybinding that runs `:Pytest` is `<leader>T`.
+The default keybinding that runs `:Pytest` is `<leader>TT`.
 
 ## Defaults
 
@@ -140,4 +133,58 @@ require 'pytest'.setup {
    },
 }
 ```
+---
+
+- If Docker is disabled, all Docker-related features are also disabled.
+
+- When Docker Compose is enabled, its configuration takes precedence over the plugin’s direct settings.
+
+- The prefix_app setting maps your local directory to the Docker path.
+
+> For example, if your current working directory is ~/projects/, and the prefix is app, the Docker path /usr/src/app will map to ~/projects/app.
+
+- Docker is responsible only for path mapping and executing the Pytest command inside a running container — the container must already be running.
+
+- If you're using Docker Compose, the plugin retrieves the Docker path from the volume configuration.
+
+> For example, if your docker-compose.yml contains:
+> 
+> ```yaml
+> volumes:
+>   - app:/usr/src/app
+> ```
+> 
+> Then /usr/src/app will be used as the Docker path.
+
+- If enable_docker_compose is set to false, the plugin will fall back to the manually configured path instead. (Note: the container itself is not retrieved from Docker Compose at this point.)
+
+---
+
+## Features
+
+- [x] Docker integration
+- [x] Path from docker compose file
+- [ ] Container name from docker compose file
+- [ ] Tests for docker compose file
+- [ ] Custom args for pytest command
+- [x] Pass function as settings
+- [x] Handle single file testing
+- [ ] Handle multiple files
+- [ ] Handle modules and project
+- [ ] Integrate treesitter for parsing
+- [ ] Centralized UI
+
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git switch -c feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
