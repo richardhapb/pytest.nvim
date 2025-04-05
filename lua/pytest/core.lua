@@ -1,5 +1,7 @@
-local config = require('pytest.config')
-local utils = require('pytest.utils')
+local config = require'pytest.config'
+local utils = require'pytest.utils'
+local docker = require'pytest.docker'
+local pytest = require'pytest.pytest'
 
 
 local core = {}
@@ -130,69 +132,38 @@ end
 ---Test file with pytest
 ---@param file? string
 ---@param opts? PytestConfig
-core.test_file = function(file, opts)
+function core.test_file(file, opts)
    if core.status.working then
       vim.print('Tests are already running')
       return
    end
-
-   config.update(opts)
-
-   local settings = config.get()
    local current_file = file or vim.fn.expand('%:p')
    local bufnr = utils.get_buffer_from_filepath(current_file) or vim.api.nvim_get_current_buf()
 
-   local docker_command = {}
+   vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+   vim.diagnostic.reset(ns, bufnr)
+   core.status.working = true
 
+   config.get(opts)
+
+   local settings = config.get()
    core.status.filename = current_file:match("[^/]+$")
 
    if settings.docker.enabled then
-      local docker_compose_path = utils.find_docker_compose()
-      local docker_path = settings.docker.docker_path or ''
-
-      utils.is_container_running(function(running, message)
-         if not running then
-            vim.print(message)
-            return
-         end
-         if settings.docker.enable_docker_compose then
-            local volume = utils.get_docker_compose_volume(docker_compose_path)
-            if volume == '' then
-               vim.print('Docker compose / volume not found')
-               return
-            end
-            settings.docker.docker_path = volume
-            docker_path = volume
-         end
-
-         local path_prefix = settings.docker.local_path_prefix
-         if path_prefix and path_prefix ~= '' then
-            path_prefix = '/' .. path_prefix
-         end
-
-         local relative_file = current_file:match(utils.scape_special_chars(docker_compose_path) ..
-            utils.scape_special_chars(path_prefix) .. '/(.*)')
-
-         local docker_file_path = docker_path .. '/' .. relative_file
-         local container = settings.docker.container
-
-         docker_command = { 'docker', 'exec', container }
-
-         current_file = docker_file_path
-      end):wait()
-
-      if #docker_command == 0 then
-         return
+      local docker_command = docker.build_docker_command(settings, {current_file})
+      if #docker_command > 0 then
+         core.run_test(docker_command)
       end
+      return
    end
 
+   local command = pytest.build_command(current_file)
+   core.run_test(command)
+end
 
-   local command = utils.list_extend(docker_command, { 'pytest', '-v', current_file })
-
-   vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-   vim.diagnostic.reset(ns, bufnr)
-
-   core.status.working = true
+function core.run_test(command)
+   -- Only update marks in current buffer
+   local bufnr = vim.api.nvim_get_current_buf()
 
    vim.fn.jobstart(
       command, {

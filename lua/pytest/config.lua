@@ -45,7 +45,9 @@ config.settings = {
    end
 }
 
----Update config
+config.opts = config.settings
+
+---Update config and return config
 ---@param opts? PytestConfig
 config.update = function(opts)
    opts = opts or {}
@@ -54,13 +56,17 @@ config.update = function(opts)
       opts.docker = update_callbacks(opts.docker)
    end
 
-   config.settings = vim.tbl_deep_extend('force', config.settings, opts)
+   return vim.tbl_deep_extend('force', config.settings, opts)
 end
 
 ---Get the config
+---@param opts? table
 ---@return PytestConfig
-config.get = function()
-   return config.settings
+config.get = function(opts)
+   if opts then
+      return config.update(vim.deepcopy(opts))
+   end
+   return config.update(vim.deepcopy(config.opts))
 end
 
 return config

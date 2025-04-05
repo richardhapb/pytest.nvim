@@ -6,7 +6,10 @@ local M = {}
 ---Main settings for pytest.nvim
 ---@param opts? PytestConfig
 M.setup = function(opts)
-   config.update(opts or {})
+   if opts then
+      config.opts = vim.deepcopy(opts)
+      config.opts.docker = config.opts.docker or {}
+   end
    M.settings = config.get()
 
    local group = vim.api.nvim_create_augroup('Pytest', { clear = true })
