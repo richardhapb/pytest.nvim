@@ -1,19 +1,42 @@
-local config = require'pytest.config'
-local utils = require'pytest.utils'
-local docker = require'pytest.docker'
-local pytest = require'pytest.pytest'
+local config = require 'pytest.config'
+local utils = require 'pytest.utils'
+local docker = require 'pytest.docker'
+local pytest = require 'pytest.pytest'
 
 
 local core = {}
 
 local ns = vim.api.nvim_create_namespace('pytest_test')
-core.status = {
+
+core.state = {
    last_stdout = nil,
+   last_job_id = nil,
    lines = {},
    dependencies_verified = false,
    working = false,
-   filename = nil
+   filename = nil,
+   job_id = nil,
+   current_bufnr = nil
 }
+
+---Clear any results and reset status
+---@param bufnr? number
+local function clear_state(bufnr)
+   if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then
+      bufnr = core.state.current_bufnr or 0
+   end
+
+   vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+   vim.diagnostic.reset(ns, bufnr)
+
+   core.state.last_job_id = core.state.job_id
+   core.state.current_bufnr = bufnr
+
+   core.state.working = false
+   core.state.job_id = nil
+   core.state.lines = {}
+   core.state.filename = nil
+end
 
 ---Get the line and error message of the failed test for the current file
 ---@param stdout string[]
@@ -22,8 +45,8 @@ core.status = {
 function core._get_error_detail(stdout, index)
    local detail = { line = -1, error = '' }
 
-   if not core.status.filename then
-      core.status.filename = vim.fn.expand('%:t')
+   if not core.state.filename then
+      core.state.filename = vim.fn.expand('%:t')
    end
 
    local count = 1
@@ -37,7 +60,7 @@ function core._get_error_detail(stdout, index)
          end
       end
 
-      local linenr = line:match(core.status.filename:gsub('%.', '%%.') .. ':(%d+)')
+      local linenr = line:match(core.state.filename:gsub('%.', '%%.') .. ':(%d+)')
       if linenr and detail.line == -1 and detail.error ~= '' then
          if count == index then
             detail.line = tonumber(linenr) - 1
@@ -127,30 +150,44 @@ local function get_tests_lines(stdout, bufnr)
    return lines
 end
 
+local function update_marks(stdout, bufnr)
+   core.state.lines = get_tests_lines(stdout, bufnr)
+   for _, line in ipairs(core.state.lines) do
+      local lineno, stat = next(line)
+      if not lineno then
+         return
+      end
+      local text = stat == 'passed' and '\t✅' or ''
+      text = stat == 'failed' and '\t❌' or text
+      vim.api.nvim_buf_set_extmark(bufnr, ns, lineno, 0, { virt_text = { { text } } })
+   end
+   core.state.last_stdout = stdout
+end
+
 
 ---Main function to run the tests for the current file
 ---Test file with pytest
 ---@param file? string
 ---@param opts? PytestConfig
 function core.test_file(file, opts)
-   if core.status.working then
-      vim.print('Tests are already running')
-      return
-   end
    local current_file = file or vim.fn.expand('%:p')
    local bufnr = utils.get_buffer_from_filepath(current_file) or vim.api.nvim_get_current_buf()
 
-   vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-   vim.diagnostic.reset(ns, bufnr)
-   core.status.working = true
+   if core.state.working then
+      core.cancel_test()
+   else
+      clear_state(bufnr)
+   end
+
+   core.state.working = true
 
    config.get(opts)
 
    local settings = config.get()
-   core.status.filename = current_file:match("[^/]+$")
+   core.state.filename = current_file:match("[^/]+$")
 
    if settings.docker.enabled then
-      local docker_command = docker.build_docker_command(settings, {current_file})
+      local docker_command = docker.build_docker_command(settings, { current_file })
       if #docker_command > 0 then
          core.run_test(docker_command)
       end
@@ -165,32 +202,24 @@ function core.run_test(command)
    -- Only update marks in current buffer
    local bufnr = vim.api.nvim_get_current_buf()
 
-   vim.fn.jobstart(
+   vim.notify("Running tests...", vim.log.levels.INFO)
+
+   core.state.job_id = vim.fn.jobstart(
       command, {
          stdout_buffered = true,
          on_stdout = function(_, stdout)
             if stdout then
-               core.status.lines = get_tests_lines(stdout, bufnr)
-               for _, line in ipairs(core.status.lines) do
-                  local lineno, stat = next(line)
-                  if not lineno then
-                     return
-                  end
-                  local text = stat == 'passed' and '\t✅' or ''
-                  text = stat == 'failed' and '\t❌' or text
-                  vim.api.nvim_buf_set_extmark(bufnr, ns, lineno, 0, { virt_text = { { text } } })
-               end
-               core.status.last_stdout = stdout
+               update_marks(stdout, bufnr)
             end
          end,
          on_exit = function(_, exit_code)
             local failed = {}
             local i = 1
-            for _, line in ipairs(core.status.lines) do
+            for _, line in ipairs(core.state.lines) do
                local lineno, outcome = next(line)
 
                if outcome == 'failed' then
-                  local error = core._get_error_detail(core.status.last_stdout, i)
+                  local error = core._get_error_detail(core.state.last_stdout, i)
                   local ok, col = pcall(vim.api.nvim_buf_get_lines, bufnr, error.line, error.line + 1, false)
 
                   -- TODO: Obtain range with treesitter
@@ -221,27 +250,37 @@ function core.run_test(command)
                   })
                   i = i + 1
                end
+               core.state.job_id = nil
             end
 
             local message = exit_code == 0 and 'Tests passed 👌' or 'Tests failed 😢'
             vim.notify(message, vim.log.levels.INFO)
             vim.diagnostic.set(ns, bufnr, failed, {})
-
-            core.status.working = false
+            core.state.working = false
+            core.state.job_id = nil
          end
       })
 end
 
-
 ---Display the last stdout output in a new buffer
 core.show_last_stdout = function()
-   if core.status.last_stdout then
+   if core.state.last_stdout then
       local bufnr = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, core.status.last_stdout)
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, core.state.last_stdout)
       vim.cmd.split()
       vim.api.nvim_set_current_buf(bufnr)
    end
 end
 
+core.cancel_test = function()
+   if core.state.working and core.state.job_id then
+      local ok = pcall(vim.fn.jobstop, core.state.job_id)
+      if ok then
+         vim.notify("Pytest job cancelled, running the new test", vim.log.levels.INFO)
+      end
+
+      clear_state()
+   end
+end
 
 return core
