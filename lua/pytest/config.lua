@@ -9,8 +9,14 @@ local config = {}
 ---@field docker_compose_file string | function Docker compose name, for locating and match the docker path and local path prefix or a callback for get it
 ---@field docker_compose_service string | function Name of the service inside docker compose, for locating the path or a callback for get it
 
+---@class DjangoConfig
+---@field enabled boolean | function Enable/diable django support
+---@field django_settings_module string | function Set the DJANGO_SETTINGS_MODULE variable to pytest
+
 ---@class PytestConfig
 ---@field docker DockerConfig
+---@field django DjangoConfig
+---@field add_args string[] | string Additional arguments to pass to pytest
 ---@field keymaps_callback function function for set the keymaps
 
 ---Update the callbacks into a table
@@ -29,7 +35,7 @@ end
 ---@type PytestConfig
 config.settings = {
    docker = {
-      enabled = true,
+      enabled = false,
       container = 'app-1',
       docker_path = '/usr/src/app',
       local_path_prefix = 'app',
@@ -38,6 +44,13 @@ config.settings = {
       docker_compose_service = 'app',
    },
 
+   django = {
+      enabled = false,
+      django_settings_module = ""
+   },
+
+   add_args = "",
+
    keymaps_callback = function(bufnr)
       vim.keymap.set('n', '<leader>TT', '<CMD>Pytest<CR>', { buffer = bufnr, desc = 'Run Pytest' })
       vim.keymap.set('n', '<leader>Ta', '<CMD>PytestAttach<CR>', { buffer = bufnr, desc = 'Attach Pytest to buffer' })
@@ -45,6 +58,9 @@ config.settings = {
    end
 }
 
+-- This is used to retain the original user options
+-- and keep the callbacks for use
+-- when the command is executed
 config.opts = config.settings
 
 ---Update config and return config
@@ -56,6 +72,10 @@ config.update = function(opts)
       opts.docker = update_callbacks(opts.docker)
    end
 
+   if opts ~= nil and opts.django ~= nil then
+      opts.django = update_callbacks(opts.django)
+   end
+
    return vim.tbl_deep_extend('force', config.settings, opts)
 end
 
@@ -63,10 +83,9 @@ end
 ---@param opts? table
 ---@return PytestConfig
 config.get = function(opts)
-   if opts then
-      return config.update(vim.deepcopy(opts))
-   end
-   return config.update(vim.deepcopy(config.opts))
+   opts = opts or {}
+
+   return config.update(vim.tbl_deep_extend("force", config.opts, opts))
 end
 
 return config

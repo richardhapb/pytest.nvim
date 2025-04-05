@@ -200,8 +200,13 @@ end
 
 function core.run_test(command)
    -- Only update marks in current buffer
-   local bufnr = core.state.current_bufnr or vim.api.nvim_get_current_buf()
+   local ok, msg = utils.verify_dependencies()
+   if not ok then
+      utils.error(msg)
+      return
+   end
 
+   local bufnr = core.state.current_bufnr or vim.api.nvim_get_current_buf()
    utils.info("Running tests...")
 
    core.state.job_id = vim.fn.jobstart(

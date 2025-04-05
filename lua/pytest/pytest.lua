@@ -1,4 +1,5 @@
-local utils = require'pytest.utils'
+local utils = require 'pytest.utils'
+local config = require 'pytest.config'
 
 local pytest = {}
 
@@ -9,7 +10,16 @@ function pytest.build_command(args)
    if type(args) == "string" then
       args = { args }
    end
-   return utils.list_extend({ 'pytest', '-v' }, args)
+
+   local settings = config.get()
+   local user_args = utils.validate_args(settings.add_args)
+   local django_settings_module = settings.django.django_settings_module
+
+   if django_settings_module ~= "" then
+      table.insert(user_args, '--ds=' .. django_settings_module)
+   end
+
+   return utils.list_extend({ 'pytest', '-v' }, utils.list_extend(user_args, args))
 end
 
 ---Verify if pytest is available in local or docker according to the settings
@@ -21,26 +31,13 @@ function pytest.is_pytest_django_available(callback)
    if settings.docker.enabled then
       docker_command = { "docker", "exec", settings.docker.container }
    end
-   local command = utils.list_extend(docker_command, { "pytest", "-V", "-V" })
 
-   local job = vim.system(command, { text = true }, function(result)
-      if result.code == 0 then
-         local output = result.stdout
-         if not output then
-            callback(false, "Error obtaining pytest plugins")
-            return
-         end
-
-         -- TODO: load django option from config
-         for line in output:gmatch("[^\r\n]+") do
-            if line:match("pytest%-django") then
-               callback(true, "pytest-django available")
-               return
-            end
-         end
-         callback(false, "pytest-django not availabe")
+   local command = utils.list_extend(docker_command, { 'pip', 'show', 'pytest-django' })
+   local job = vim.system(command, { text = true }, function(stdout)
+      if stdout.code == 0 then
+         callback(true, 'pytest-django installed')
       else
-         callback(false, "Error executing pytest: " .. result.stderr)
+         callback(false, 'pytest-django is not intalled. Installed it with `pip install pytest-django`')
       end
    end)
 
@@ -48,4 +45,3 @@ function pytest.is_pytest_django_available(callback)
 end
 
 return pytest
-

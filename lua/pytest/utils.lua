@@ -24,40 +24,41 @@ function utils.scape_special_chars(str)
 end
 
 ---Verify if the dependencies are available
+---@return boolean, string
 function utils.verify_dependencies()
+   local ok = true
+   local msg = ""
+
    local settings = require('pytest.config').get()
    if settings.docker.enabled then
-      utils.is_container_running(function(container_runnings, message)
-         if not container_runnings then
-            utils.warn(message)
-            settings.docker.enabled = false
+      require 'pytest.docker'.is_container_running(function(container_running, message)
+         if not container_running then
+            ok = false
+            msg = message
          end
       end):wait()
    end
 
-   require'pytest.pytest'.is_pytest_django_available(function(pytest_available, _)
-      if not pytest_available then
-         local docker_command = {}
-         if settings.docker.enabled then
-            docker_command = { 'docker', 'exec', settings.docker.container }
-         end
+   if not ok then
+      return ok, msg
+   end
 
-         local command = utils.list_extend(docker_command, { 'pip', 'install', 'pytest', 'pytest-django' })
-         vim.system(command, { text = true }, function(stdout)
-            if stdout.code == 0 then
-               utils.info('pytest-django installed')
-            else
-               utils.error('Error installing pytest-django: ' .. stdout.stderr)
-            end
-         end)
-      end
-   end)
+   if settings.django then
+      require 'pytest.pytest'.is_pytest_django_available(function(pytest_available, message)
+         if not pytest_available then
+            ok = false
+            msg = message
+         end
+      end)
+   end
+
+   return ok, msg
 end
 
 ---Get the git root directory
 ---@return string
 function utils.get_git_root()
-   local result = vim.system({"git", "rev-parse", "--show-toplevel"}, {text = true}):wait()
+   local result = vim.system({ "git", "rev-parse", "--show-toplevel" }, { text = true }):wait()
    return (result.code == 0 and result.stdout:gsub("[\n\r]", "") or "")
 end
 
@@ -83,6 +84,35 @@ function utils.get_buffer_from_filepath(filepath)
    return buffer
 end
 
+---Validate args, if it is a string, convert it to a table
+---split using comma or space
+---@param args string | string[] List of args
+---@return string[]
+function utils.validate_args(args)
+   if not args or args == "" then
+      return {}
+   end
+
+   assert(type(args) == "table" or type(args) == "string", "Args must be a string or a table")
+
+   local result = {}
+
+   if type(args) == 'string' then
+      args = args:gsub(",", " ")
+      local parsed_args = vim.split(args, ' ')
+
+      -- Remove any empty space (case when has multiple spaces)
+      for _, arg in ipairs(parsed_args) do
+         if arg ~= '' then
+            table.insert(result, arg)
+         end
+      end
+   else
+      result = args
+   end
+
+   return result
+end
 
 ---Logger helper
 ---@param msg string

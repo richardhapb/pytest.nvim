@@ -99,14 +99,21 @@ Default settings, is not necessary to set up, but you can change the settings in
 ```lua
 require 'pytest'.setup {
    docker = {
-      enabled = true,  -- Enable docker support
+      enabled = false,  -- Enable docker support
       container = 'app-1',  -- Container where the tests will be run
       docker_path = '/usr/src/app',  -- This is the default path, if you use docker compose this is obtained from the docker compose file
       docker_path_prefix = 'app', -- This is the prefix for the path in the cwd in your local, for example: root/app/<docker_app_content>
+      enable_docker_compose = false,  -- Enable docker compose support
       docker_compose_file = 'docker-compose.yml',  -- This is the default docker compose file name
-      docker_compose_service = 'app',  -- This is for looking for the docker path in docker compose
-      enable_docker_compose = true,  -- Enable docker compose support
+      docker_compose_service = 'app',  -- This is docker service name in docker compose for looking for retrieve docker path
    },
+
+   django = {
+      enabled = false,  -- Enable django support 
+      django_settings_module = ""  -- Set the DJANGO_SETTINGS_MODULE variable to pytest
+   },
+
+   add_args = "",  -- Additional arguments to pass to pytest
 
    -- You can overwrite this callback with your custom keymaps,
    -- this is called when open a Python file and buffer number is passed as an argument
@@ -141,22 +148,38 @@ require 'pytest'.setup {
 
 - The prefix_app setting maps your local directory to the Docker path.
 
-> For example, if your current working directory is ~/projects/, and the prefix is app, the Docker path /usr/src/app will map to ~/projects/app.
+   > For example, if your current working directory is `~/projects/`, and the prefix is app, the Docker path `/usr/src/app` will map to `~/projects/app`.
 
 - Docker is responsible only for path mapping and executing the Pytest command inside a running container — the container must already be running.
 
 - If you're using Docker Compose, the plugin retrieves the Docker path from the volume configuration.
 
-> For example, if your docker-compose.yml contains:
-> 
-> ```yaml
-> volumes:
->   - app:/usr/src/app
-> ```
-> 
-> Then /usr/src/app will be used as the Docker path.
+   > For example, if your docker-compose.yml contains:
+   >
+   > ```yaml
+   > volumes:
+   >   - app:/usr/src/app
+   > ```
 
-- If enable_docker_compose is set to false, the plugin will fall back to the manually configured path instead. (Note: the container itself is not retrieved from Docker Compose at this point.)
+> Then `/usr/src/app` will be used as the Docker path.
+
+- If `enable_docker_compose` is set to false, the plugin will fall back to the manually configured path instead. (Note: the container itself is not retrieved from Docker Compose at this point.)
+
+- If `django` is enabled, the plugin will be check for the `pytest-django` extension for pytest, you can install it with `pip install pytest-django`, also you can define in `django_settings_module` the settings module to use (can be a custom settings for testing purposes).
+
+  > ```lua
+  > django = {
+  >   enabled = true,
+  >   django_settings_module = "myapp.settings_test"  -- This will pass the option `DJANGO_SETTINGS_MODULE` to `pytest`
+  > }
+  > ```
+
+- You can pass additional arguments to pytest command:
+  > ```lua
+  > require 'pytest'.setup {
+  >   add_args = { "-vv", "-s" } -- Verbose output
+  > }
+  > ```
 
 ---
 
@@ -173,6 +196,7 @@ require 'pytest'.setup {
 - [ ] Handle modules and project
 - [ ] Integrate treesitter for parsing
 - [ ] Centralized UI
+- [ ] Parse error lines from JSON output of pytest, instead of relying on stdout 
 
 ## Contributing
 

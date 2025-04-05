@@ -8,8 +8,7 @@ local M = {}
 ---@param opts? PytestConfig
 M.setup = function(opts)
    if opts then
-      config.opts = vim.deepcopy(opts)
-      config.opts.docker = config.opts.docker or {}
+      config.opts = vim.tbl_deep_extend("force", config.opts, opts)
    end
    M.settings = config.get(opts)
 
