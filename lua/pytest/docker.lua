@@ -66,7 +66,7 @@ function docker.get_docker_compose_service_line(path)
    local settings = require('pytest.config').get()
 
    if not path or path == '' then
-      docker_compose_path = utils.find_docker_compose()
+      docker_compose_path = docker.find_docker_compose()
    else
       docker_compose_path = path
    end
@@ -109,7 +109,7 @@ function docker.get_docker_compose_volume(path)
    local settings = require('pytest.config').get()
 
    if not path or path == '' then
-      docker_compose_path = utils.find_docker_compose()
+      docker_compose_path = docker.find_docker_compose()
    else
       docker_compose_path = path
    end
