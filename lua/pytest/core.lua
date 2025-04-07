@@ -9,14 +9,15 @@ local core = {}
 local ns = vim.api.nvim_create_namespace('pytest_test')
 
 core.state = {
-   last_stdout = nil,
+   last_output = nil,
    last_job_id = nil,
    lines = {},
    dependencies_verified = false,
    working = false,
    filename = nil,
    job_id = nil,
-   current_bufnr = nil
+   current_bufnr = nil,
+   has_stdout = false
 }
 
 ---Clear any results and reset state
@@ -36,6 +37,7 @@ local function clear_state(bufnr)
    core.state.job_id = nil
    core.state.lines = {}
    core.state.filename = nil
+   core.state.has_stdout = false
 end
 
 ---Get the line and error message of the failed test for the current file
@@ -161,7 +163,7 @@ local function update_marks(stdout, bufnr)
       text = stat == 'failed' and '\t❌' or text
       vim.api.nvim_buf_set_extmark(bufnr, ns, lineno, 0, { virt_text = { { text } } })
    end
-   core.state.last_stdout = stdout
+   core.state.last_output = stdout
 end
 
 
@@ -175,9 +177,9 @@ function core.test_file(file, opts)
 
    if core.state.working then
       core.cancel_test()
-   else
-      clear_state(bufnr)
    end
+
+   clear_state(bufnr)
 
    core.state.working = true
 
@@ -200,8 +202,8 @@ end
 
 function core.run_test(command)
    -- Only update marks in current buffer
-   local ok, msg = utils.verify_dependencies()
-   if not ok then
+   local ok_dep, msg = utils.verify_dependencies()
+   if not ok_dep then
       utils.error(msg)
       return
    end
@@ -212,9 +214,16 @@ function core.run_test(command)
    core.state.job_id = vim.fn.jobstart(
       command, {
          stdout_buffered = true,
+         stderr_buffered = true,
          on_stdout = function(_, stdout)
             if stdout then
+               core.state.has_stdout = true
                update_marks(stdout, bufnr)
+            end
+         end,
+         on_stderr = function(_, stderr)
+            if stderr and not core.state.has_stdout then
+               core.state.last_output = stderr
             end
          end,
          on_exit = function(_, exit_code)
@@ -224,7 +233,7 @@ function core.run_test(command)
                local lineno, outcome = next(line)
 
                if outcome == 'failed' then
-                  local error = core._get_error_detail(core.state.last_stdout, i)
+                  local error = core._get_error_detail(core.state.last_output, i)
                   local ok, col = pcall(vim.api.nvim_buf_get_lines, bufnr, error.line, error.line + 1, false)
 
                   -- TODO: Obtain range with treesitter
@@ -263,15 +272,20 @@ function core.run_test(command)
             vim.diagnostic.set(ns, bufnr, failed, {})
             core.state.working = false
             core.state.job_id = nil
+
+            -- Show the output if fails
+            if exit_code == 1 and config.get().open_output_onfail then
+               core.show_last_output()
+            end
          end
       })
 end
 
----Display the last stdout output in a new buffer
-core.show_last_stdout = function()
-   if core.state.last_stdout then
+---Display the last output (stdout or stderr) in a new buffer
+core.show_last_output = function()
+   if core.state.last_output then
       local bufnr = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, core.state.last_stdout)
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, core.state.last_output)
       vim.cmd.split()
       vim.api.nvim_set_current_buf(bufnr)
    end

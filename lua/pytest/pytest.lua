@@ -22,6 +22,10 @@ function pytest.build_command(args)
    return utils.list_extend({ 'pytest', '-v' }, utils.list_extend(user_args, args))
 end
 
+function pytest.is_pytest_available()
+   return vim.fn.executable("pytest") == 1
+end
+
 ---Verify if pytest is available in local or docker according to the settings
 ---@param callback function
 function pytest.is_pytest_django_available(callback)

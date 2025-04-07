@@ -28,6 +28,7 @@ end
 function utils.verify_dependencies()
    local ok = true
    local msg = ""
+   local pytest = require 'pytest.pytest'
 
    local settings = require('pytest.config').get()
    if settings.docker.enabled then
@@ -43,8 +44,13 @@ function utils.verify_dependencies()
       return ok, msg
    end
 
+   if not pytest.is_pytest_available() then
+      ok = false
+      return ok, "Pytest is not available"
+   end
+
    if settings.django then
-      require 'pytest.pytest'.is_pytest_django_available(function(pytest_available, message)
+      pytest.is_pytest_django_available(function(pytest_available, message)
          if not pytest_available then
             ok = false
             msg = message

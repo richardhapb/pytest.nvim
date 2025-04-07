@@ -114,6 +114,7 @@ require 'pytest'.setup {
    },
 
    add_args = "",  -- Additional arguments to pass to pytest
+   open_output_onfail = false, -- Open the buffer with output automatically if fails
 
    -- You can overwrite this callback with your custom keymaps,
    -- this is called when open a Python file and buffer number is passed as an argument

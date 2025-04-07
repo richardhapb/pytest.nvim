@@ -16,7 +16,8 @@ local config = {}
 ---@class PytestConfig
 ---@field docker DockerConfig
 ---@field django DjangoConfig
----@field add_args string[] | string Additional arguments to pass to pytest
+---@field add_args string[] | string | function Additional arguments to pass to pytest
+---@field open_output_onfail boolean | function Open the buffer with output automatically if fails
 ---@field keymaps_callback function function for set the keymaps
 
 ---Update the callbacks into a table
@@ -33,7 +34,7 @@ local function update_callbacks(opts)
 end
 
 ---@type PytestConfig
-config.settings = {
+config.defaults = {
    docker = {
       enabled = false,
       container = 'app-1',
@@ -50,6 +51,7 @@ config.settings = {
    },
 
    add_args = "",
+   open_output_onfail = false,
 
    keymaps_callback = function(bufnr)
       vim.keymap.set('n', '<leader>TT', '<CMD>Pytest<CR>', { buffer = bufnr, desc = 'Run Pytest' })
@@ -76,7 +78,7 @@ config.update = function(opts)
       opts.django = update_callbacks(opts.django)
    end
 
-   return vim.tbl_deep_extend('force', config.settings, opts)
+   return vim.tbl_deep_extend('force', config.opts, opts)
 end
 
 ---Get the config

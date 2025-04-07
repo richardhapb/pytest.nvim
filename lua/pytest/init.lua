@@ -8,7 +8,7 @@ local M = {}
 ---@param opts? PytestConfig
 M.setup = function(opts)
    if opts then
-      config.opts = vim.tbl_deep_extend("force", config.opts, opts)
+      config.opts = vim.tbl_deep_extend("force", config.defaults, opts)
    end
    M.settings = config.get(opts)
 
@@ -28,8 +28,8 @@ M.setup = function(opts)
          })
 
          vim.api.nvim_buf_create_user_command(bufnr, 'PytestOutput', function()
-            if core.state.last_stdout then
-               core.show_last_stdout()
+            if core.state.last_output then
+               core.show_last_output()
             else
                utils.info('No output to show')
             end
@@ -60,13 +60,13 @@ M.setup = function(opts)
          })
 
          vim.api.nvim_buf_create_user_command(bufnr, 'PytestEnableDocker', function()
-            config.settings = config.update({ docker = { enabled = true } })
+            config.opts = vim.tbl_deep_extend("force", config.opts, { docker = { enabled = true } })
          end, {
             nargs = 0,
          })
 
          vim.api.nvim_buf_create_user_command(bufnr, 'PytestDisableDocker', function()
-            config.settings = config.update({ docker = { enabled = false } })
+            config.opts = vim.tbl_deep_extend("force", config.opts, { docker = { enabled = false } })
          end, {
             nargs = 0,
          })
