@@ -238,8 +238,8 @@ function core.run_test(command)
 
                   -- TODO: Obtain range with treesitter
                   if ok and #col > 0 then
-                     error.col = string.find(col[1], '[^%s]+') - 1
-                     error.end_col = string.len(col[1])
+                     error.col = (string.find(col[1], '[^%s]+') or 1) - 1
+                     error.end_col = (string.len(col[1]) or error.col)
                   else
                      error.col = 0
                      error.end_col = 0
