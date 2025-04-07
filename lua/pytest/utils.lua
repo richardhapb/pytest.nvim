@@ -38,15 +38,13 @@ function utils.verify_dependencies()
             msg = message
          end
       end):wait()
+   elseif not pytest.is_pytest_available() then
+      ok = false
+      return ok, "pytest is not available"
    end
 
    if not ok then
       return ok, msg
-   end
-
-   if not pytest.is_pytest_available() then
-      ok = false
-      return ok, "Pytest is not available"
    end
 
    if settings.django then
