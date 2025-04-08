@@ -1,6 +1,7 @@
 ---@diagnostic disable: undefined-field, duplicate-set-field
-local core = require 'pytest.parse'
+local test = require 'pytest.test'
 local async = require 'plenary.async'
+local parse = require 'pytest.parse'
 
 ---@class Mock
 ---@field func string
@@ -9,8 +10,8 @@ local async = require 'plenary.async'
 
 ---Wrap a test function to mock functions
 ---@param mocks Mock[]
----@param test function
-local test_wrapper = function(mocks, test)
+---@param test_element function
+local test_wrapper = function(mocks, test_element)
    for _, mock in ipairs(mocks) do
       mock.calls = mock.calls or {}
 
@@ -38,7 +39,7 @@ local test_wrapper = function(mocks, test)
       end
    end
 
-   test()
+   test_element()
 
    for _, mock in ipairs(mocks) do
       mock.calls = {}
@@ -51,7 +52,7 @@ describe("Get failed details", function()
    local expand = vim.fn.expand
 
    it("should return the failed details", function()
-      core.state.filename = nil
+      test.reset_state()
 
       local mocks = {
          {
@@ -64,12 +65,15 @@ describe("Get failed details", function()
       }
 
       test_wrapper(mocks, function()
-         local error = core.get_error_detail({
+         local stdout = {
             'E   AssertionError: assert 1 == 2',
             '',
             'apps/core/tests/test_views.py:10: AssertionError'
          }
-         , 1)
+         local test_result = { filename = "test_views.py" }
+         local error = parse.get_error_detail(
+            stdout
+            , 1, test_result)
 
          assert.is.equal(9, error.line)
          assert.is.equal('AssertionError: assert 1 == 2', error.error)
@@ -164,18 +168,21 @@ describe("Get failed details", function()
          'ZeroDivisionError: division by zero',
       }
 
+      local filename = 'test_middlewares.py'
+
       local mocks = {
          {
             func = 'vim.fn.expand',
             calls = {},
-            return_values = { 'test_middlewares.py' }
+            return_values = { filename }
          }
       }
 
-      core.state.filename = nil
+      test.reset_state()
 
       test_wrapper(mocks, function()
-         local error = core.get_error_detail(error_message, 1)
+         local test_result = { filename = filename }
+         local error = parse.get_error_detail(error_message, 1, test_result)
          assert.is.equal(73, error.line)
          assert.is.equal('ZeroDivisionError: division by zero', error.error)
       end)
@@ -250,17 +257,19 @@ describe("Get failed details", function()
          '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
       }
 
+      local filename = 'test_memory_profiler.py'
       local mocks = {
          {
             func = 'vim.fn.expand',
             calls = {},
-            return_values = { 'test_memory_profiler.py' }
+            return_values = { filename }
          },
       }
 
-      core.state.filename = nil
+      test.reset_state()
       test_wrapper(mocks, function()
-         local error = core.get_error_detail(error_message, 1)
+         local test_result = { filename = filename }
+         local error = parse.get_error_detail(error_message, 1, test_result)
 
          assert.is.equal(-1, error.line)
          assert.is.equal('ModuleNotFoundError: No module named "psutil"', error.error)
@@ -296,17 +305,20 @@ describe("Get failed details", function()
          '=========================================== 1 failed in 4.85s ===========================================',
       }
 
+      local filename = 'test_profile_views.py'
+
       local mocks = {
          {
             func = 'vim.fn.expand',
             calls = {},
-            return_values = { 'test_profile_views.py' }
+            return_values = { filename }
          },
       }
 
-      core.state.filename = nil
+      test.reset_state()
       test_wrapper(mocks, function()
-         local error = core.get_error_detail(error_message, 1)
+         local test_result = { filename = filename }
+         local error = parse.get_error_detail(error_message, 1, test_result)
 
          assert.is.equal(15, error.line)
          assert.is.equal(
@@ -413,17 +425,20 @@ describe("Get failed details", function()
 
       }
 
+      local filename = 'test_profile_views.py'
+
       local mocks = {
          {
             func = 'vim.fn.expand',
             calls = {},
-            return_values = { 'test_profile_views.py' }
+            return_values = { filename }
          },
       }
 
-      core.state.filename = nil
+      test.reset_state()
       test_wrapper(mocks, function()
-         local error = core.get_error_detail(error_message, 1)
+         local test_result = { filename = filename }
+         local error = parse.get_error_detail(error_message, 1, test_result)
 
          assert.is.equal(102, error.line)
          assert.is.equal(
@@ -488,17 +503,20 @@ describe("Get failed details", function()
 
       }
 
+      local filename = 'test_utils.py'
+
       local mocks = {
          {
             func = 'vim.fn.expand',
             calls = {},
-            return_values = { 'test_utils.py' }
+            return_values = { filename }
          },
       }
 
-      core.state.filename = nil
+      test.reset_state()
       test_wrapper(mocks, function()
-         local error = core.get_error_detail(error_message, 1)
+         local test_result = { filename = filename }
+         local error = parse.get_error_detail(error_message, 1, test_result)
 
          assert.is.equal(124, error.line)
          assert.is.equal(

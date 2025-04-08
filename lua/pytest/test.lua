@@ -34,11 +34,13 @@ local test_state = {
 
 ---Clear any results and reset state
 ---@param reset_buffer? boolean
-local function reset_state(reset_buffer)
+function M.reset_state(reset_buffer)
    local ns = parse.NS
 
-   vim.api.nvim_buf_clear_namespace(test_state.bufnr, ns, 0, -1)
-   vim.diagnostic.reset(ns, test_state.bufnr)
+   if test_state.bufnr and vim.api.nvim_buf_is_valid(test_state.bufnr) then
+      vim.api.nvim_buf_clear_namespace(test_state.bufnr, ns, 0, -1)
+      vim.diagnostic.reset(ns, test_state.bufnr)
+   end
 
    test_state.working = false
    test_state.filenames = nil
@@ -63,7 +65,7 @@ function M.run(test)
    if test_state.working then
       M.cancel_test()
    end
-   reset_state()
+   M.reset_state()
    test_state.working = true
 
    local bufnr = test_state.bufnr or vim.api.nvim_get_current_buf()
@@ -87,7 +89,7 @@ function M.run(test)
          on_exit = function(_, exit_code)
             local failed = {}
             local i = 1
-            test.results = parse.get_tests_results(test_state.last_output, bufnr) or {}
+            test.results = parse.get_test_results(test_state.last_output, bufnr) or {}
             parse.update_marks(bufnr, test.results)
             for _, test_result in ipairs(test.results) do
                if test_result.state == 'failed' then
@@ -157,7 +159,7 @@ M.cancel_test = function()
          utils.info("Pytest job cancelled, running the new test")
       end
 
-      reset_state()
+      M.reset_state()
    end
 end
 

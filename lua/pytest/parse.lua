@@ -29,7 +29,7 @@ function M.get_error_detail(stdout, index, test_result)
       end
 
       local linenr = line:match(test_result.filename:gsub('%.', '%%.') .. ':(%d+)')
-      if linenr and detail.line == -1 and detail.error ~= '' then
+      if linenr and detail.line == -1 then
          if count == index then
             detail.line = tonumber(linenr) - 1
          end
@@ -47,7 +47,7 @@ end
 ---@param stdout string[]
 ---@param bufnr number
 ---@return TestResult[]?
-function M.get_tests_results(stdout, bufnr)
+function M.get_test_results(stdout, bufnr)
    -- TODO: Refactor this function
    local tests_executed = {}
 
