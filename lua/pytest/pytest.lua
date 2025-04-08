@@ -5,7 +5,7 @@ local pytest = {}
 
 ---Build pytest command
 ---@param args table | string
----@return table
+---@return string[]
 function pytest.build_command(args)
    if type(args) == "string" then
       args = { args }

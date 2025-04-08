@@ -90,11 +90,15 @@ end
 
 ---Validate args, if it is a string, convert it to a table
 ---split using comma or space
----@param args string | string[] List of args
+---@param args string | string[] | function List of args
 ---@return string[]
 function utils.validate_args(args)
    if not args or args == "" then
       return {}
+   end
+
+   if type(args) == "function" then
+      args = args()
    end
 
    assert(type(args) == "table" or type(args) == "string", "Args must be a string or a table")

@@ -1,6 +1,7 @@
 local config = require('pytest.config')
-local core = require('pytest.core')
+local runner = require('pytest.runner')
 local utils = require('pytest.utils')
+local test = require('pytest.test')
 
 local M = {}
 
@@ -22,14 +23,14 @@ M.setup = function(opts)
          local bufnr = vim.api.nvim_get_current_buf()
 
          vim.api.nvim_buf_create_user_command(bufnr, 'Pytest', function()
-            core.test_file()
+            runner.test_file()
          end, {
             nargs = 0,
          })
 
          vim.api.nvim_buf_create_user_command(bufnr, 'PytestOutput', function()
-            if core.state.last_output then
-               core.show_last_output()
+            if test.get_last_output() then
+               test.show_last_output()
             else
                utils.info('No output to show')
             end
@@ -43,7 +44,7 @@ M.setup = function(opts)
                group = group,
                pattern = "*.py",
                callback = function()
-                  core.test_file(file)
+                  runner.test_file(file)
                end,
             })
          end, {
@@ -77,6 +78,6 @@ M.setup = function(opts)
 end
 
 -- API functions
-M.test_file = core.test_file
+M.test_file = runner.test_file
 
 return M

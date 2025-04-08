@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-field, duplicate-set-field
-local core = require 'pytest.core'
+local core = require 'pytest.parse'
 local async = require 'plenary.async'
 
 ---@class Mock
@@ -64,7 +64,7 @@ describe("Get failed details", function()
       }
 
       test_wrapper(mocks, function()
-         local error = core._get_error_detail({
+         local error = core.get_error_detail({
             'E   AssertionError: assert 1 == 2',
             '',
             'apps/core/tests/test_views.py:10: AssertionError'
@@ -175,7 +175,7 @@ describe("Get failed details", function()
       core.state.filename = nil
 
       test_wrapper(mocks, function()
-         local error = core._get_error_detail(error_message, 1)
+         local error = core.get_error_detail(error_message, 1)
          assert.is.equal(73, error.line)
          assert.is.equal('ZeroDivisionError: division by zero', error.error)
       end)
@@ -260,7 +260,7 @@ describe("Get failed details", function()
 
       core.state.filename = nil
       test_wrapper(mocks, function()
-         local error = core._get_error_detail(error_message, 1)
+         local error = core.get_error_detail(error_message, 1)
 
          assert.is.equal(-1, error.line)
          assert.is.equal('ModuleNotFoundError: No module named "psutil"', error.error)
@@ -306,7 +306,7 @@ describe("Get failed details", function()
 
       core.state.filename = nil
       test_wrapper(mocks, function()
-         local error = core._get_error_detail(error_message, 1)
+         local error = core.get_error_detail(error_message, 1)
 
          assert.is.equal(15, error.line)
          assert.is.equal(
@@ -423,7 +423,7 @@ describe("Get failed details", function()
 
       core.state.filename = nil
       test_wrapper(mocks, function()
-         local error = core._get_error_detail(error_message, 1)
+         local error = core.get_error_detail(error_message, 1)
 
          assert.is.equal(102, error.line)
          assert.is.equal(
@@ -498,7 +498,7 @@ describe("Get failed details", function()
 
       core.state.filename = nil
       test_wrapper(mocks, function()
-         local error = core._get_error_detail(error_message, 1)
+         local error = core.get_error_detail(error_message, 1)
 
          assert.is.equal(124, error.line)
          assert.is.equal(

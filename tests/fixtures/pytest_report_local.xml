@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+    <testsuite name="pytest" errors="0" failures="1" skipped="0" tests="9" time="4.418"
+        timestamp="2025-04-07T18:59:26.679234-04:00" hostname="richard-syzlab">
+        <testcase classname="tests.test_utils" name="test_get_data" time="2.546" />
+        <testcase classname="tests.test_utils" name="test_get_data_multiple" time="0.139" />
+        <testcase classname="tests.test_utils" name="test_get_data_concurrent" time="0.079" />
+        <testcase classname="tests.test_utils" name="test_update_timezone" time="0.003" />
+        <testcase classname="tests.test_utils" name="test_separate_coords" time="0.007" />
+        <testcase classname="tests.test_utils" name="test_freq_nearby" time="0.006" />
+        <testcase classname="tests.test_utils" name="test_hourly_group" time="0.025" />
+        <testcase classname="tests.test_utils" name="test_daily_group" time="0.020" />
+        <testcase classname="tests.test_utils" name="test_generate_aggregate_data" time="0.034">
+            <failure
+                message="AssertionError: assert not True&#10; +  where True = hasattr(                                   uuid  ...                           geometry\n0  16272ee8-9a60-4dea-a4b1-76a8281732d4  ...  POINT (-7835709.939 -2708222.708)\n1  3ed960c0-13e9-441d-baf9-7a27181c35a4  ...  POINT (-7836296.593 -2707541.801)\n2  f51a5fbc-1a4a-4a36-9c4e-b8c67598e1f3  ...  POINT (-7836074.399 -2698175.727)\n\n[3 rows x 17 columns], 'group')&#10; +    where                                    uuid  ...                           geometry\n0  16272ee8-9a60-4dea-a4b1-76a8281732d4  ...  POINT (-7835709.939 -2708222.708)\n1  3ed960c0-13e9-441d-baf9-7a27181c35a4  ...  POINT (-7836296.593 -2707541.801)\n2  f51a5fbc-1a4a-4a36-9c4e-b8c67598e1f3  ...  POINT (-7836074.399 -2698175.727)\n\n[3 rows x 17 columns] = &lt;analytics.alerts.Alerts object at 0x719d4a6c6570&gt;.data">def
+                test_generate_aggregate_data():
+                """
+                Test the response of the API in /aggregate.
+                Must be return aggregate data and group information.
+                """
+                df = generate_simple_alerts_data()
+                n = len(df)
+
+                curr_time = datetime.datetime.now()
+                df["pub_millis"] = [curr_time] * n
+                df3 = utils.generate_aggregate_data(df)
+
+                assert len(df3.data), n
+
+                &gt; assert not hasattr(df3.data, "group")
+                E AssertionError: assert not True
+                E + where True = hasattr( uuid ... geometry\n0 16272ee8-9a60-4dea-a4b1-76a8281732d4
+                ... POINT (-7835709.939 -2708222.708)\n1 3ed960c0-13e9-441d-baf9-7a27181c35a4 ...
+                POINT (-7836296.593 -2707541.801)\n2 f51a5fbc-1a4a-4a36-9c4e-b8c67598e1f3 ... POINT
+                (-7836074.399 -2698175.727)\n\n[3 rows x 17 columns], 'group')
+                E + where uuid ... geometry\n0 16272ee8-9a60-4dea-a4b1-76a8281732d4 ... POINT
+                (-7835709.939 -2708222.708)\n1 3ed960c0-13e9-441d-baf9-7a27181c35a4 ... POINT
+                (-7836296.593 -2707541.801)\n2 f51a5fbc-1a4a-4a36-9c4e-b8c67598e1f3 ... POINT
+                (-7836074.399 -2698175.727)\n\n[3 rows x 17 columns] = &lt;analytics.alerts.Alerts
+                object at 0x719d4a6c6570&gt;.data
+
+                tests/test_utils.py:275: AssertionError</failure>
+        </testcase>
+    </testsuite>
+</testsuites>
