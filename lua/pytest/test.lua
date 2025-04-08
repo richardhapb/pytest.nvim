@@ -4,17 +4,16 @@ local parse = require 'pytest.parse'
 
 ---@class Test
 ---@field command string[]
----@field last_job_id number
 ---@field job_id number
 ---@field has_sdout boolean
 ---@field results TestResult[]
----@field has_stdout boolean
 
 ---@class TestState
 ---@field bufnr number
 ---@field last_output string[]
 ---@field filenames string[]
 ---@field working boolean
+---@field last_job_id number
 
 ---@class TestResult
 ---@field line number
@@ -34,24 +33,21 @@ local test_state = {
 }
 
 ---Clear any results and reset state
----@param test Test
-local function clear_state(test)
+---@param reset_buffer? boolean
+local function reset_state(reset_buffer)
    local ns = parse.NS
-   test_state.bufnr = test_state.bufnr or 0
 
    vim.api.nvim_buf_clear_namespace(test_state.bufnr, ns, 0, -1)
    vim.diagnostic.reset(ns, test_state.bufnr)
 
-   test.last_job_id = test.job_id
-
    test_state.working = false
-   test.job_id = nil
-   test.results = {}
    test_state.filenames = nil
    test_state.has_stdout = false
+
+   if reset_buffer then
+      test_state.bufnr = nil
+   end
 end
-
-
 
 ---Run a test
 ---@param test Test
@@ -65,9 +61,9 @@ function M.run(test)
    local ns = parse.NS
 
    if test_state.working then
-      M.cancel_test(test)
+      M.cancel_test()
    end
-   clear_state(test)
+   reset_state()
    test_state.working = true
 
    local bufnr = test_state.bufnr or vim.api.nvim_get_current_buf()
@@ -154,15 +150,14 @@ M.show_last_output = function()
 end
 
 ---Cancel a running test
----@param test Test
-M.cancel_test = function(test)
-   if test_state.working and test.job_id then
-      local ok = pcall(vim.fn.jobstop, test.job_id)
+M.cancel_test = function()
+   if test_state.working and test_state.last_job_id then
+      local ok = pcall(vim.fn.jobstop, test_state.last_job_id)
       if ok then
          utils.info("Pytest job cancelled, running the new test")
       end
 
-      clear_state(test)
+      reset_state()
    end
 end
 
