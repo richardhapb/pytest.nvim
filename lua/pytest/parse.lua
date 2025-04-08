@@ -1,9 +1,77 @@
 local utils = require 'pytest.utils'
 
+---@class TSParser
+---@field query vim.treesitter.Query
+---@field text_lines string[]
+---@field bufnr number
+
 
 local M = {}
 
-M.NS = vim.api.nvim_create_namespace('pytest_test')
+if vim.fn.has("win32") == 1 then
+   OUTPUT_FILE = "C:\\tmp\\pytest_report.xml"
+else
+   -- OUTPUT_FILE = "/tmp/pytest_report.xml"
+   OUTPUT_FILE = "/Users/richard/plugins/pytest.nvim/tests/fixtures/pytest_report_local.xml"
+end
+
+local ns = vim.api.nvim_create_namespace('pytest_test')
+
+local TSParser = {}
+TSParser.__index = TSParser
+
+---Create a new TSParser instance
+---@return TSParser?
+function TSParser.new()
+   local self = setmetatable({}, TSParser)
+
+   local tmp_file = io.open(OUTPUT_FILE, "r")
+
+   if tmp_file then
+      self.text_lines = tmp_file:read("*a")
+      self.parser = vim.treesitter.get_string_parser(self.text_lines, "xml")
+      tmp_file:close()
+   else
+      self.text_lines = {}
+      self.parser = nil
+   end
+
+   self.query = vim.treesitter.query.get("xml", "pytest")
+   if not self.query then
+      utils.error("Pytest query for XML not found. Make sure you have defined it in queries/xml/pytest.scm")
+      return nil
+   end
+   return self
+end
+
+function TSParser:get_fail_nodes(name)
+end
+
+---Get the lines of test functions for the current file
+---@param stdout string[]
+---@param bufnr number
+---@return TestResult[]?
+function TSParser:get_test_results(stdout, bufnr)
+   local test_results = {}
+
+   local root = self.parser:parse()[1]:root()
+   for id, node in self.query:iter_captures(root, self.text_lines) do
+      local name = self.query.captures[id]
+      if name == "case_passed" then
+         -- vim.print(self.query.captures[id])
+         -- vim.print(vim.treesitter.get_node_text(node, self.text_lines))
+      end
+      if name == "not_passed" then
+         local node_text = vim.treesitter.get_node_text(node, self.text_lines)
+         vim.print(self.query.captures[id])
+         local state = node_text:find("skipped") and "skipped" or "failed"
+
+         vim.print(state)
+      end
+   end
+
+   return test_results
+end
 
 ---Get the line and error message of the failed test for the current file
 ---@param stdout string[]
@@ -43,83 +111,6 @@ function M.get_error_detail(stdout, index, test_result)
    return detail
 end
 
----Get the lines of test functions for the current file
----@param stdout string[]
----@param bufnr number
----@return TestResult[]?
-function M.get_test_results(stdout, bufnr)
-   -- TODO: Refactor this function
-   local tests_executed = {}
-
-   for _, line in ipairs(stdout) do
-      if line:match('.*%.py::.*::.*') then
-         table.insert(tests_executed, line)
-      end
-   end
-
-   if #tests_executed == 0 then
-      for _, line in ipairs(stdout) do
-         if line:match('.*%.py::.*') then
-            table.insert(tests_executed, line)
-         end
-      end
-   end
-
-   local parser = vim.treesitter.get_parser(bufnr, "python")
-   if not parser then
-      utils.error("Parser not found")
-      return
-   end
-   local tree = parser:parse()[1]
-   local root = tree:root()
-
-   local parsed_query = vim.treesitter.query.get("python", 'custom')
-   if not parsed_query then
-      utils.error("Query not found")
-      return
-   end
-
-   local test_results = {}
-
-   for _, test_exec in ipairs(tests_executed) do
-      -- TODO: Extract this to a function
-      local class_name, function_name, stat = test_exec:match('.*%.py::(.*)::(.-)%s+(.*)%s+%[')
-      if not function_name then
-         class_name, function_name, stat = test_exec:match('.*%.py::(.*)::(.-)%s+(.*)%s+%[?')
-         if not function_name then
-            function_name, stat = test_exec:match('.*%.py::(.-)%s+([^%s]+)%s')
-            class_name = ''
-         end
-      end
-
-      local active_class = ''
-      if function_name then
-         for id, node in parsed_query:iter_captures(root, bufnr, 0, -1) do
-            local capture_name = parsed_query.captures[id]
-            if capture_name == 'class' then
-               local range = { node:range() }
-               local line = vim.api.nvim_buf_get_lines(bufnr, range[1], range[1] + 1, false)[1]
-               if line:match(class_name) then
-                  active_class = class_name
-               end
-            end
-
-            if capture_name == 'function' then
-               local range = { node:range() }
-               local line = vim.api.nvim_buf_get_lines(bufnr, range[1], range[1] + 1, false)[1]
-               if line:match(function_name) and active_class == class_name then
-                  table.insert(test_results,
-                     { line = range[1], state = string.lower(stat), class_name = class_name, function_name =
-                     function_name })
-                  active_class = ''
-               end
-            end
-         end
-      end
-   end
-   return test_results
-end
-
 function M.update_marks(bufnr, test_results)
    for _, test_result in ipairs(test_results) do
       if not test_result.line then
@@ -127,8 +118,17 @@ function M.update_marks(bufnr, test_results)
       end
       local text = test_result.state == 'passed' and '\t✅' or ''
       text = test_result.state == 'failed' and '\t❌' or text
-      vim.api.nvim_buf_set_extmark(bufnr, M.NS, test_result.line, 0, { virt_text = { { text } } })
+      vim.api.nvim_buf_set_extmark(bufnr, ns, test_result.line, 0, { virt_text = { { text } } })
    end
+end
+
+M.TSParser = TSParser
+M.NS = ns
+
+local parser = M.TSParser.new()
+
+if parser then
+   vim.print(parser:get_test_results())
 end
 
 return M
