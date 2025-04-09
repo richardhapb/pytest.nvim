@@ -15,14 +15,21 @@ local parse = require 'pytest.parse'
 ---@field working boolean
 ---@field last_job_id number
 
+---@class FailedTest
+---@field lnum number
+---@field end_lnum number
+---@field col number
+---@field end_col number
+---@field message string[]
+
 ---@class TestResult
----@field line number
 ---@field state 'passed' | 'skipped' | 'failed'
 ---@field filename string
 ---@field class_name string
+---@field class_lnum number
 ---@field function_name string
----@field function_line number
----@field message string[]
+---@field function_lnum number
+---@field failed_test? FailedTest
 
 local M = {}
 
@@ -32,6 +39,12 @@ local test_state = {
    working = false,
    last_output = nil
 }
+
+---Set the test_state
+---@param state TestState
+function M.set_state(state)
+   test_state = vim.tbl_extend("force", test_state, state)
+end
 
 ---Clear any results and reset state
 ---@param reset_buffer? boolean
@@ -90,7 +103,7 @@ function M.run(test)
          on_exit = function(_, exit_code)
             local failed = {}
             local i = 1
-            local parser = parse.TSParser.new(test_state.last_output)
+            local parser = parse.XmlParser.new(test_state.last_output)
 
             if not parser then
                utils.error("Error building the parser")
@@ -98,23 +111,20 @@ function M.run(test)
             end
 
             test.results = parser:get_test_results()
-            vim.print(test.results)
             parse.update_marks(bufnr, test.results)
             for _, test_result in ipairs(test.results) do
-               if test_result.state == 'failed' then
-                  if test_result.line == -1 then
-                     test_result.line = test_result.line
-                  end
+               if test_result.failed_test and test_result.state == 'failed' then
+                  local failed_test = test_result.failed_test or {}
 
                   table.insert(failed, {
                      bufnr = bufnr,
-                     lnum = test_result.line,
-                     end_lnum = test_result.line,
+                     lnum = failed_test.lnum,
+                     end_lnum = failed_test.lnum,
                      col = 0,
                      end_col = 0,
                      text = 'Test failed',
                      severity = vim.diagnostic.severity.ERROR,
-                     message = 'Test failed\n' .. test_result.message,
+                     message = 'Test failed\n' .. table.concat(failed_test.message, "\n"),
                      source = 'Django test',
                      code = 'TestError',
                      namespace = ns,

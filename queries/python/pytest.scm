@@ -9,16 +9,16 @@
 ) @function
 
 (class_definition
-  name: (identifier) @test_class_name
+  name: (identifier) @class_name
   body: (block   
-          (function_definition) @test_class_method
-        ) @test_class_body
-) @test_class
+          (function_definition) @class_method
+        ) @class_body
+) @class
 
 (class_definition
   body: (block
    (decorated_definition
-       definition: (function_definition) @test_class_method
+       definition: (function_definition) @class_method
    )
         )
 )

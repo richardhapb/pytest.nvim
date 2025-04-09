@@ -35,8 +35,24 @@
                   (Name) @not_passed_att_name
                   (AttValue) @not_passed_att_value
                 ) @not_passed_att
-              )  @not_passed
+              )
                 (content) @not_passed_content 
+            )
+          )
+        )
+      )
+    )
+  )
+)
+
+(element 
+  (content 
+    (element 
+      (content 
+        (element 
+          (content 
+            (element 
+              (STag)  @not_passed
             )
           )
         )
