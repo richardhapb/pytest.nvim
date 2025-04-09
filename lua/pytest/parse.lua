@@ -340,5 +340,6 @@ M.OUTPUT_FILE = OUTPUT_FILE
 M.NS = ns
 M.set_output_file = set_output_file
 M.update_marks = update_marks
+M.decode_xml_entities = decode_xml_entities
 
 return M
