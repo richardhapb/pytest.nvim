@@ -78,7 +78,7 @@ function docker.get_docker_compose_service_line(path)
 
    local docker_compose_name = settings.docker.docker_compose_file or 'docker-compose.yml'
 
-   local docker_compose_file = io.open(docker_compose_path .. '/' .. docker_compose_name, 'r')
+   local docker_compose_file = io.open(vim.fs.joinpath(docker_compose_path, docker_compose_name), 'r')
    if not docker_compose_file then
       return lineno
    end
@@ -117,7 +117,7 @@ function docker.get_docker_compose_volume(path)
 
    local docker_compose_name = settings.docker.docker_compose_file or 'docker-compose.yml'
 
-   local docker_compose_file = io.open(docker_compose_path .. '/' .. docker_compose_name, 'r')
+   local docker_compose_file = io.open(vim.fs.joinpath(docker_compose_path, docker_compose_name), 'r')
    if not docker_compose_file then
       return ''
    end
@@ -151,8 +151,8 @@ function docker.get_docker_compose_volume(path)
       end
 
       if volume_match then
-         if line:match('^%s*-%s+%.' .. path_prefix .. '/:(.*)') then
-            volume = line:match('^%s*-%s+%.' .. path_prefix .. '/:(.*)')
+         if line:match('^%s*-%s+%.' .. path_prefix .. '[\\/]:(.*)') then
+            volume = line:match('^%s*-%s+%.' .. path_prefix .. '[\\/]:(.*)')
             break
          end
       end
@@ -182,14 +182,23 @@ function docker.build_docker_command(settings, files)
 
    local path_prefix = settings.docker.local_path_prefix
    if path_prefix and path_prefix ~= '' then
-      path_prefix = '/' .. path_prefix
+      local path_char = vim.fn.has("win32") == 1 and "\\" or "/"
+
+      path_prefix = path_char .. path_prefix
    end
 
    local parsed_files = docker.parse_docker_files(docker_path, path_prefix, docker_compose_path, files)
    local container = settings.docker.container
 
-   local pytest_command = pytest.build_command(parsed_files)
-   return utils.list_extend({ 'docker', 'exec', container }, pytest_command)
+   local report_name = "pytest_report.xml"
+
+   local output_file = vim.fs.joinpath(docker_compose_path, path_prefix, report_name)
+
+   require 'pytest.parse'.set_output_file(output_file)
+
+   -- In docker create the report in project's root
+   local pytest_command = pytest.build_command(parsed_files, report_name)
+   return utils.list_extend({ 'docker', 'exec', '-i', container }, pytest_command)
 end
 
 ---Parse a file or a list of files to docker internal path
@@ -207,10 +216,10 @@ function docker.parse_docker_files(docker_path, path_prefix, local_root, files)
    -- Transform each file to docker path format
    for _, file in ipairs(files) do
       local relative_file = file:match(utils.scape_special_chars(local_root) ..
-         utils.scape_special_chars(path_prefix) .. '/(.*)')
+         utils.scape_special_chars(path_prefix) .. '[/\\](.*)')
 
       local docker_file_path = docker_path .. relative_file
-      parsed = utils.list_extend(parsed, {docker_file_path})
+      parsed = utils.list_extend(parsed, { docker_file_path })
    end
 
    return parsed

@@ -8,6 +8,7 @@ local M = {}
 ---Main settings for pytest.nvim
 ---@param opts? PytestConfig
 M.setup = function(opts)
+   opts = opts or {}
    if opts then
       config.opts = vim.tbl_deep_extend("force", config.defaults, opts)
    end

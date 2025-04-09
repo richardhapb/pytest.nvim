@@ -189,15 +189,15 @@ require 'pytest'.setup {
 - [x] Docker integration
 - [x] Path from docker compose file
 - [ ] Container name from docker compose file
-- [ ] Tests for docker compose file
-- [ ] Custom args for pytest command
+- [x] Tests for docker compose file
+- [x] Custom args for pytest command
 - [x] Pass function as settings
 - [x] Handle single file testing
 - [ ] Handle multiple files
 - [ ] Handle modules and project
-- [ ] Integrate treesitter for parsing
+- [x] Integrate treesitter for parsing
 - [ ] Centralized UI
-- [ ] Parse error lines from JSON output of pytest, instead of relying on stdout 
+- [x] Parse error lines from XML output of pytest, instead of relying on stdout 
 
 ## Contributing
 

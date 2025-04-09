@@ -13,8 +13,12 @@ local M = {}
 function M.test_file(file, opts)
    local current_file = file or vim.fn.expand('%:p')
    local new_test = {}
-   new_test.filenames = { current_file:match("[^/]+$") }
-   new_test.bufnr = utils.get_buffer_from_filepath(current_file) or vim.api.nvim_get_current_buf()
+   local filenames = { current_file:match("[^/]+$") }
+   local bufnr = utils.get_buffer_from_filepath(current_file) or vim.api.nvim_get_current_buf()
+
+   test.set_state(
+      { filenames = filenames, bufnr = bufnr }
+   )
 
    local settings = config.get(opts)
 

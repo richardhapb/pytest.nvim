@@ -1,0 +1,72 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.4, pytest-8.3.4, pluggy-1.5.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+django: version: 5.0.6, settings: dirtystroke.settings_test (from option)
+rootdir: /usr/src/app
+configfile: pyproject.toml
+plugins: django-4.9.0
+collecting ... collected 5 items
+
+apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_memory_threshold PASSED [ 20%]
+apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_memory_usage_disabled FAILED [ 40%]
+apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_memory_usage_enabled FAILED [ 60%]
+apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_memory_usage_no_env PASSED [ 80%]
+apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_save_interval SKIPPED [100%]
+
+=================================== FAILURES ===================================
+_____________ TestMemoryUsageMiddleware.test_memory_usage_disabled _____________
+
+self = <apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware testMethod=test_memory_usage_disabled>
+mocktake_snapshot = <MagicMock name='take_snapshot' id='124665463417328'>
+
+    @patch('memory_usage.middlewares.AppMemoryProfiler.take_snapshot', return_value={'size_mb': 100})
+    def test_memory_usage_disabled(self, mocktake_snapshot: MagicMock) -> None:
+        """Test that a memory usage snapshot is taken when MEMORY_USAGE is disabled."""
+    
+        # Stub the environment variables MEMORY_USAGE
+        with self.settings(MEMORY_USAGE=False):
+            self.client.get('/')
+    
+            # This function is not called.
+>           mocktake_snapshot.assert_called_once()
+
+apps/memory_usage/tests/test_middlewares.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='take_snapshot' id='124665463417328'>
+
+    def assert_called_once(self):
+        """assert that the mock was called only once.
+        """
+        if not self.call_count == 1:
+            msg = ("Expected '%s' to have been called once. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'take_snapshot' to have been called once. Called 0 times.
+
+/usr/local/lib/python3.12/unittest/mock.py:923: AssertionError
+_____________ TestMemoryUsageMiddleware.test_memory_usage_enabled ______________
+
+self = <apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware testMethod=test_memory_usage_enabled>
+mocktake_snapshot = <MagicMock name='take_snapshot' id='124665464267856'>
+
+    @patch('memory_usage.middlewares.AppMemoryProfiler.take_snapshot', return_value={'size_mb': 100})
+    def test_memory_usage_enabled(self, mocktake_snapshot: MagicMock) -> None:
+        """Test that a memory usage snapshot is taken when MEMORY_USAGE is enabled."""
+    
+        # Stub the environment variables MEMORY_USAGE
+        with self.settings(MEMORY_USAGE=True):
+            self.client.get('/')
+    
+            # This function is called twice.
+>           self.assertEqual(mocktake_snapshot.call_count, 1)
+E           AssertionError: 2 != 1
+
+apps/memory_usage/tests/test_middlewares.py:41: AssertionError
+---------- generated xml file: /usr/src/app/pytest_report_docker.xml -----------
+=========================== short test summary info ============================
+FAILED apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_memory_usage_disabled - AssertionError: Expected 'take_snapshot' to have been called once. Called 0 times.
+FAILED apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_memory_usage_enabled - AssertionError: 2 != 1
+==================== 2 failed, 2 passed, 1 skipped in 2.26s ====================

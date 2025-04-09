@@ -5,10 +5,15 @@ local pytest = {}
 
 ---Build pytest command
 ---@param args table | string
+---@param output_file? string
 ---@return string[]
-function pytest.build_command(args)
+function pytest.build_command(args, output_file)
    if type(args) == "string" then
       args = { args }
+   end
+
+   if not output_file then
+      output_file = require 'pytest.parse'.OUTPUT_FILE
    end
 
    local settings = config.get()
@@ -19,7 +24,8 @@ function pytest.build_command(args)
       table.insert(user_args, '--ds=' .. django_settings_module)
    end
 
-   return utils.list_extend({ 'pytest', '-v' }, utils.list_extend(user_args, args))
+
+   return utils.list_extend({ 'pytest', '-v', '--junit-xml=' .. output_file }, utils.list_extend(user_args, args))
 end
 
 function pytest.is_pytest_available()

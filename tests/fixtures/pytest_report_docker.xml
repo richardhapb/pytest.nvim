@@ -1,51 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <testsuites>
-   <testsuite name="pytest" errors="0" failures="2" skipped="0" tests="40" time="72.864"
-      timestamp="2025-04-07T23:12:36.355254+00:00" hostname="ccd2e2ed952d">
-      <testcase classname="apps.analytics.tests.test_etl.TestMedian" name="test_median_even"
-         time="0.033" />
-      <testcase classname="apps.analytics.tests.test_etl.TestMedian" name="test_median_odd"
-         time="0.008">
-         <failure message="AssertionError: Decimal('5') != 4">self =
-            &lt;apps.analytics.tests.test_etl.TestMedian testMethod=test_median_odd&gt;
+   <testsuite name="pytest" errors="0" failures="2" skipped="1" tests="5" time="2.271"
+      timestamp="2025-04-09T23:22:06.778368+00:00" hostname="4b2fe98f8261">
+      <testcase classname="apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware"
+         name="test_memory_threshold" time="1.555" />
+      <testcase classname="apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware"
+         name="test_memory_usage_disabled" time="0.145">
+         <failure
+            message="AssertionError: Expected 'take_snapshot' to have been called once. Called 0 times.">self
+            = &lt;apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware
+            testMethod=test_memory_usage_disabled&gt;
+            mocktake_snapshot = &lt;MagicMock name='take_snapshot' id='124665463417328'&gt;
+            @patch('memory_usage.middlewares.AppMemoryProfiler.take_snapshot',
+            return_value={'size_mb': 100})
+            def test_memory_usage_disabled(self, mocktake_snapshot: MagicMock) -&gt; None:
+            """Test that a memory usage snapshot is taken when MEMORY_USAGE is disabled."""
 
-            def test_median_odd(self) -&gt; None:
-            """Test median calculation for odd number of elements"""
-            self.TestModel.objects.all().delete()
-            self.TestModel.objects.bulk_create([self.TestModel(id=i, value=i) for i in range(1,
-            10)])
+            # Stub the environment variables MEMORY_USAGE
+            with self.settings(MEMORY_USAGE=False):
+            self.client.get('/')
 
-            result = self.TestModel.objects.aggregate(median=Median('value'))['median']
-            &gt; self.assertEqual(result, 4)
-            E AssertionError: Decimal('5') != 4
+            # This function is not called.
+            &gt; mocktake_snapshot.assert_called_once()
+            apps/memory_usage/tests/test_middlewares.py:52:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
-            apps/analytics/tests/test_etl.py:78: AssertionError</failure>
+            self = &lt;MagicMock name='take_snapshot' id='124665463417328'&gt;
+
+            def assert_called_once(self):
+            """assert that the mock was called only once.
+            """
+            if not self.call_count == 1:
+            msg = ("Expected '%s' to have been called once. Called %s times.%s"
+            % (self._mock_name or 'mock',
+            self.call_count,
+            self._calls_repr()))
+            &gt; raise AssertionError(msg)
+            E AssertionError: Expected 'take_snapshot' to have been called once. Called 0 times.
+            /usr/local/lib/python3.12/unittest/mock.py:923: AssertionError</failure>
       </testcase>
-      <testcase classname="apps.analytics.tests.test_etl.TestETLGenerics"
-         name="test_calculate_metrics" time="0.037" />
-      <testcase classname="apps.analytics.tests.test_etl.TestETLGenerics"
-         name="test_filter_outliers" time="0.022" />
-      <testcase classname="apps.analytics.tests.test_etl.TestETLUtils"
-         name="test_filter_staff_users" time="0.347" />
-      <testcase classname="apps.analytics.tests.test_etl.TestETL" name="test_load_data" time="0.029" />
-      <testcase classname="apps.memory_usage.tests.test_memory_pofiler.TestAppMemoryProfiler"
-         name="test_base_hour_from_timestamp" time="0.021" />
-      <testcase classname="apps.memory_usage.tests.test_memory_pofiler.TestAppMemoryProfiler"
-         name="test_get_app_name" time="0.004" />
-      <testcase classname="apps.memory_usage.tests.test_memory_pofiler.TestAppMemoryProfiler"
-         name="test_insert_into_db" time="0.064" />
-      <testcase classname="apps.memory_usage.tests.test_memory_pofiler.TestAppMemoryProfiler"
-         name="test_take_snapshot" time="0.005" />
       <testcase classname="apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware"
-         name="test_memory_threshold" time="0.317" />
-      <testcase classname="apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware"
-         name="test_memory_usage_disabled" time="0.022" />
-      <testcase classname="apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware"
-         name="test_memory_usage_enabled" time="0.024">
+         name="test_memory_usage_enabled" time="0.140">
          <failure message="AssertionError: 2 != 1">self =
             &lt;apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware
             testMethod=test_memory_usage_enabled&gt;
-            mocktake_snapshot = &lt;MagicMock name='take_snapshot' id='133132241142320'&gt;
+            mocktake_snapshot = &lt;MagicMock name='take_snapshot' id='124665464267856'&gt;
             @patch('memory_usage.middlewares.AppMemoryProfiler.take_snapshot',
             return_value={'size_mb': 100})
             def test_memory_usage_enabled(self, mocktake_snapshot: MagicMock) -&gt; None:
@@ -59,61 +58,14 @@
             &gt; self.assertEqual(mocktake_snapshot.call_count, 1)
             E AssertionError: 2 != 1
 
-            apps/memory_usage/tests/test_middlewares.py:40: AssertionError</failure>
+            apps/memory_usage/tests/test_middlewares.py:41: AssertionError</failure>
       </testcase>
       <testcase classname="apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware"
-         name="test_memory_usage_no_env" time="0.023" />
+         name="test_memory_usage_no_env" time="0.140" />
       <testcase classname="apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware"
-         name="test_save_interval" time="0.054" />
-      <testcase classname="apps.memory_usage.tests.test_view.TestMemoryUsageCaptureView"
-         name="test_get" time="0.030" />
-      <testcase classname="apps.users.tests.test_authentication.AuthenticationTests"
-         name="test_login_redirects" time="0.377" />
-      <testcase classname="apps.users.tests.test_authentication.AuthenticationTests"
-         name="test_sign_out_view" time="0.147" />
-      <testcase classname="apps.users.tests.test_models.ProfileMatchManagerTest"
-         name="test_find_matches_for_profile" time="11.527" />
-      <testcase classname="apps.users.tests.test_models.ProfileMatchManagerTest"
-         name="test_profile_exclusion_conditions" time="0.016" />
-      <testcase classname="apps.users.tests.test_models.ProfileMatchManagerTest"
-         name="test_profile_exclusion_conditions_with_blocks" time="0.063" />
-      <testcase classname="apps.users.tests.test_models.ProfileMatchManagerTest"
-         name="test_profile_exclusion_conditions_with_inactive_users" time="0.340" />
-      <testcase classname="apps.users.tests.test_profile_config.TestProfileConfig"
-         name="test_profile_config_creation" time="0.065" />
-      <testcase classname="apps.users.tests.test_profile_config.TestProfileConfigMigration"
-         name="test_idempotency" time="0.071" />
-      <testcase classname="apps.users.tests.test_profile_config.TestProfileReadReceiptsConfig"
-         name="test_new_config" time="4.229" />
-      <testcase classname="apps.users.tests.test_profile_config.TestRelatedViews"
-         name="test_read_receipts_update_view" time="15.211" />
-      <testcase classname="apps.users.tests.test_profile_views.TestProfileViews"
-         name="test_fill_profiles_list_with_remaining_matches" time="11.744" />
-      <testcase classname="apps.users.tests.test_profile_views.TestProfileViews"
-         name="test_get_profiles_sorting_with_filter_mixed" time="0.892" />
-      <testcase classname="apps.users.tests.test_profile_views.TestProfileViews"
-         name="test_paginate_profiles" time="0.066" />
-      <testcase classname="apps.users.tests.test_profile_views.TestProfileViews"
-         name="test_profile_view_complete_flow_0" time="8.988" />
-      <testcase classname="apps.users.tests.test_profile_views.TestProfileViews"
-         name="test_profile_view_complete_flow_1" time="15.067" />
-      <testcase classname="apps.users.tests.test_registration.RegistrationTests"
-         name="test_create_user" time="0.160" />
-      <testcase classname="apps.users.tests.test_session.TestUserBehavior"
-         name="test_get_last_user_behavior" time="0.144" />
-      <testcase classname="apps.users.tests.test_session.TestUserBehavior"
-         name="test_new_user_action" time="0.061" />
-      <testcase classname="apps.users.tests.test_session.TestUserBehavior"
-         name="test_new_view_visit" time="0.072" />
-      <testcase classname="apps.users.tests.test_session.TestUserBehavior" name="test_set_end_time"
-         time="0.072" />
-      <testcase classname="apps.users.tests.test_session.TestUserSession"
-         name="test_get_last_user_session" time="0.131" />
-      <testcase classname="apps.users.tests.test_session.TestUserSession"
-         name="test_new_user_session" time="0.060" />
-      <testcase classname="apps.users.tests.test_session.TestUserSession" name="test_set_end_time"
-         time="0.062" />
-      <testcase classname="apps.memory_usage.tests.test_view.TestMemoryUsageView" name="test_get"
-         time="1.646" />
+         name="test_save_interval" time="0.002">
+         <skipped type="pytest.skip" message="unconditional skip">/usr/src/app/apps/memory_usage/tests/test_middlewares.py:54:
+            unconditional skip</skipped>
+      </testcase>
    </testsuite>
 </testsuites>

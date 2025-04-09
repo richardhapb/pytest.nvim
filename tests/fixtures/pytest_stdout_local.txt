@@ -1,0 +1,92 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.4, pytest-8.3.5, pluggy-1.5.0 -- /home/richard/proj/antof_traffic/client/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/richard/proj/antof_traffic/client
+configfile: pyproject.toml
+plugins: dash-2.18.2
+collecting ... collected 9 items
+
+tests/test_utils.py::test_get_data PASSED                                [ 11%]
+tests/test_utils.py::test_get_data_multiple FAILED                       [ 22%]
+tests/test_utils.py::test_get_data_concurrent PASSED                     [ 33%]
+tests/test_utils.py::test_update_timezone PASSED                         [ 44%]
+tests/test_utils.py::test_separate_coords PASSED                         [ 55%]
+tests/test_utils.py::test_freq_nearby PASSED                             [ 66%]
+tests/test_utils.py::test_hourly_group PASSED                            [ 77%]
+tests/test_utils.py::test_daily_group PASSED                             [ 88%]
+tests/test_utils.py::test_generate_aggregate_data FAILED                 [100%]
+
+=================================== FAILURES ===================================
+____________________________ test_get_data_multiple ____________________________
+
+    def test_get_data_multiple():
+        """
+        Test multiple requests for data in a short period of time
+    
+        Simulate behavior in the graph when multiple requests are made
+        """
+        Alerts.reset_instance()
+    
+        now = datetime.datetime.now(pytz.UTC)
+        since = int((now - datetime.timedelta(days=30)).timestamp()) * 1000
+        until = int((now - datetime.timedelta(minutes=MINUTES_BETWEEN_UPDATES_FROM_API)).timestamp()) * 1000
+    
+        calls_when_request_to_server = 2
+    
+        # Side effect
+        alerts_empty = Alerts()
+        alerts_full = Alerts.new_instance(generate_alerts_data())
+    
+        # Reset data of Singleton class
+        Alerts.reset_instance()
+    
+        with patch("utils.utils.Alerts") as mock_alerts, patch("utils.utils.requests.get") as mock_requests:
+            mock_alerts.side_effect = [alerts_empty, alerts_full]
+    
+            alerts = utils.get_data(since, until)
+            assert mock_alerts.call_count == calls_when_request_to_server
+            mock_requests.assert_called_once()
+            mock_requests.reset_mock()
+    
+        with patch("utils.utils.requests.get") as mock_requests:
+            # Mock the http response: `Response`
+            response_mock = mock_requests.return_value
+            response_mock.json.return_value = {"alerts": generate_alerts_data()}
+    
+            for _ in range(4):
+                alerts = utils.get_data(since, until)
+                assert isinstance(alerts, Alerts)
+                assert not alerts.is_empty
+>               assert alerts.data.shape[0] < 0
+E               assert 3 < 0
+
+tests/test_utils.py:150: AssertionError
+_________________________ test_generate_aggregate_data _________________________
+
+    def test_generate_aggregate_data():
+        """
+        Test the response of the API in /aggregate.
+        Must be return aggregate data and group information.
+        """
+        df = generate_simple_alerts_data()
+        n = len(df)
+    
+        curr_time = datetime.datetime.now()
+        df["pub_millis"] = [curr_time] * n
+        df3 = utils.generate_aggregate_data(df)
+    
+        assert len(df3.data), n
+    
+>       assert not hasattr(df3.data, "group")
+E       AssertionError: assert not True
+E        +  where True = hasattr(                                   uuid  ...                           geometry\n0  16272ee8-9a60-4dea-a4b1-76a8281732d4  ...  POINT (-7835709.939 -2708222.708)\n1  3ed960c0-13e9-441d-baf9-7a27181c35a4  ...  POINT (-7836296.593 -2707541.801)\n2  f51a5fbc-1a4a-4a36-9c4e-b8c67598e1f3  ...  POINT (-7836074.399 -2698175.727)\n\n[3 rows x 17 columns], 'group')
+E        +    where                                    uuid  ...                           geometry\n0  16272ee8-9a60-4dea-a4b1-76a8281732d4  ...  POINT (-7835709.939 -2708222.708)\n1  3ed960c0-13e9-441d-baf9-7a27181c35a4  ...  POINT (-7836296.593 -2707541.801)\n2  f51a5fbc-1a4a-4a36-9c4e-b8c67598e1f3  ...  POINT (-7836074.399 -2698175.727)\n\n[3 rows x 17 columns] = <analytics.alerts.Alerts object at 0x72d815dfc0b0>.data
+
+tests/test_utils.py:275: AssertionError
+------------------ generated xml file: /tmp/pytest_report.xml ------------------
+=========================== short test summary info ============================
+FAILED tests/test_utils.py::test_get_data_multiple - assert 3 < 0
+FAILED tests/test_utils.py::test_generate_aggregate_data - AssertionError: assert not True
+ +  where True = hasattr(                                   uuid  ...                           geometry\n0  16272ee8-9a60-4dea-a4b1-76a8281732d4  ...  POINT (-7835709.939 -2708222.708)\n1  3ed960c0-13e9-441d-baf9-7a27181c35a4  ...  POINT (-7836296.593 -2707541.801)\n2  f51a5fbc-1a4a-4a36-9c4e-b8c67598e1f3  ...  POINT (-7836074.399 -2698175.727)\n\n[3 rows x 17 columns], 'group')
+ +    where                                    uuid  ...                           geometry\n0  16272ee8-9a60-4dea-a4b1-76a8281732d4  ...  POINT (-7835709.939 -2708222.708)\n1  3ed960c0-13e9-441d-baf9-7a27181c35a4  ...  POINT (-7836296.593 -2707541.801)\n2  f51a5fbc-1a4a-4a36-9c4e-b8c67598e1f3  ...  POINT (-7836074.399 -2698175.727)\n\n[3 rows x 17 columns] = <analytics.alerts.Alerts object at 0x72d815dfc0b0>.data
+========================= 2 failed, 7 passed in 4.39s ==========================
