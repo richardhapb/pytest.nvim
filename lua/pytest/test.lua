@@ -10,10 +10,11 @@ local parse = require 'pytest.parse'
 
 ---@class TestState
 ---@field bufnr number
----@field last_output string[]
----@field filenames string[]
----@field working boolean
----@field last_job_id number
+---@field last_output? string[]
+---@field has_stdout? boolean
+---@field filenames? string[]
+---@field working? boolean
+---@field last_job_id? number
 
 ---@class FailedTest
 ---@field lnum number
@@ -37,7 +38,8 @@ local test_state = {
    bufnr = nil,
    filenames = nil,
    working = false,
-   last_output = nil
+   last_output = nil,
+   has_sdout = false
 }
 
 ---Set the test_state

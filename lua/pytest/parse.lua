@@ -6,7 +6,7 @@ local utils = require 'pytest.utils'
 ---@field text_lines string[]
 ---@field stdout string[]
 ---@field parser vim.treesitter.LanguageTree
----@field get_filenames_from_output fun(self: XmlParser, function_name: string): table
+---@field get_filename_and_class_from_output fun(self: XmlParser, function_name: string): table
 ---@field get_function_name fun(self: XmlParser, source: string): string
 ---@field get_test_results fun(self: XmlParser): TestResult[]
 
@@ -96,7 +96,6 @@ function XmlParser.new(stdout)
    end
 
    local self = setmetatable({}, XmlParser)
-   vim.print(OUTPUT_FILE)
    local tmp_file = io.open(OUTPUT_FILE, "r")
 
    if tmp_file then
@@ -131,7 +130,7 @@ end
 ---Get all filenames from pytest output
 ---@param function_name string
 ---@return table
-function XmlParser:get_filenames_from_output(function_name)
+function XmlParser:get_filename_and_class_from_output(function_name)
    local filename = ""
    local class_name = ""
    for _, line in ipairs(self.stdout) do
@@ -191,7 +190,7 @@ function PythonParser:get_test_elements_lnum(class_name, function_name)
       end
    end
 
-   return function_lnum, class_lnum
+   return class_lnum, function_lnum
 end
 
 ---Get the lines of test functions for the current file
@@ -227,12 +226,12 @@ function XmlParser:get_test_results()
             end
          end
 
-         local names = self:get_filenames_from_output(function_name)
+         local names = self:get_filename_and_class_from_output(function_name)
 
          local function_lnum = 0
          local class_lnum = 0
          if python_parser then
-            function_lnum, class_lnum = python_parser:get_test_elements_lnum(names.class_name, function_name)
+            class_lnum, function_lnum = python_parser:get_test_elements_lnum(names.class_name, function_name)
          end
 
          local test_result = nil

@@ -192,8 +192,7 @@ function docker.build_docker_command(settings, files)
 
    local report_name = "pytest_report.xml"
 
-   local output_file = vim.fs.joinpath(utils.scape_special_chars(docker_compose_path),
-      utils.scape_special_chars(path_prefix), report_name)
+   local output_file = vim.fs.joinpath(docker_compose_path, path_prefix, report_name)
 
    require 'pytest.parse'.set_output_file(output_file)
 
