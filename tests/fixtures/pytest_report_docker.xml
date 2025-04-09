@@ -1,51 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <testsuites>
-   <testsuite name="pytest" errors="0" failures="2" skipped="0" tests="40" time="72.864"
-      timestamp="2025-04-07T23:12:36.355254+00:00" hostname="ccd2e2ed952d">
+   <testsuite name="pytest" errors="1" failures="14" skipped="1" tests="40" time="36.374"
+      timestamp="2025-04-08T23:04:06.320531+00:00" hostname="4b2fe98f8261">
       <testcase classname="apps.analytics.tests.test_etl.TestMedian" name="test_median_even"
-         time="0.033" />
+         time="0.039" />
       <testcase classname="apps.analytics.tests.test_etl.TestMedian" name="test_median_odd"
-         time="0.008">
-         <failure message="AssertionError: Decimal('5') != 4">self =
-            &lt;apps.analytics.tests.test_etl.TestMedian testMethod=test_median_odd&gt;
-
-            def test_median_odd(self) -&gt; None:
-            """Test median calculation for odd number of elements"""
-            self.TestModel.objects.all().delete()
-            self.TestModel.objects.bulk_create([self.TestModel(id=i, value=i) for i in range(1,
-            10)])
-
-            result = self.TestModel.objects.aggregate(median=Median('value'))['median']
-            &gt; self.assertEqual(result, 4)
-            E AssertionError: Decimal('5') != 4
-
-            apps/analytics/tests/test_etl.py:78: AssertionError</failure>
-      </testcase>
+         time="0.008" />
       <testcase classname="apps.analytics.tests.test_etl.TestETLGenerics"
-         name="test_calculate_metrics" time="0.037" />
+         name="test_calculate_metrics" time="0.036" />
       <testcase classname="apps.analytics.tests.test_etl.TestETLGenerics"
-         name="test_filter_outliers" time="0.022" />
+         name="test_filter_outliers" time="0.017" />
       <testcase classname="apps.analytics.tests.test_etl.TestETLUtils"
-         name="test_filter_staff_users" time="0.347" />
-      <testcase classname="apps.analytics.tests.test_etl.TestETL" name="test_load_data" time="0.029" />
+         name="test_filter_staff_users" time="0.233">
+         <failure message="AssertionError: 37 != 10">self =
+            &lt;apps.analytics.tests.test_etl.TestETLUtils testMethod=test_filter_staff_users&gt;
+
+            def test_filter_staff_users(self) -&gt; None:
+            """Test the filter_staff_users function"""
+
+            profiles = Profile.objects.all()
+            messages = Message.objects.all()
+            drawings = DrawingPage.objects.all()
+            users = User.objects.all()
+
+            &gt; self.assertEqual(len(profiles), 10)
+            E AssertionError: 37 != 10
+
+            apps/analytics/tests/test_etl.py:253: AssertionError</failure>
+      </testcase>
+      <testcase classname="apps.analytics.tests.test_etl.TestETL" name="test_load_data" time="0.043" />
       <testcase classname="apps.memory_usage.tests.test_memory_pofiler.TestAppMemoryProfiler"
-         name="test_base_hour_from_timestamp" time="0.021" />
+         name="test_base_hour_from_timestamp" time="0.020" />
       <testcase classname="apps.memory_usage.tests.test_memory_pofiler.TestAppMemoryProfiler"
          name="test_get_app_name" time="0.004" />
       <testcase classname="apps.memory_usage.tests.test_memory_pofiler.TestAppMemoryProfiler"
-         name="test_insert_into_db" time="0.064" />
+         name="test_insert_into_db" time="0.027">
+         <failure message="AssertionError: 35 != 10">self =
+            &lt;apps.memory_usage.tests.test_memory_pofiler.TestAppMemoryProfiler
+            testMethod=test_insert_into_db&gt;
+
+            def test_insert_into_db(self):
+            """Test the insert_into_db method of AppMemoryProfiler."""
+            self.memory_profiler.insert_into_db()
+
+            # Verify whether the objects are inserted into the database.
+            objects = MemoryUsage.objects.all()
+
+            &gt; self.assertEqual(objects.count(), OBJECTS)
+            E AssertionError: 35 != 10
+
+            apps/memory_usage/tests/test_memory_pofiler.py:111: AssertionError</failure>
+      </testcase>
       <testcase classname="apps.memory_usage.tests.test_memory_pofiler.TestAppMemoryProfiler"
-         name="test_take_snapshot" time="0.005" />
+         name="test_take_snapshot" time="0.004" />
       <testcase classname="apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware"
-         name="test_memory_threshold" time="0.317" />
+         name="test_memory_threshold" time="0.000">
+         <skipped type="pytest.skip" message="unconditional skip">/usr/src/app/apps/memory_usage/tests/test_middlewares.py:83:
+            unconditional skip</skipped>
+      </testcase>
       <testcase classname="apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware"
-         name="test_memory_usage_disabled" time="0.022" />
+         name="test_memory_usage_disabled" time="1.297" />
       <testcase classname="apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware"
-         name="test_memory_usage_enabled" time="0.024">
+         name="test_memory_usage_enabled" time="0.145">
          <failure message="AssertionError: 2 != 1">self =
             &lt;apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware
             testMethod=test_memory_usage_enabled&gt;
-            mocktake_snapshot = &lt;MagicMock name='take_snapshot' id='133132241142320'&gt;
+            mocktake_snapshot = &lt;MagicMock name='take_snapshot' id='126384822552432'&gt;
             @patch('memory_usage.middlewares.AppMemoryProfiler.take_snapshot',
             return_value={'size_mb': 100})
             def test_memory_usage_enabled(self, mocktake_snapshot: MagicMock) -&gt; None:
@@ -59,61 +79,1271 @@
             &gt; self.assertEqual(mocktake_snapshot.call_count, 1)
             E AssertionError: 2 != 1
 
-            apps/memory_usage/tests/test_middlewares.py:40: AssertionError</failure>
+            apps/memory_usage/tests/test_middlewares.py:41: AssertionError</failure>
       </testcase>
       <testcase classname="apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware"
-         name="test_memory_usage_no_env" time="0.023" />
+         name="test_memory_usage_no_env" time="0.141">
+         <failure
+            message="AssertionError: Expected 'take_snapshot' to have been called once. Called 0 times.">self
+            = &lt;apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware
+            testMethod=test_memory_usage_no_env&gt;
+            mock_take_snapshot = &lt;MagicMock name='take_snapshot' id='126384820322576'&gt;
+            @patch('memory_usage.middlewares.AppMemoryProfiler.take_snapshot',
+            return_value={'size_mb': 100})
+            def test_memory_usage_no_env(self, mock_take_snapshot: MagicMock) -&gt; None:
+            """Ensure that a memory usage snapshot is taken when MEMORY_USAGE is disabled."""
+
+            with self.settings(MEMORY_USAGE=False):
+            self.client.get('/')
+
+            # Not called.
+            &gt; mock_take_snapshot.assert_called_once()
+            apps/memory_usage/tests/test_middlewares.py:113:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+            self = &lt;MagicMock name='take_snapshot' id='126384820322576'&gt;
+
+            def assert_called_once(self):
+            """assert that the mock was called only once.
+            """
+            if not self.call_count == 1:
+            msg = ("Expected '%s' to have been called once. Called %s times.%s"
+            % (self._mock_name or 'mock',
+            self.call_count,
+            self._calls_repr()))
+            &gt; raise AssertionError(msg)
+            E AssertionError: Expected 'take_snapshot' to have been called once. Called 0 times.
+            /usr/local/lib/python3.12/unittest/mock.py:923: AssertionError</failure>
+      </testcase>
       <testcase classname="apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware"
-         name="test_save_interval" time="0.054" />
+         name="test_save_interval" time="0.291" />
       <testcase classname="apps.memory_usage.tests.test_view.TestMemoryUsageCaptureView"
-         name="test_get" time="0.030" />
+         name="test_get" time="0.022" />
       <testcase classname="apps.users.tests.test_authentication.AuthenticationTests"
-         name="test_login_redirects" time="0.377" />
+         name="test_login_redirects" time="0.205" />
       <testcase classname="apps.users.tests.test_authentication.AuthenticationTests"
-         name="test_sign_out_view" time="0.147" />
+         name="test_sign_out_view" time="0.104" />
       <testcase classname="apps.users.tests.test_models.ProfileMatchManagerTest"
-         name="test_find_matches_for_profile" time="11.527" />
+         name="test_find_matches_for_profile" time="5.384" />
       <testcase classname="apps.users.tests.test_models.ProfileMatchManagerTest"
-         name="test_profile_exclusion_conditions" time="0.016" />
+         name="test_profile_exclusion_conditions" time="0.010" />
       <testcase classname="apps.users.tests.test_models.ProfileMatchManagerTest"
-         name="test_profile_exclusion_conditions_with_blocks" time="0.063" />
+         name="test_profile_exclusion_conditions_with_blocks" time="0.057" />
       <testcase classname="apps.users.tests.test_models.ProfileMatchManagerTest"
-         name="test_profile_exclusion_conditions_with_inactive_users" time="0.340" />
+         name="test_profile_exclusion_conditions_with_inactive_users" time="0.384" />
       <testcase classname="apps.users.tests.test_profile_config.TestProfileConfig"
-         name="test_profile_config_creation" time="0.065" />
+         name="test_profile_config_creation" time="0.038" />
       <testcase classname="apps.users.tests.test_profile_config.TestProfileConfigMigration"
-         name="test_idempotency" time="0.071" />
+         name="test_idempotency" time="0.110">
+         <failure message="AssertionError: 29 != 2">self =
+            &lt;apps.users.tests.test_profile_config.TestProfileConfigMigration
+            testMethod=test_idempotency&gt;
+
+            def test_idempotency(self) -&gt; None:
+            """Test that running the config creation function twice does not create duplicate
+            configs"""
+            # Run the function once
+            create_profile_config(apps, None)
+
+            &gt; self.assertEqual(ProfileConfig.objects.count(), 2)
+            E AssertionError: 29 != 2
+
+            apps/users/tests/test_profile_config.py:95: AssertionError</failure>
+      </testcase>
       <testcase classname="apps.users.tests.test_profile_config.TestProfileReadReceiptsConfig"
-         name="test_new_config" time="4.229" />
+         name="test_new_config" time="2.606">
+         <error
+            message="failed on setup with &quot;django.db.utils.IntegrityError: duplicate key value violates unique constraint &quot;auth_user_username_key&quot;&#10;DETAIL:  Key (username)=(syzlab) already exists.&quot;">self
+            = &lt;django.db.backends.utils.CursorWrapper object at 0x72f241e38110&gt;
+            sql = 'INSERT INTO "auth_user" ("password", "last_login", "is_superuser", "username",
+            "first_name", "last_name", "email", "is_staff", "is_active", "date_joined") VALUES (%s,
+            %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "auth_user"."id"'
+            params = ('', None, False, 'syzlab', '', '', ...)
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f241e38110&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            return self.cursor.execute(sql)
+            else:
+            &gt; return self.cursor.execute(sql, params)
+            E psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint
+            "auth_user_username_key"
+            E DETAIL: Key (username)=(syzlab) already exists.
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:105: UniqueViolation
+            The above exception was the direct cause of the following exception:
+
+            cls = &lt;class 'apps.users.tests.test_profile_config.TestProfileReadReceiptsConfig'&gt;
+            @classmethod
+            def setUpTestData(cls) -&gt; None:
+            call_command('install_fixtures')
+
+            &gt; user = User.objects.create(username='syzlab')
+            apps/users/tests/test_profile_config.py:110:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            /usr/local/lib/python3.12/site-packages/django/db/models/manager.py:87: in
+            manager_method
+            return getattr(self.get_queryset(), name)(*args, **kwargs)
+            /usr/local/lib/python3.12/site-packages/django/db/models/query.py:679: in create
+            obj.save(force_insert=True, using=self.db)
+            /usr/local/lib/python3.12/site-packages/django/contrib/auth/base_user.py:78: in save
+            super().save(*args, **kwargs)
+            /usr/local/lib/python3.12/site-packages/django/db/models/base.py:822: in save
+            self.save_base(
+            /usr/local/lib/python3.12/site-packages/django/db/models/base.py:909: in save_base
+            updated = self._save_table(
+            /usr/local/lib/python3.12/site-packages/django/db/models/base.py:1071: in _save_table
+            results = self._do_insert(
+            /usr/local/lib/python3.12/site-packages/django/db/models/base.py:1112: in _do_insert
+            return manager._insert(
+            /usr/local/lib/python3.12/site-packages/django/db/models/manager.py:87: in
+            manager_method
+            return getattr(self.get_queryset(), name)(*args, **kwargs)
+            /usr/local/lib/python3.12/site-packages/django/db/models/query.py:1847: in _insert
+            return query.get_compiler(using=using).execute_sql(returning_fields)
+            /usr/local/lib/python3.12/site-packages/django/db/models/sql/compiler.py:1823: in
+            execute_sql
+            cursor.execute(sql, params)
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+            return self._execute_with_wrappers(
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in
+            _execute_with_wrappers
+            return executor(sql, params, many, context)
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+            with self.db.wrap_database_errors:
+            /usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+            raise dj_exc_value.with_traceback(traceback) from exc_value
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+            self = &lt;django.db.backends.utils.CursorWrapper object at 0x72f241e38110&gt;
+            sql = 'INSERT INTO "auth_user" ("password", "last_login", "is_superuser", "username",
+            "first_name", "last_name", "email", "is_staff", "is_active", "date_joined") VALUES (%s,
+            %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "auth_user"."id"'
+            params = ('', None, False, 'syzlab', '', '', ...)
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f241e38110&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            return self.cursor.execute(sql)
+            else:
+            &gt; return self.cursor.execute(sql, params)
+            E django.db.utils.IntegrityError: duplicate key value violates unique constraint
+            "auth_user_username_key"
+            E DETAIL: Key (username)=(syzlab) already exists.
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:105: IntegrityError</error>
+      </testcase>
       <testcase classname="apps.users.tests.test_profile_config.TestRelatedViews"
-         name="test_read_receipts_update_view" time="15.211" />
+         name="test_read_receipts_update_view" time="2.571" />
       <testcase classname="apps.users.tests.test_profile_views.TestProfileViews"
-         name="test_fill_profiles_list_with_remaining_matches" time="11.744" />
+         name="test_fill_profiles_list_with_remaining_matches" time="5.360">
+         <failure
+            message="users.models.Profile.DoesNotExist: Profile matching query does not exist.">self
+            = &lt;apps.users.tests.test_profile_views.TestProfileViews
+            testMethod=test_fill_profiles_list_with_remaining_matches&gt;
+
+            def test_fill_profiles_list_with_remaining_matches(self) -&gt; None:
+            """
+            Test the fill_profiles_list_with_remaining_matches method
+
+            Consider the following behaviors:
+
+            - The method should fill the profiles_list with the remaining matches
+            - The method should not return any None profiles
+            - The method should not add any profiles already in the profiles_list
+            """
+
+            profiles_list: list[Profile | None] = [None] *
+            profile_viewing.ProfilesView.PROFILES_PER_PAGE
+            profiles_to_insert = [103, 90, 125, 71, 100]
+
+            # Test setup
+            profiles_view = profile_viewing.ProfilesView()
+            &gt; profiles = [Profile.objects.get(id=profile_id) for profile_id in
+            profiles_to_insert]
+
+            apps/users/tests/test_profile_views.py:268:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            /usr/local/lib/python3.12/site-packages/django/db/models/manager.py:87: in
+            manager_method
+            return getattr(self.get_queryset(), name)(*args, **kwargs)
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+            self = &lt;QuerySet [&lt;Profile: Richard&gt;, &lt;Profile: Kissy&gt;, &lt;Profile:
+            Ron&gt;, &lt;Profile: Hermione&gt;, &lt;Profile: Giulia&gt;, &lt;Profile:
+            Tro...amie&gt;, &lt;Profile: Dylan&gt;, &lt;Profile: Chella&gt;, &lt;Profile:
+            SyzLab&gt;, &lt;Profile: Ada&gt;, '...(remaining elements truncated)...']&gt;
+            args = (), kwargs = {'id': 103}, clone = &lt;QuerySet []&gt;, limit = 21, num = 0
+
+            def get(self, *args, **kwargs):
+            """
+            Perform the query and return a single object matching the given
+            keyword arguments.
+            """
+            if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+            "Calling QuerySet.get(...) with filters after %s() is not "
+            "supported." % self.query.combinator
+            )
+            clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+            if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+            limit = None
+            if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+            ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+            num = len(clone)
+            if num == 1:
+            return clone._result_cache[0]
+            if not num:
+            &gt; raise self.model.DoesNotExist(
+            "%s matching query does not exist." % self.model._meta.object_name
+            )
+            E users.models.Profile.DoesNotExist: Profile matching query does not exist.
+            /usr/local/lib/python3.12/site-packages/django/db/models/query.py:649: DoesNotExist</failure>
+      </testcase>
       <testcase classname="apps.users.tests.test_profile_views.TestProfileViews"
-         name="test_get_profiles_sorting_with_filter_mixed" time="0.892" />
+         name="test_get_profiles_sorting_with_filter_mixed" time="0.901" />
       <testcase classname="apps.users.tests.test_profile_views.TestProfileViews"
-         name="test_paginate_profiles" time="0.066" />
+         name="test_paginate_profiles" time="0.080" />
       <testcase classname="apps.users.tests.test_profile_views.TestProfileViews"
-         name="test_profile_view_complete_flow_0" time="8.988" />
+         name="test_profile_view_complete_flow_0" time="6.517" />
       <testcase classname="apps.users.tests.test_profile_views.TestProfileViews"
-         name="test_profile_view_complete_flow_1" time="15.067" />
+         name="test_profile_view_complete_flow_1" time="6.562" />
       <testcase classname="apps.users.tests.test_registration.RegistrationTests"
-         name="test_create_user" time="0.160" />
+         name="test_create_user" time="0.153" />
       <testcase classname="apps.users.tests.test_session.TestUserBehavior"
-         name="test_get_last_user_behavior" time="0.144" />
+         name="test_get_last_user_behavior" time="0.252">
+         <failure
+            message="django.db.utils.IntegrityError: update or delete on table &quot;users_profile&quot; violates foreign key constraint &quot;users_userbehavior_profile_id_9ed767df_fk_users_profile_id&quot; on table &quot;users_userbehavior&quot;&#10;DETAIL:  Key (id)=(37) is still referenced from table &quot;users_userbehavior&quot;.">self
+            = &lt;django.db.backends.utils.CursorWrapper object at 0x72f242831430&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f242831430&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile"
+            violates foreign key constraint
+            "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table
+            "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103:
+            ForeignKeyViolation
+
+            The above exception was the direct cause of the following exception:
+
+            self = &lt;apps.users.tests.test_session.TestUserBehavior
+            testMethod=test_get_last_user_behavior&gt;
+            result = &lt;TestCaseFunction test_get_last_user_behavior&gt;, debug = False
+
+            def _setup_and_call(self, result, debug=False):
+            """
+            Perform the following in order: pre-setup, run test, post-teardown,
+            skipping pre/post hooks if test is set to be skipped.
+
+            If debug=True, reraise any errors in setup and use super().debug()
+            instead of __call__() to run the test.
+            """
+            testMethod = getattr(self, self._testMethodName)
+            skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+            )
+
+            # Convert async test methods.
+            if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+
+            if not skipped:
+            try:
+            self._pre_setup()
+            except Exception:
+            if debug:
+            raise
+            result.addError(self, sys.exc_info())
+            return
+            if debug:
+            super().debug()
+            else:
+            super().__call__(result)
+            if not skipped:
+            try:
+            &gt; self._post_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:296:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+            self._fixture_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in
+            _fixture_teardown
+            connections[db_name].check_constraints()
+            /usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in
+            check_constraints
+            cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+            return self._execute_with_wrappers(
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in
+            _execute_with_wrappers
+            return executor(sql, params, many, context)
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+            with self.db.wrap_database_errors:
+            /usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+            raise dj_exc_value.with_traceback(traceback) from exc_value
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+            self = &lt;django.db.backends.utils.CursorWrapper object at 0x72f242831430&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f242831430&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E django.db.utils.IntegrityError: update or delete on table "users_profile" violates
+            foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on
+            table "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError</failure>
+      </testcase>
       <testcase classname="apps.users.tests.test_session.TestUserBehavior"
-         name="test_new_user_action" time="0.061" />
+         name="test_new_user_action" time="0.142">
+         <failure
+            message="django.db.utils.IntegrityError: update or delete on table &quot;users_profile&quot; violates foreign key constraint &quot;users_userbehavior_profile_id_9ed767df_fk_users_profile_id&quot; on table &quot;users_userbehavior&quot;&#10;DETAIL:  Key (id)=(37) is still referenced from table &quot;users_userbehavior&quot;.">self
+            = &lt;django.db.backends.utils.CursorWrapper object at 0x72f242854ce0&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f242854ce0&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile"
+            violates foreign key constraint
+            "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table
+            "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103:
+            ForeignKeyViolation
+
+            The above exception was the direct cause of the following exception:
+
+            self = &lt;apps.users.tests.test_session.TestUserBehavior
+            testMethod=test_new_user_action&gt;
+            result = &lt;TestCaseFunction test_new_user_action&gt;, debug = False
+
+            def _setup_and_call(self, result, debug=False):
+            """
+            Perform the following in order: pre-setup, run test, post-teardown,
+            skipping pre/post hooks if test is set to be skipped.
+
+            If debug=True, reraise any errors in setup and use super().debug()
+            instead of __call__() to run the test.
+            """
+            testMethod = getattr(self, self._testMethodName)
+            skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+            )
+
+            # Convert async test methods.
+            if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+
+            if not skipped:
+            try:
+            self._pre_setup()
+            except Exception:
+            if debug:
+            raise
+            result.addError(self, sys.exc_info())
+            return
+            if debug:
+            super().debug()
+            else:
+            super().__call__(result)
+            if not skipped:
+            try:
+            &gt; self._post_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:296:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+            self._fixture_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in
+            _fixture_teardown
+            connections[db_name].check_constraints()
+            /usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in
+            check_constraints
+            cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+            return self._execute_with_wrappers(
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in
+            _execute_with_wrappers
+            return executor(sql, params, many, context)
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+            with self.db.wrap_database_errors:
+            /usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+            raise dj_exc_value.with_traceback(traceback) from exc_value
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+            self = &lt;django.db.backends.utils.CursorWrapper object at 0x72f242854ce0&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f242854ce0&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E django.db.utils.IntegrityError: update or delete on table "users_profile" violates
+            foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on
+            table "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError</failure>
+      </testcase>
       <testcase classname="apps.users.tests.test_session.TestUserBehavior"
-         name="test_new_view_visit" time="0.072" />
+         name="test_new_view_visit" time="0.148">
+         <failure
+            message="django.db.utils.IntegrityError: update or delete on table &quot;users_profile&quot; violates foreign key constraint &quot;users_userbehavior_profile_id_9ed767df_fk_users_profile_id&quot; on table &quot;users_userbehavior&quot;&#10;DETAIL:  Key (id)=(37) is still referenced from table &quot;users_userbehavior&quot;.">self
+            = &lt;django.db.backends.utils.CursorWrapper object at 0x72f2429165a0&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f2429165a0&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile"
+            violates foreign key constraint
+            "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table
+            "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103:
+            ForeignKeyViolation
+
+            The above exception was the direct cause of the following exception:
+
+            self = &lt;apps.users.tests.test_session.TestUserBehavior
+            testMethod=test_new_view_visit&gt;
+            result = &lt;TestCaseFunction test_new_view_visit&gt;, debug = False
+
+            def _setup_and_call(self, result, debug=False):
+            """
+            Perform the following in order: pre-setup, run test, post-teardown,
+            skipping pre/post hooks if test is set to be skipped.
+
+            If debug=True, reraise any errors in setup and use super().debug()
+            instead of __call__() to run the test.
+            """
+            testMethod = getattr(self, self._testMethodName)
+            skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+            )
+
+            # Convert async test methods.
+            if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+
+            if not skipped:
+            try:
+            self._pre_setup()
+            except Exception:
+            if debug:
+            raise
+            result.addError(self, sys.exc_info())
+            return
+            if debug:
+            super().debug()
+            else:
+            super().__call__(result)
+            if not skipped:
+            try:
+            &gt; self._post_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:296:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+            self._fixture_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in
+            _fixture_teardown
+            connections[db_name].check_constraints()
+            /usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in
+            check_constraints
+            cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+            return self._execute_with_wrappers(
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in
+            _execute_with_wrappers
+            return executor(sql, params, many, context)
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+            with self.db.wrap_database_errors:
+            /usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+            raise dj_exc_value.with_traceback(traceback) from exc_value
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+            self = &lt;django.db.backends.utils.CursorWrapper object at 0x72f2429165a0&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f2429165a0&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E django.db.utils.IntegrityError: update or delete on table "users_profile" violates
+            foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on
+            table "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError</failure>
+      </testcase>
       <testcase classname="apps.users.tests.test_session.TestUserBehavior" name="test_set_end_time"
-         time="0.072" />
+         time="0.150">
+         <failure
+            message="django.db.utils.IntegrityError: update or delete on table &quot;users_profile&quot; violates foreign key constraint &quot;users_userbehavior_profile_id_9ed767df_fk_users_profile_id&quot; on table &quot;users_userbehavior&quot;&#10;DETAIL:  Key (id)=(37) is still referenced from table &quot;users_userbehavior&quot;.">self
+            = &lt;django.db.backends.utils.CursorWrapper object at 0x72f242523230&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f242523230&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile"
+            violates foreign key constraint
+            "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table
+            "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103:
+            ForeignKeyViolation
+
+            The above exception was the direct cause of the following exception:
+
+            self = &lt;apps.users.tests.test_session.TestUserBehavior
+            testMethod=test_set_end_time&gt;
+            result = &lt;TestCaseFunction test_set_end_time&gt;, debug = False
+
+            def _setup_and_call(self, result, debug=False):
+            """
+            Perform the following in order: pre-setup, run test, post-teardown,
+            skipping pre/post hooks if test is set to be skipped.
+
+            If debug=True, reraise any errors in setup and use super().debug()
+            instead of __call__() to run the test.
+            """
+            testMethod = getattr(self, self._testMethodName)
+            skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+            )
+
+            # Convert async test methods.
+            if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+
+            if not skipped:
+            try:
+            self._pre_setup()
+            except Exception:
+            if debug:
+            raise
+            result.addError(self, sys.exc_info())
+            return
+            if debug:
+            super().debug()
+            else:
+            super().__call__(result)
+            if not skipped:
+            try:
+            &gt; self._post_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:296:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+            self._fixture_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in
+            _fixture_teardown
+            connections[db_name].check_constraints()
+            /usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in
+            check_constraints
+            cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+            return self._execute_with_wrappers(
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in
+            _execute_with_wrappers
+            return executor(sql, params, many, context)
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+            with self.db.wrap_database_errors:
+            /usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+            raise dj_exc_value.with_traceback(traceback) from exc_value
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+            self = &lt;django.db.backends.utils.CursorWrapper object at 0x72f242523230&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f242523230&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E django.db.utils.IntegrityError: update or delete on table "users_profile" violates
+            foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on
+            table "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError</failure>
+      </testcase>
       <testcase classname="apps.users.tests.test_session.TestUserSession"
-         name="test_get_last_user_session" time="0.131" />
+         name="test_get_last_user_session" time="0.257">
+         <failure
+            message="django.db.utils.IntegrityError: update or delete on table &quot;users_profile&quot; violates foreign key constraint &quot;users_userbehavior_profile_id_9ed767df_fk_users_profile_id&quot; on table &quot;users_userbehavior&quot;&#10;DETAIL:  Key (id)=(37) is still referenced from table &quot;users_userbehavior&quot;.">self
+            = &lt;django.db.backends.utils.CursorWrapper object at 0x72f242878680&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f242878680&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile"
+            violates foreign key constraint
+            "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table
+            "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103:
+            ForeignKeyViolation
+
+            The above exception was the direct cause of the following exception:
+
+            self = &lt;apps.users.tests.test_session.TestUserSession
+            testMethod=test_get_last_user_session&gt;
+            result = &lt;TestCaseFunction test_get_last_user_session&gt;, debug = False
+
+            def _setup_and_call(self, result, debug=False):
+            """
+            Perform the following in order: pre-setup, run test, post-teardown,
+            skipping pre/post hooks if test is set to be skipped.
+
+            If debug=True, reraise any errors in setup and use super().debug()
+            instead of __call__() to run the test.
+            """
+            testMethod = getattr(self, self._testMethodName)
+            skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+            )
+
+            # Convert async test methods.
+            if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+
+            if not skipped:
+            try:
+            self._pre_setup()
+            except Exception:
+            if debug:
+            raise
+            result.addError(self, sys.exc_info())
+            return
+            if debug:
+            super().debug()
+            else:
+            super().__call__(result)
+            if not skipped:
+            try:
+            &gt; self._post_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:296:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+            self._fixture_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in
+            _fixture_teardown
+            connections[db_name].check_constraints()
+            /usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in
+            check_constraints
+            cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+            return self._execute_with_wrappers(
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in
+            _execute_with_wrappers
+            return executor(sql, params, many, context)
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+            with self.db.wrap_database_errors:
+            /usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+            raise dj_exc_value.with_traceback(traceback) from exc_value
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+            self = &lt;django.db.backends.utils.CursorWrapper object at 0x72f242878680&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f242878680&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E django.db.utils.IntegrityError: update or delete on table "users_profile" violates
+            foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on
+            table "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError</failure>
+      </testcase>
       <testcase classname="apps.users.tests.test_session.TestUserSession"
-         name="test_new_user_session" time="0.060" />
+         name="test_new_user_session" time="0.139">
+         <failure
+            message="django.db.utils.IntegrityError: update or delete on table &quot;users_profile&quot; violates foreign key constraint &quot;users_userbehavior_profile_id_9ed767df_fk_users_profile_id&quot; on table &quot;users_userbehavior&quot;&#10;DETAIL:  Key (id)=(37) is still referenced from table &quot;users_userbehavior&quot;.">self
+            = &lt;django.db.backends.utils.CursorWrapper object at 0x72f241e5fe90&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f241e5fe90&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile"
+            violates foreign key constraint
+            "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table
+            "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103:
+            ForeignKeyViolation
+
+            The above exception was the direct cause of the following exception:
+
+            self = &lt;apps.users.tests.test_session.TestUserSession
+            testMethod=test_new_user_session&gt;
+            result = &lt;TestCaseFunction test_new_user_session&gt;, debug = False
+
+            def _setup_and_call(self, result, debug=False):
+            """
+            Perform the following in order: pre-setup, run test, post-teardown,
+            skipping pre/post hooks if test is set to be skipped.
+
+            If debug=True, reraise any errors in setup and use super().debug()
+            instead of __call__() to run the test.
+            """
+            testMethod = getattr(self, self._testMethodName)
+            skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+            )
+
+            # Convert async test methods.
+            if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+
+            if not skipped:
+            try:
+            self._pre_setup()
+            except Exception:
+            if debug:
+            raise
+            result.addError(self, sys.exc_info())
+            return
+            if debug:
+            super().debug()
+            else:
+            super().__call__(result)
+            if not skipped:
+            try:
+            &gt; self._post_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:296:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+            self._fixture_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in
+            _fixture_teardown
+            connections[db_name].check_constraints()
+            /usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in
+            check_constraints
+            cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+            return self._execute_with_wrappers(
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in
+            _execute_with_wrappers
+            return executor(sql, params, many, context)
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+            with self.db.wrap_database_errors:
+            /usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+            raise dj_exc_value.with_traceback(traceback) from exc_value
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+            self = &lt;django.db.backends.utils.CursorWrapper object at 0x72f241e5fe90&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f241e5fe90&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E django.db.utils.IntegrityError: update or delete on table "users_profile" violates
+            foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on
+            table "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError</failure>
+      </testcase>
       <testcase classname="apps.users.tests.test_session.TestUserSession" name="test_set_end_time"
-         time="0.062" />
+         time="0.144">
+         <failure
+            message="django.db.utils.IntegrityError: update or delete on table &quot;users_profile&quot; violates foreign key constraint &quot;users_userbehavior_profile_id_9ed767df_fk_users_profile_id&quot; on table &quot;users_userbehavior&quot;&#10;DETAIL:  Key (id)=(37) is still referenced from table &quot;users_userbehavior&quot;.">self
+            = &lt;django.db.backends.utils.CursorWrapper object at 0x72f242d320c0&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f242d320c0&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile"
+            violates foreign key constraint
+            "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table
+            "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103:
+            ForeignKeyViolation
+
+            The above exception was the direct cause of the following exception:
+
+            self = &lt;apps.users.tests.test_session.TestUserSession
+            testMethod=test_set_end_time&gt;
+            result = &lt;TestCaseFunction test_set_end_time&gt;, debug = False
+
+            def _setup_and_call(self, result, debug=False):
+            """
+            Perform the following in order: pre-setup, run test, post-teardown,
+            skipping pre/post hooks if test is set to be skipped.
+
+            If debug=True, reraise any errors in setup and use super().debug()
+            instead of __call__() to run the test.
+            """
+            testMethod = getattr(self, self._testMethodName)
+            skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+            )
+
+            # Convert async test methods.
+            if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+
+            if not skipped:
+            try:
+            self._pre_setup()
+            except Exception:
+            if debug:
+            raise
+            result.addError(self, sys.exc_info())
+            return
+            if debug:
+            super().debug()
+            else:
+            super().__call__(result)
+            if not skipped:
+            try:
+            &gt; self._post_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:296:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+            self._fixture_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in
+            _fixture_teardown
+            connections[db_name].check_constraints()
+            /usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in
+            check_constraints
+            cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+            return self._execute_with_wrappers(
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in
+            _execute_with_wrappers
+            return executor(sql, params, many, context)
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+            with self.db.wrap_database_errors:
+            /usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+            raise dj_exc_value.with_traceback(traceback) from exc_value
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+            self = &lt;django.db.backends.utils.CursorWrapper object at 0x72f242d320c0&gt;
+            sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f242d320c0&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E django.db.utils.IntegrityError: update or delete on table "users_profile" violates
+            foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on
+            table "users_userbehavior"
+            E DETAIL: Key (id)=(37) is still referenced from table "users_userbehavior".
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError</failure>
+      </testcase>
       <testcase classname="apps.memory_usage.tests.test_view.TestMemoryUsageView" name="test_get"
-         time="1.646" />
+         time="0.068">
+         <failure
+            message="django.core.management.base.CommandError: Database dirtystroke_dev couldn't be flushed. Possible reasons:&#10;  * The database isn't running or isn't configured correctly.&#10;  * At least one of the expected database tables doesn't exist.&#10;  * The SQL was invalid.&#10;Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.">self
+            = &lt;django.db.backends.utils.CursorWrapper object at 0x72f242a4c410&gt;
+            sql = 'TRUNCATE "auth_group_permissions", "memory_usage_memoryusage",
+            "feedback_surveydismissal", "users_subprofile", "subsc...on_new_drawings", "auth_user",
+            "drawings_drawingsheet", "subscriptions_pricecurrency", "drawings_drawinggroupprivacy";'
+            params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f242a4c410&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E psycopg2.errors.FeatureNotSupported: cannot truncate a table referenced in a foreign
+            key constraint
+            E DETAIL: Table "users_userbehavior" references "users_profile".
+            E HINT: Truncate table "users_userbehavior" at the same time, or use TRUNCATE ...
+            CASCADE.
+
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103:
+            FeatureNotSupported
+
+            The above exception was the direct cause of the following exception:
+
+            self = &lt;django.core.management.commands.flush.Command object at 0x72f242a435f0&gt;
+            options = {'allow_cascade': False, 'database': 'default', 'force_color': False,
+            'inhibit_post_migrate': False, ...}
+            database = 'default'
+            connection = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+            verbosity = 0, interactive = False, reset_sequences = False
+            allow_cascade = False, inhibit_post_migrate = False
+
+            def handle(self, **options):
+            database = options["database"]
+            connection = connections[database]
+            verbosity = options["verbosity"]
+            interactive = options["interactive"]
+            # The following are stealth options used by Django's internals.
+            reset_sequences = options.get("reset_sequences", True)
+            allow_cascade = options.get("allow_cascade", False)
+            inhibit_post_migrate = options.get("inhibit_post_migrate", False)
+
+            self.style = no_style()
+
+            # Import the 'management' module within each installed app, to register
+            # dispatcher events.
+            for app_config in apps.get_app_configs():
+            try:
+            import_module(".management", app_config.name)
+            except ImportError:
+            pass
+
+            sql_list = sql_flush(
+            self.style,
+            connection,
+            reset_sequences=reset_sequences,
+            allow_cascade=allow_cascade,
+            )
+
+            if interactive:
+            confirm = input(
+            """You have requested a flush of the database.
+            This will IRREVERSIBLY DESTROY all data currently in the "%s" database,
+            and return each table to an empty state.
+            Are you sure you want to do this?
+
+            Type 'yes' to continue, or 'no' to cancel: """
+            % connection.settings_dict["NAME"]
+            )
+            else:
+            confirm = "yes"
+
+            if confirm == "yes":
+            try:
+            &gt; connection.ops.execute_sql_flush(sql_list)
+            /usr/local/lib/python3.12/site-packages/django/core/management/commands/flush.py:73:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            /usr/local/lib/python3.12/site-packages/django/db/backends/base/operations.py:461: in
+            execute_sql_flush
+            cursor.execute(sql)
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+            return self._execute_with_wrappers(
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in
+            _execute_with_wrappers
+            return executor(sql, params, many, context)
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+            with self.db.wrap_database_errors:
+            /usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+            raise dj_exc_value.with_traceback(traceback) from exc_value
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+            self = &lt;django.db.backends.utils.CursorWrapper object at 0x72f242a4c410&gt;
+            sql = 'TRUNCATE "auth_group_permissions", "memory_usage_memoryusage",
+            "feedback_surveydismissal", "users_subprofile", "subsc...on_new_drawings", "auth_user",
+            "drawings_drawingsheet", "subscriptions_pricecurrency", "drawings_drawinggroupprivacy";'
+            params = None
+            ignored_wrapper_args = (False, {'connection': &lt;DatabaseWrapper vendor='postgresql'
+            alias='default'&gt;, 'cursor': &lt;django.db.backends.utils.CursorWrapper object at
+            0x72f242a4c410&gt;})
+
+            def _execute(self, sql, params, *ignored_wrapper_args):
+            # Raise a warning during app initialization (stored_app_configs is only
+            # ever set during testing).
+            if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+            self.db.validate_no_broken_transaction()
+            with self.db.wrap_database_errors:
+            if params is None:
+            # params default might be backend specific.
+            &gt; return self.cursor.execute(sql)
+            E django.db.utils.NotSupportedError: cannot truncate a table referenced in a foreign key
+            constraint
+            E DETAIL: Table "users_userbehavior" references "users_profile".
+            E HINT: Truncate table "users_userbehavior" at the same time, or use TRUNCATE ...
+            CASCADE.
+
+            /usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103:
+            NotSupportedError
+
+            The above exception was the direct cause of the following exception:
+
+            self = &lt;apps.memory_usage.tests.test_view.TestMemoryUsageView testMethod=test_get&gt;
+            result = &lt;TestCaseFunction test_get&gt;, debug = False
+
+            def _setup_and_call(self, result, debug=False):
+            """
+            Perform the following in order: pre-setup, run test, post-teardown,
+            skipping pre/post hooks if test is set to be skipped.
+
+            If debug=True, reraise any errors in setup and use super().debug()
+            instead of __call__() to run the test.
+            """
+            testMethod = getattr(self, self._testMethodName)
+            skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+            )
+
+            # Convert async test methods.
+            if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+
+            if not skipped:
+            try:
+            self._pre_setup()
+            except Exception:
+            if debug:
+            raise
+            result.addError(self, sys.exc_info())
+            return
+            if debug:
+            super().debug()
+            else:
+            super().__call__(result)
+            if not skipped:
+            try:
+            &gt; self._post_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:296:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+            self._fixture_teardown()
+            /usr/local/lib/python3.12/site-packages/django/test/testcases.py:1136: in
+            _fixture_teardown
+            call_command(
+            /usr/local/lib/python3.12/site-packages/django/core/management/__init__.py:194: in
+            call_command
+            return command.execute(*args, **defaults)
+            /usr/local/lib/python3.12/site-packages/django/core/management/base.py:459: in execute
+            output = self.handle(*args, **options)
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+            self = &lt;django.core.management.commands.flush.Command object at 0x72f242a435f0&gt;
+            options = {'allow_cascade': False, 'database': 'default', 'force_color': False,
+            'inhibit_post_migrate': False, ...}
+            database = 'default'
+            connection = &lt;DatabaseWrapper vendor='postgresql' alias='default'&gt;
+            verbosity = 0, interactive = False, reset_sequences = False
+            allow_cascade = False, inhibit_post_migrate = False
+
+            def handle(self, **options):
+            database = options["database"]
+            connection = connections[database]
+            verbosity = options["verbosity"]
+            interactive = options["interactive"]
+            # The following are stealth options used by Django's internals.
+            reset_sequences = options.get("reset_sequences", True)
+            allow_cascade = options.get("allow_cascade", False)
+            inhibit_post_migrate = options.get("inhibit_post_migrate", False)
+
+            self.style = no_style()
+
+            # Import the 'management' module within each installed app, to register
+            # dispatcher events.
+            for app_config in apps.get_app_configs():
+            try:
+            import_module(".management", app_config.name)
+            except ImportError:
+            pass
+
+            sql_list = sql_flush(
+            self.style,
+            connection,
+            reset_sequences=reset_sequences,
+            allow_cascade=allow_cascade,
+            )
+
+            if interactive:
+            confirm = input(
+            """You have requested a flush of the database.
+            This will IRREVERSIBLY DESTROY all data currently in the "%s" database,
+            and return each table to an empty state.
+            Are you sure you want to do this?
+
+            Type 'yes' to continue, or 'no' to cancel: """
+            % connection.settings_dict["NAME"]
+            )
+            else:
+            confirm = "yes"
+
+            if confirm == "yes":
+            try:
+            connection.ops.execute_sql_flush(sql_list)
+            except Exception as exc:
+            &gt; raise CommandError(
+            "Database %s couldn't be flushed. Possible reasons:\n"
+            " * The database isn't running or isn't configured correctly.\n"
+            " * At least one of the expected database tables doesn't exist.\n"
+            " * The SQL was invalid.\n"
+            "Hint: Look at the output of 'django-admin sqlflush'. "
+            "That's the SQL this command wasn't able to run."
+            % (connection.settings_dict["NAME"],)
+            ) from exc
+            E django.core.management.base.CommandError: Database dirtystroke_dev couldn't be
+            flushed. Possible reasons:
+            E * The database isn't running or isn't configured correctly.
+            E * At least one of the expected database tables doesn't exist.
+            E * The SQL was invalid.
+            E Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command
+            wasn't able to run.
+            /usr/local/lib/python3.12/site-packages/django/core/management/commands/flush.py:75:
+            CommandError</failure>
+      </testcase>
    </testsuite>
 </testsuites>

@@ -17,10 +17,11 @@ local parse = require 'pytest.parse'
 
 ---@class TestResult
 ---@field line number
----@field state 'passed' | 'failed'
+---@field state 'passed' | 'skipped' | 'failed'
 ---@field filename string
 ---@field class_name string
 ---@field function_name string
+---@field function_line number
 ---@field message string[]
 
 local M = {}
@@ -89,35 +90,31 @@ function M.run(test)
          on_exit = function(_, exit_code)
             local failed = {}
             local i = 1
-            test.results = parse.get_test_results(test_state.last_output, bufnr) or {}
+            local parser = parse.TSParser.new(test_state.last_output)
+
+            if not parser then
+               utils.error("Error building the parser")
+               return
+            end
+
+            test.results = parser:get_test_results()
+            vim.print(test.results)
             parse.update_marks(bufnr, test.results)
             for _, test_result in ipairs(test.results) do
                if test_result.state == 'failed' then
-                  local error = parse.get_error_detail(test_state.last_output, i, test_result)
-                  local ok, col = pcall(vim.api.nvim_buf_get_lines, bufnr, error.line, error.line + 1, false)
-
-                  -- TODO: Obtain range with treesitter
-                  if ok and #col > 0 then
-                     error.col = (string.find(col[1], '[^%s]+') or 1) - 1
-                     error.end_col = (string.len(col[1]) or error.col)
-                  else
-                     error.col = 0
-                     error.end_col = 0
-                  end
-
-                  if error.line == -1 then
-                     error.line = test_result.line
+                  if test_result.line == -1 then
+                     test_result.line = test_result.line
                   end
 
                   table.insert(failed, {
                      bufnr = bufnr,
-                     lnum = error.line,
-                     end_lnum = error.line,
-                     col = error.col,
-                     end_col = error.end_col,
+                     lnum = test_result.line,
+                     end_lnum = test_result.line,
+                     col = 0,
+                     end_col = 0,
                      text = 'Test failed',
                      severity = vim.diagnostic.severity.ERROR,
-                     message = 'Test failed\n' .. error.error,
+                     message = 'Test failed\n' .. test_result.message,
                      source = 'Django test',
                      code = 'TestError',
                      namespace = ns,

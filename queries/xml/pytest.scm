@@ -1,12 +1,12 @@
 ; inherits: xml
 ; extends
 ;
-(EmptyElemTag) @case_passed
-(EmptyElemTag (Name) @case_passed_name (Attribute) @case_passed_att)
+(EmptyElemTag) @passed
+(EmptyElemTag (Name) @passed_name (Attribute) @passed_att)
 (EmptyElemTag 
   (Attribute 
-    (Name) @case_passed_att_name
-    (AttValue) @case_passed_att_value
+    (Name) @passed_att_name
+    (AttValue) @passed_att_value
   )
 ) 
 
@@ -22,45 +22,6 @@
 
 (element) @element
 
-
-(element 
-  (content 
-    (element 
-      (content 
-        (element 
-          (content 
-            (element 
-              (STag) @not_passed
-            ) 
-          )
-        )
-      )
-    )
-  )
-)
-
-(element 
-  (content 
-    (element 
-      (content 
-        (element 
-          (content 
-            (element 
-              (STag 
-                (Attribute 
-                  (Name) @not_passed_att_name
-                  (AttValue) @not_passed_att_value
-                )
-              ) 
-                (content) @not_passed_content 
-            )
-          )
-        )
-      )
-    )
-  )
-)
-
 (element 
   (content 
     (element 
@@ -70,12 +31,15 @@
             (element 
               (STag 
                 (Name) @not_passed_name 
-                (Attribute) @not_passed_att
-              ) 
+                (Attribute 
+                  (Name) @not_passed_att_name
+                  (AttValue) @not_passed_att_value
+                ) @not_passed_att
+              )  @not_passed
                 (content) @not_passed_content 
             )
-          ) 
-        ) 
+          )
+        )
       )
     )
   )

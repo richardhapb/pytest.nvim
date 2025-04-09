@@ -19,7 +19,9 @@ function pytest.build_command(args)
       table.insert(user_args, '--ds=' .. django_settings_module)
    end
 
-   return utils.list_extend({ 'pytest', '-v' }, utils.list_extend(user_args, args))
+   local output_file = require'pytest.parse'.OUTPUT_FILE
+
+   return utils.list_extend({ 'pytest', '-v', '--junit-xml=' .. output_file }, utils.list_extend(user_args, args))
 end
 
 function pytest.is_pytest_available()

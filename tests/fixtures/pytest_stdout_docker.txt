@@ -1,0 +1,1785 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.4, pytest-8.3.4, pluggy-1.5.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+django: version: 5.0.6, settings: dirtystroke.settings_test (from option)
+rootdir: /usr/src/app
+configfile: pyproject.toml
+testpaths: apps, dirtystroke
+plugins: django-4.9.0
+collecting ... collected 40 items
+
+apps/analytics/tests/test_etl.py::TestMedian::test_median_even PASSED    [  2%]
+apps/analytics/tests/test_etl.py::TestMedian::test_median_odd PASSED     [  5%]
+apps/analytics/tests/test_etl.py::TestETLGenerics::test_calculate_metrics PASSED [  7%]
+apps/analytics/tests/test_etl.py::TestETLGenerics::test_filter_outliers PASSED [ 10%]
+apps/analytics/tests/test_etl.py::TestETLUtils::test_filter_staff_users FAILED [ 12%]
+apps/analytics/tests/test_etl.py::TestETL::test_load_data PASSED         [ 15%]
+apps/memory_usage/tests/test_memory_pofiler.py::TestAppMemoryProfiler::test_base_hour_from_timestamp PASSED [ 17%]
+apps/memory_usage/tests/test_memory_pofiler.py::TestAppMemoryProfiler::test_get_app_name PASSED [ 20%]
+apps/memory_usage/tests/test_memory_pofiler.py::TestAppMemoryProfiler::test_insert_into_db FAILED [ 22%]
+apps/memory_usage/tests/test_memory_pofiler.py::TestAppMemoryProfiler::test_take_snapshot PASSED [ 25%]
+apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_memory_threshold SKIPPED [ 27%]
+apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_memory_usage_disabled PASSED [ 30%]
+apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_memory_usage_enabled FAILED [ 32%]
+apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_memory_usage_no_env FAILED [ 35%]
+apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_save_interval PASSED [ 37%]
+apps/memory_usage/tests/test_view.py::TestMemoryUsageCaptureView::test_get PASSED [ 40%]
+apps/users/tests/test_authentication.py::AuthenticationTests::test_login_redirects PASSED [ 42%]
+apps/users/tests/test_authentication.py::AuthenticationTests::test_sign_out_view PASSED [ 45%]
+apps/users/tests/test_models.py::ProfileMatchManagerTest::test_find_matches_for_profile PASSED [ 47%]
+apps/users/tests/test_models.py::ProfileMatchManagerTest::test_profile_exclusion_conditions PASSED [ 50%]
+apps/users/tests/test_models.py::ProfileMatchManagerTest::test_profile_exclusion_conditions_with_blocks PASSED [ 52%]
+apps/users/tests/test_models.py::ProfileMatchManagerTest::test_profile_exclusion_conditions_with_inactive_users PASSED [ 55%]
+apps/users/tests/test_profile_config.py::TestProfileConfig::test_profile_config_creation PASSED [ 57%]
+apps/users/tests/test_profile_config.py::TestProfileConfigMigration::test_idempotency FAILED [ 60%]
+apps/users/tests/test_profile_config.py::TestProfileReadReceiptsConfig::test_new_config ERROR [ 62%]
+apps/users/tests/test_profile_config.py::TestRelatedViews::test_read_receipts_update_view PASSED [ 65%]
+apps/users/tests/test_profile_views.py::TestProfileViews::test_fill_profiles_list_with_remaining_matches FAILED [ 67%]
+apps/users/tests/test_profile_views.py::TestProfileViews::test_get_profiles_sorting_with_filter_mixed PASSED [ 70%]
+apps/users/tests/test_profile_views.py::TestProfileViews::test_paginate_profiles PASSED [ 72%]
+apps/users/tests/test_profile_views.py::TestProfileViews::test_profile_view_complete_flow_0 PASSED [ 75%]
+apps/users/tests/test_profile_views.py::TestProfileViews::test_profile_view_complete_flow_1 PASSED [ 77%]
+apps/users/tests/test_registration.py::RegistrationTests::test_create_user PASSED [ 80%]
+apps/users/tests/test_session.py::TestUserBehavior::test_get_last_user_behavior FAILED [ 82%]
+apps/users/tests/test_session.py::TestUserBehavior::test_new_user_action FAILED [ 85%]
+apps/users/tests/test_session.py::TestUserBehavior::test_new_view_visit FAILED [ 87%]
+apps/users/tests/test_session.py::TestUserBehavior::test_set_end_time FAILED [ 90%]
+apps/users/tests/test_session.py::TestUserSession::test_get_last_user_session FAILED [ 92%]
+apps/users/tests/test_session.py::TestUserSession::test_new_user_session FAILED [ 95%]
+apps/users/tests/test_session.py::TestUserSession::test_set_end_time FAILED [ 97%]
+apps/memory_usage/tests/test_view.py::TestMemoryUsageView::test_get FAILED [100%]
+
+==================================== ERRORS ====================================
+_______ ERROR at setup of TestProfileReadReceiptsConfig.test_new_config ________
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f241e38110>
+sql = 'INSERT INTO "auth_user" ("password", "last_login", "is_superuser", "username", "first_name", "last_name", "email", "is_staff", "is_active", "date_joined") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "auth_user"."id"'
+params = ('', None, False, 'syzlab', '', '', ...)
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f241e38110>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+                return self.cursor.execute(sql)
+            else:
+>               return self.cursor.execute(sql, params)
+E               psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "auth_user_username_key"
+E               DETAIL:  Key (username)=(syzlab) already exists.
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:105: UniqueViolation
+
+The above exception was the direct cause of the following exception:
+
+cls = <class 'apps.users.tests.test_profile_config.TestProfileReadReceiptsConfig'>
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        call_command('install_fixtures')
+    
+>       user = User.objects.create(username='syzlab')
+
+apps/users/tests/test_profile_config.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/django/db/models/manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+/usr/local/lib/python3.12/site-packages/django/db/models/query.py:679: in create
+    obj.save(force_insert=True, using=self.db)
+/usr/local/lib/python3.12/site-packages/django/contrib/auth/base_user.py:78: in save
+    super().save(*args, **kwargs)
+/usr/local/lib/python3.12/site-packages/django/db/models/base.py:822: in save
+    self.save_base(
+/usr/local/lib/python3.12/site-packages/django/db/models/base.py:909: in save_base
+    updated = self._save_table(
+/usr/local/lib/python3.12/site-packages/django/db/models/base.py:1071: in _save_table
+    results = self._do_insert(
+/usr/local/lib/python3.12/site-packages/django/db/models/base.py:1112: in _do_insert
+    return manager._insert(
+/usr/local/lib/python3.12/site-packages/django/db/models/manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+/usr/local/lib/python3.12/site-packages/django/db/models/query.py:1847: in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+/usr/local/lib/python3.12/site-packages/django/db/models/sql/compiler.py:1823: in execute_sql
+    cursor.execute(sql, params)
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+    return self._execute_with_wrappers(
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+/usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f241e38110>
+sql = 'INSERT INTO "auth_user" ("password", "last_login", "is_superuser", "username", "first_name", "last_name", "email", "is_staff", "is_active", "date_joined") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "auth_user"."id"'
+params = ('', None, False, 'syzlab', '', '', ...)
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f241e38110>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+                return self.cursor.execute(sql)
+            else:
+>               return self.cursor.execute(sql, params)
+E               django.db.utils.IntegrityError: duplicate key value violates unique constraint "auth_user_username_key"
+E               DETAIL:  Key (username)=(syzlab) already exists.
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:105: IntegrityError
+---------------------------- Captured stdout setup -----------------------------
+Uploaded fixtures/drawings/1-0500-penis_pointing_v1_3.png to drawings/1-0500-penis_pointing_v1_3.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_17.png to drawings/1-3300-body_female_bras_v1_17.png
+Uploaded fixtures/drawings/3-0700-penis_hair_color_v1_6.png to drawings/3-0700-penis_hair_color_v1_6.png
+Uploaded fixtures/drawings/3-0600-penis_hairy_style_v1_2.png to drawings/3-0600-penis_hairy_style_v1_2.png
+Uploaded fixtures/drawings/Recurso_1452.png to drawings/Recurso_1452.png
+Uploaded fixtures/drawings/5-0200-sex_position_v1_24.png to drawings/5-0200-sex_position_v1_24.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_2_Pof03V5.png to drawings/5-0300-sex_duration_v1_2_Pof03V5.png
+Uploaded fixtures/drawings/1-1100-penis_cum_ropes_v1_5_XSNkkPx.png to drawings/1-1100-penis_cum_ropes_v1_5_XSNkkPx.png
+Uploaded fixtures/drawings/1-1200-body_male_age_v1_10_4ZNc8LB.png to drawings/1-1200-body_male_age_v1_10_4ZNc8LB.png
+Uploaded fixtures/drawings/2-0100-consumption_v1_5.png to drawings/2-0100-consumption_v1_5.png
+Uploaded fixtures/drawings/4-0100-vagina_deep_v1_2.png to drawings/4-0100-vagina_deep_v1_2.png
+Uploaded fixtures/drawings/1-0900-penis_head_size_v2_4C.png to drawings/1-0900-penis_head_size_v2_4C.png
+Uploaded fixtures/drawings/3-1850-body_female_nipple_type_v1_4.png to drawings/3-1850-body_female_nipple_type_v1_4.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_13.png to drawings/1-0300-penis_length_v2_13.png
+Uploaded fixtures/drawings/3-1200-penis_cum_thickness_v1_3.png to drawings/3-1200-penis_cum_thickness_v1_3.png
+Uploaded fixtures/drawings/1-2400-vagina_hairy_v1_7.png to drawings/1-2400-vagina_hairy_v1_7.png
+Uploaded fixtures/drawings/3-1000-penis_cum_length_v1_5_LG4O2M6.png to drawings/3-1000-penis_cum_length_v1_5_LG4O2M6.png
+Uploaded fixtures/drawings/7-03-hiv-4.png to drawings/7-03-hiv-4.png
+Uploaded fixtures/drawings/7-01-privacy-1.png to drawings/7-01-privacy-1.png
+Uploaded fixtures/drawings/3-0800-penis_cum_time_v1_2_5jK6zrC.png to drawings/3-0800-penis_cum_time_v1_2_5jK6zrC.png
+Uploaded fixtures/drawings/1-1200-body_male_age_v1_6_t2vHcR5.png to drawings/1-1200-body_male_age_v1_6_t2vHcR5.png
+Uploaded fixtures/drawings/1-1900-body_male_shape_v1_4.png to drawings/1-1900-body_male_shape_v1_4.png
+Uploaded fixtures/drawings/Recurso_1391.png to drawings/Recurso_1391.png
+Uploaded fixtures/drawings/1-1200-body_male_age_v1_7_V0cSJKB.png to drawings/1-1200-body_male_age_v1_7_V0cSJKB.png
+Uploaded fixtures/drawings/3-1850-body_female_nipple_type_v1_5.png to drawings/3-1850-body_female_nipple_type_v1_5.png
+Uploaded fixtures/drawings/1-2900-body_female_shape_v1_5.png to drawings/1-2900-body_female_shape_v1_5.png
+Uploaded fixtures/drawings/1-2000-body_male_chest_hair_v1_6.png to drawings/1-2000-body_male_chest_hair_v1_6.png
+Uploaded fixtures/drawings/3-0300-penis_girth_v2_5.png to drawings/3-0300-penis_girth_v2_5.png
+Uploaded fixtures/drawings/2-1200-vagina_squirt_v1_2.png to drawings/2-1200-vagina_squirt_v1_2.png
+Uploaded fixtures/drawings/1-1800-body_male_leg_hair_v1_4.png to drawings/1-1800-body_male_leg_hair_v1_4.png
+Uploaded fixtures/drawings/1-0700-penis_balls_shape_v1_3.png to drawings/1-0700-penis_balls_shape_v1_3.png
+Uploaded fixtures/drawings/3-0800-body_male_butt_size_v1_4.png to drawings/3-0800-body_male_butt_size_v1_4.png
+Uploaded fixtures/drawings/Recurso_1389.png to drawings/Recurso_1389.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_3.png to drawings/1-3400-body_female_underwear_v1_3.png
+Uploaded fixtures/drawings/4-0100-kink_v1_43.png to drawings/4-0100-kink_v1_43.png
+Uploaded fixtures/drawings/3-0900-penis_cum_style_v1_2.png to drawings/3-0900-penis_cum_style_v1_2.png
+Uploaded fixtures/drawings/1-1600-body_male_butt_hair_v1_4.png to drawings/1-1600-body_male_butt_hair_v1_4.png
+Uploaded fixtures/drawings/1-1100-penis_cum_ropes_v1_6_QNTELih.png to drawings/1-1100-penis_cum_ropes_v1_6_QNTELih.png
+Uploaded fixtures/drawings/1-2700-vagina_separation_v1_3.png to drawings/1-2700-vagina_separation_v1_3.png
+Uploaded fixtures/drawings/1-0700-penis_balls_shape_v1_1.png to drawings/1-0700-penis_balls_shape_v1_1.png
+Uploaded fixtures/drawings/4-0300-vagina_clit_v1_1.png to drawings/4-0300-vagina_clit_v1_1.png
+Uploaded fixtures/drawings/1-1400-body_eye_color_v1_5.png to drawings/1-1400-body_eye_color_v1_5.png
+Uploaded fixtures/drawings/3-1850-body_female_nipple_type_v1_1.png to drawings/3-1850-body_female_nipple_type_v1_1.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_9.png to drawings/1-3300-body_female_bras_v1_9.png
+Uploaded fixtures/drawings/2.png to drawings/2.png
+Uploaded fixtures/drawings/Recurso_1465.png to drawings/Recurso_1465.png
+Uploaded fixtures/drawings/1-0900-penis_hairy_v1_3.png to drawings/1-0900-penis_hairy_v1_3.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_12.png to drawings/1-3300-body_female_bras_v1_12.png
+Uploaded fixtures/drawings/2-0300-vagina_labia_v3C_7.png to drawings/2-0300-vagina_labia_v3C_7.png
+Uploaded fixtures/drawings/Recurso_1387.png to drawings/Recurso_1387.png
+Uploaded fixtures/drawings/1-1100-penis_cum_ropes_v1_9_YhUgQhA.png to drawings/1-1100-penis_cum_ropes_v1_9_YhUgQhA.png
+Uploaded fixtures/drawings/1-1100-penis_cum_ropes_v1_4_F3zohw4.png to drawings/1-1100-penis_cum_ropes_v1_4_F3zohw4.png
+Uploaded fixtures/drawings/4-0100-kink_v1_34.png to drawings/4-0100-kink_v1_34.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_6.png to drawings/1-0300-penis_length_v2_6.png
+Uploaded fixtures/drawings/4-0100-kink_v1_41.png to drawings/4-0100-kink_v1_41.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_8.png to drawings/1-2100-vagina_shape_v1_8.png
+Uploaded fixtures/drawings/4-0200-sex_position_v1_25.png to drawings/4-0200-sex_position_v1_25.png
+Uploaded fixtures/drawings/4-0600-body_female_breast_pointing_v1_2.png to drawings/4-0600-body_female_breast_pointing_v1_2.png
+Uploaded fixtures/drawings/11.png to drawings/11.png
+Uploaded fixtures/drawings/1-1400-body_eye_color_v1_11.png to drawings/1-1400-body_eye_color_v1_11.png
+Uploaded fixtures/drawings/3-1000-penis_cum_length_v1_8_omfCD4D.png to drawings/3-1000-penis_cum_length_v1_8_omfCD4D.png
+Uploaded fixtures/drawings/4-0600-body_female_breast_pointing_v1_3.png to drawings/4-0600-body_female_breast_pointing_v1_3.png
+Uploaded fixtures/drawings/3-0200-penis_color_v1_6.png to drawings/3-0200-penis_color_v1_6.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_7.png to drawings/1-2100-vagina_shape_v1_7.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_3.png to drawings/1-3300-body_female_bras_v1_3.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_12.png to drawings/1-3400-body_female_underwear_v1_12.png
+Uploaded fixtures/drawings/3-1500-body_male_butt_hole_v1_3.png to drawings/3-1500-body_male_butt_hole_v1_3.png
+Uploaded fixtures/drawings/1-2800-body_female_age_v1_1_antJkAg.png to drawings/1-2800-body_female_age_v1_1_antJkAg.png
+Uploaded fixtures/drawings/3-1600-body_male_underwear_v1_7.png to drawings/3-1600-body_male_underwear_v1_7.png
+Uploaded fixtures/drawings/1-0300-penis_curvature_v2_2B.png to drawings/1-0300-penis_curvature_v2_2B.png
+Uploaded fixtures/drawings/1-1400-body_eye_color_v1_7.png to drawings/1-1400-body_eye_color_v1_7.png
+Uploaded fixtures/drawings/1-2800-body_female_age_v1_4_WGY4Q7n.png to drawings/1-2800-body_female_age_v1_4_WGY4Q7n.png
+Uploaded fixtures/drawings/1-0300-penis_curvature_v2_7B.png to drawings/1-0300-penis_curvature_v2_7B.png
+Uploaded fixtures/drawings/Recurso_1414.png to drawings/Recurso_1414.png
+Uploaded fixtures/drawings/1-2400-vagina_hairy_v1_6.png to drawings/1-2400-vagina_hairy_v1_6.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_7.png to drawings/1-3300-body_female_bras_v1_7.png
+Uploaded fixtures/drawings/1-1100-penis_cum_ropes_v1_7_5Omq7JN.png to drawings/1-1100-penis_cum_ropes_v1_7_5Omq7JN.png
+Uploaded fixtures/drawings/2-0100-consumption_v1_1.png to drawings/2-0100-consumption_v1_1.png
+Uploaded fixtures/drawings/2-0100-consumption_v1_4.png to drawings/2-0100-consumption_v1_4.png
+Uploaded fixtures/drawings/3-0600-penis_hairy_style_v1_6.png to drawings/3-0600-penis_hairy_style_v1_6.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_15.png to drawings/1-2100-vagina_shape_v1_15.png
+Uploaded fixtures/drawings/1-1500-body_hair_color_v1_2.png to drawings/1-1500-body_hair_color_v1_2.png
+Uploaded fixtures/drawings/1-1400-body_eye_color_v1_9.png to drawings/1-1400-body_eye_color_v1_9.png
+Uploaded fixtures/drawings/1-2700-vagina_separation_v1_2.png to drawings/1-2700-vagina_separation_v1_2.png
+Uploaded fixtures/drawings/2-0100-consumption_v1_6.png to drawings/2-0100-consumption_v1_6.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_10_m-m_hGLr2zL.png to drawings/6-0200-sex_position_v1_10_m-m_hGLr2zL.png
+Uploaded fixtures/drawings/3-1800-body_female_nipple_size_v2_1.png to drawings/3-1800-body_female_nipple_size_v2_1.png
+Uploaded fixtures/drawings/1-1700-body_male_armpit_hair_v1_3.png to drawings/1-1700-body_male_armpit_hair_v1_3.png
+Uploaded fixtures/drawings/Recurso_1423.png to drawings/Recurso_1423.png
+Uploaded fixtures/drawings/1-1800-body_male_leg_hair_v1_2.png to drawings/1-1800-body_male_leg_hair_v1_2.png
+Uploaded fixtures/drawings/1-1200-body_male_age_v1_4_f1vqaEC.png to drawings/1-1200-body_male_age_v1_4_f1vqaEC.png
+Uploaded fixtures/drawings/3-0300-penis_girth_v2_3.png to drawings/3-0300-penis_girth_v2_3.png
+Uploaded fixtures/drawings/3-0500-penis_balls_size_v1_1.png to drawings/3-0500-penis_balls_size_v1_1.png
+Uploaded fixtures/drawings/4-0100-kink_v1_32.png to drawings/4-0100-kink_v1_32.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_14.png to drawings/1-0300-penis_length_v2_14.png
+Uploaded fixtures/drawings/4-0100-kink_v1_31.png to drawings/4-0100-kink_v1_31.png
+Uploaded fixtures/drawings/1-0900-penis_head_size_v2_5C.png to drawings/1-0900-penis_head_size_v2_5C.png
+Uploaded fixtures/drawings/5.png to drawings/5.png
+Uploaded fixtures/drawings/Recurso_1412.png to drawings/Recurso_1412.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_1.png to drawings/1-3300-body_female_bras_v1_1.png
+Uploaded fixtures/drawings/3-0800-penis_cum_time_v1_5_OIowxFa.png to drawings/3-0800-penis_cum_time_v1_5_OIowxFa.png
+Uploaded fixtures/drawings/3-0200-penis_color_v1_3.png to drawings/3-0200-penis_color_v1_3.png
+Uploaded fixtures/drawings/1-2300-vagina_size_v2_3.png to drawings/1-2300-vagina_size_v2_3.png
+Uploaded fixtures/drawings/3-1800-body_female_nipple_size_v2_2.png to drawings/3-1800-body_female_nipple_size_v2_2.png
+Uploaded fixtures/drawings/1-3100-body_female_breast_shape_v1_1.png to drawings/1-3100-body_female_breast_shape_v1_1.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_3.png to drawings/1-2100-vagina_shape_v1_3.png
+Uploaded fixtures/drawings/1-0700-penis_balls_shape_v1_2.png to drawings/1-0700-penis_balls_shape_v1_2.png
+Uploaded fixtures/drawings/2-1200-vagina_squirt_v1_4_LYobRvS.png to drawings/2-1200-vagina_squirt_v1_4_LYobRvS.png
+Uploaded fixtures/drawings/1-0300-penis_curvature_v2_6B.png to drawings/1-0300-penis_curvature_v2_6B.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_10.png to drawings/1-3400-body_female_underwear_v1_10.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_12.png to drawings/1-0300-penis_length_v2_12.png
+Uploaded fixtures/drawings/1-0500-penis_pointing_v1_1.png to drawings/1-0500-penis_pointing_v1_1.png
+Uploaded fixtures/drawings/3-0700-penis_hair_color_v1_1.png to drawings/3-0700-penis_hair_color_v1_1.png
+Uploaded fixtures/drawings/1-0800-penis_balls_hairy_v1_2.png to drawings/1-0800-penis_balls_hairy_v1_2.png
+Uploaded fixtures/drawings/1-0900-penis_head_size_v2_6C.png to drawings/1-0900-penis_head_size_v2_6C.png
+Uploaded fixtures/drawings/1-0100-penis_foreskin_v1_5.png to drawings/1-0100-penis_foreskin_v1_5.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_15_m-m_LMEcaIC.png to drawings/6-0200-sex_position_v1_15_m-m_LMEcaIC.png
+Uploaded fixtures/drawings/3-0300-penis_girth_v2_4.png to drawings/3-0300-penis_girth_v2_4.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_4.png to drawings/1-3300-body_female_bras_v1_4.png
+Uploaded fixtures/drawings/Recurso_1413.png to drawings/Recurso_1413.png
+Uploaded fixtures/drawings/1-1200-body_male_age_v1_3_cJqG4CI.png to drawings/1-1200-body_male_age_v1_3_cJqG4CI.png
+Uploaded fixtures/drawings/16.png to drawings/16.png
+Uploaded fixtures/drawings/1-1100-penis_cum_ropes_v1_8_Nxzhhp1.png to drawings/1-1100-penis_cum_ropes_v1_8_Nxzhhp1.png
+Uploaded fixtures/drawings/Recurso_1469.png to drawings/Recurso_1469.png
+Uploaded fixtures/drawings/1-2800-body_female_age_v1_5_LRpdT45.png to drawings/1-2800-body_female_age_v1_5_LRpdT45.png
+Uploaded fixtures/drawings/1-0400-penis_color_v1_13.png to drawings/1-0400-penis_color_v1_13.png
+Uploaded fixtures/drawings/3-0200-penis_color_v1_7.png to drawings/3-0200-penis_color_v1_7.png
+Uploaded fixtures/drawings/3-1200-penis_cum_thickness_v1_1.png to drawings/3-1200-penis_cum_thickness_v1_1.png
+Uploaded fixtures/drawings/1-0300-penis_curvature_v2_3B.png to drawings/1-0300-penis_curvature_v2_3B.png
+Uploaded fixtures/drawings/1-0200-penis_curvature_v1_7.png to drawings/1-0200-penis_curvature_v1_7.png
+Uploaded fixtures/drawings/3-0300-penis_girth_v2_1.png to drawings/3-0300-penis_girth_v2_1.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_13.png to drawings/1-3300-body_female_bras_v1_13.png
+Uploaded fixtures/drawings/1-0100-penis_foreskin_v1_4.png to drawings/1-0100-penis_foreskin_v1_4.png
+Uploaded fixtures/drawings/3-1600-body_male_underwear_v1_4.png to drawings/3-1600-body_male_underwear_v1_4.png
+Uploaded fixtures/drawings/Recurso_1462.png to drawings/Recurso_1462.png
+Uploaded fixtures/drawings/3-1600-body_male_underwear_v1_12.png to drawings/3-1600-body_male_underwear_v1_12.png
+Uploaded fixtures/drawings/4-0600-body_female_breast_pointing_v1_4.png to drawings/4-0600-body_female_breast_pointing_v1_4.png
+Uploaded fixtures/drawings/3-1400-body_male_butt_shape_v1_2.png to drawings/3-1400-body_male_butt_shape_v1_2.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_8.png to drawings/1-3300-body_female_bras_v1_8.png
+Uploaded fixtures/drawings/Recurso_1384.png to drawings/Recurso_1384.png
+Uploaded fixtures/drawings/Recurso_1445.png to drawings/Recurso_1445.png
+Uploaded fixtures/drawings/1-2300-vagina_size_v2_4.png to drawings/1-2300-vagina_size_v2_4.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_4.png to drawings/1-3400-body_female_underwear_v1_4.png
+Uploaded fixtures/drawings/1-1400-body_eye_color_v1_6.png to drawings/1-1400-body_eye_color_v1_6.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_6_m-m_SYuikKA.png to drawings/6-0200-sex_position_v1_6_m-m_SYuikKA.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_10.png to drawings/1-3300-body_female_bras_v1_10.png
+Uploaded fixtures/drawings/3-1600-body_male_underwear_v1_6.png to drawings/3-1600-body_male_underwear_v1_6.png
+Uploaded fixtures/drawings/3-1800-body_female_nipple_size_v2_4.png to drawings/3-1800-body_female_nipple_size_v2_4.png
+Uploaded fixtures/drawings/9.png to drawings/9.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_16_m-m_OngRjYI.png to drawings/6-0200-sex_position_v1_16_m-m_OngRjYI.png
+Uploaded fixtures/drawings/Recurso_1446.png to drawings/Recurso_1446.png
+Uploaded fixtures/drawings/3-1000-penis_cum_length_v1_3_ce5rsko.png to drawings/3-1000-penis_cum_length_v1_3_ce5rsko.png
+Uploaded fixtures/drawings/3-1500-body_male_butt_hole_v1_1.png to drawings/3-1500-body_male_butt_hole_v1_1.png
+Uploaded fixtures/drawings/4-0100-kink_v1_29.png to drawings/4-0100-kink_v1_29.png
+Uploaded fixtures/drawings/3-0200-penis_color_v1_5.png to drawings/3-0200-penis_color_v1_5.png
+Uploaded fixtures/drawings/1-0400-penis_veins_v1_2.png to drawings/1-0400-penis_veins_v1_2.png
+Uploaded fixtures/drawings/1-2300-vagina_size_v2_2.png to drawings/1-2300-vagina_size_v2_2.png
+Uploaded fixtures/drawings/3-1600-body_male_underwear_v1_3.png to drawings/3-1600-body_male_underwear_v1_3.png
+Uploaded fixtures/drawings/1-0800-penis_balls_hairy_v1_4.png to drawings/1-0800-penis_balls_hairy_v1_4.png
+Uploaded fixtures/drawings/1-1900-body_male_shape_v1_3.png to drawings/1-1900-body_male_shape_v1_3.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_5.png to drawings/1-3300-body_female_bras_v1_5.png
+Uploaded fixtures/drawings/1-1400-body_eye_color_v1_4.png to drawings/1-1400-body_eye_color_v1_4.png
+Uploaded fixtures/drawings/1-1000-penis_cum_strength_v1_1.png to drawings/1-1000-penis_cum_strength_v1_1.png
+Uploaded fixtures/drawings/1-2400-vagina_hairy_v1_8.png to drawings/1-2400-vagina_hairy_v1_8.png
+Uploaded fixtures/drawings/1-2900-body_female_shape_v1_3.png to drawings/1-2900-body_female_shape_v1_3.png
+Uploaded fixtures/drawings/Recurso_1466.png to drawings/Recurso_1466.png
+Uploaded fixtures/drawings/3-1500-body_male_butt_hole_v1_2.png to drawings/3-1500-body_male_butt_hole_v1_2.png
+Uploaded fixtures/drawings/1-2800-body_female_age_v1_7_59WSUoV.png to drawings/1-2800-body_female_age_v1_7_59WSUoV.png
+Uploaded fixtures/drawings/1-0900-penis_hairy_v1_4.png to drawings/1-0900-penis_hairy_v1_4.png
+Uploaded fixtures/drawings/1-0500-penis_pointing_v1_4.png to drawings/1-0500-penis_pointing_v1_4.png
+Uploaded fixtures/drawings/19.png to drawings/19.png
+Uploaded fixtures/drawings/4-0100-kink_v1_39.png to drawings/4-0100-kink_v1_39.png
+Uploaded fixtures/drawings/1-1500-body_hair_color_v1_5.png to drawings/1-1500-body_hair_color_v1_5.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_4.png to drawings/1-0300-penis_length_v2_4.png
+Uploaded fixtures/drawings/3-0300-penis_girth_v2_7.png to drawings/3-0300-penis_girth_v2_7.png
+Uploaded fixtures/drawings/1-1600-body_male_butt_hair_v1_1.png to drawings/1-1600-body_male_butt_hair_v1_1.png
+Uploaded fixtures/drawings/1-1500-body_hair_color_v1_7.png to drawings/1-1500-body_hair_color_v1_7.png
+Uploaded fixtures/drawings/1-3000-body_female_butt_shape_v1_1.png to drawings/1-3000-body_female_butt_shape_v1_1.png
+Uploaded fixtures/drawings/4-0200-vagina_color_v1_3.png to drawings/4-0200-vagina_color_v1_3.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_11.png to drawings/1-2100-vagina_shape_v1_11.png
+Uploaded fixtures/drawings/3.png to drawings/3.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_10.png to drawings/1-0300-penis_length_v2_10.png
+Uploaded fixtures/drawings/1-2800-body_female_age_v1_9_mjx1EHw.png to drawings/1-2800-body_female_age_v1_9_mjx1EHw.png
+Uploaded fixtures/drawings/1-0100-penis_foreskin_v1_1.png to drawings/1-0100-penis_foreskin_v1_1.png
+Uploaded fixtures/drawings/2-0800-vagina_wet_v2_1_1.png to drawings/2-0800-vagina_wet_v2_1_1.png
+Uploaded fixtures/drawings/4-0100-kink_v1_27.png to drawings/4-0100-kink_v1_27.png
+Uploaded fixtures/drawings/1-0600-penis_head_size_v1_1.png to drawings/1-0600-penis_head_size_v1_1.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_7.png to drawings/1-0300-penis_length_v2_7.png
+Uploaded fixtures/drawings/8.png to drawings/8.png
+Uploaded fixtures/drawings/Recurso_1447.png to drawings/Recurso_1447.png
+Uploaded fixtures/drawings/2-1200-vagina_squirt_v1_1.png to drawings/2-1200-vagina_squirt_v1_1.png
+Uploaded fixtures/drawings/3-1800-body_female_nipple_size_v2_5.png to drawings/3-1800-body_female_nipple_size_v2_5.png
+Uploaded fixtures/drawings/Recurso_1449.png to drawings/Recurso_1449.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_15.png to drawings/1-0300-penis_length_v2_15.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_3_DAkvSfB.png to drawings/5-0300-sex_duration_v1_3_DAkvSfB.png
+Uploaded fixtures/drawings/1-1500-body_hair_color_v1_1.png to drawings/1-1500-body_hair_color_v1_1.png
+Uploaded fixtures/drawings/1-1200-body_male_age_v1_9_xqnkwkc.png to drawings/1-1200-body_male_age_v1_9_xqnkwkc.png
+Uploaded fixtures/drawings/1-0500-penis_pointing_v1_2.png to drawings/1-0500-penis_pointing_v1_2.png
+Uploaded fixtures/drawings/3-1000-penis_cum_length_v1_7_t2bZuzH.png to drawings/3-1000-penis_cum_length_v1_7_t2bZuzH.png
+Uploaded fixtures/drawings/2-0800-vagina_wet_v2_3_1.png to drawings/2-0800-vagina_wet_v2_3_1.png
+Uploaded fixtures/drawings/3-1200-penis_cum_thickness_v1_2.png to drawings/3-1200-penis_cum_thickness_v1_2.png
+Uploaded fixtures/drawings/3-0600-penis_hairy_style_v1_4.png to drawings/3-0600-penis_hairy_style_v1_4.png
+Uploaded fixtures/drawings/1-1900-body_male_shape_v1_2.png to drawings/1-1900-body_male_shape_v1_2.png
+Uploaded fixtures/drawings/1-2000-body_male_chest_hair_v1_2.png to drawings/1-2000-body_male_chest_hair_v1_2.png
+Uploaded fixtures/drawings/1-0800-penis_balls_hairy_v1_1.png to drawings/1-0800-penis_balls_hairy_v1_1.png
+Uploaded fixtures/drawings/1-1100-penis_cum_ropes_v1_3_yU26eQF.png to drawings/1-1100-penis_cum_ropes_v1_3_yU26eQF.png
+Uploaded fixtures/drawings/5-0200-sex_position_v1_4_OKROM7L.png to drawings/5-0200-sex_position_v1_4_OKROM7L.png
+Uploaded fixtures/drawings/1-0200-penis_curvature_v1_2.png to drawings/1-0200-penis_curvature_v1_2.png
+Uploaded fixtures/drawings/4.png to drawings/4.png
+Uploaded fixtures/drawings/1-2800-body_female_age_v1_6_9O374zI.png to drawings/1-2800-body_female_age_v1_6_9O374zI.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_5.png to drawings/1-3400-body_female_underwear_v1_5.png
+Uploaded fixtures/drawings/3-1850-body_female_nipple_type_v1_7.png to drawings/3-1850-body_female_nipple_type_v1_7.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_1_1.png to drawings/1-0300-penis_length_v2_1_1.png
+Uploaded fixtures/drawings/3-1700-activity_male_v1_3.png to drawings/3-1700-activity_male_v1_3.png
+Uploaded fixtures/drawings/3-0400-penis_head_shape_v1_4.png to drawings/3-0400-penis_head_shape_v1_4.png
+Uploaded fixtures/drawings/4-0100-kink_v1_42.png to drawings/4-0100-kink_v1_42.png
+Uploaded fixtures/drawings/3-1600-body_male_underwear_v1_8.png to drawings/3-1600-body_male_underwear_v1_8.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_9.png to drawings/1-2100-vagina_shape_v1_9.png
+Uploaded fixtures/drawings/7-01-looking-for-3_cc6sWZp.png to drawings/7-01-looking-for-3_cc6sWZp.png
+Uploaded fixtures/drawings/4-0100-vagina_deep_v1_1.png to drawings/4-0100-vagina_deep_v1_1.png
+Uploaded fixtures/drawings/4-1000-body_female_armpit_hair_v1_1.png to drawings/4-1000-body_female_armpit_hair_v1_1.png
+Uploaded fixtures/drawings/3-0900-penis_cum_style_v1_3.png to drawings/3-0900-penis_cum_style_v1_3.png
+Uploaded fixtures/drawings/1-2400-vagina_hairy_v1_5.png to drawings/1-2400-vagina_hairy_v1_5.png
+Uploaded fixtures/drawings/3-1000-penis_cum_length_v1_1_xhalRKZ.png to drawings/3-1000-penis_cum_length_v1_1_xhalRKZ.png
+Uploaded fixtures/drawings/1-1400-body_eye_color_v1_3.png to drawings/1-1400-body_eye_color_v1_3.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_8_m-m_Kd4N5k1.png to drawings/6-0200-sex_position_v1_8_m-m_Kd4N5k1.png
+Uploaded fixtures/drawings/4-0900-body_female_leg_hair_v1_3.png to drawings/4-0900-body_female_leg_hair_v1_3.png
+Uploaded fixtures/drawings/1-1000-penis_cum_strength_v1_2.png to drawings/1-1000-penis_cum_strength_v1_2.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_12.png to drawings/1-2100-vagina_shape_v1_12.png
+Uploaded fixtures/drawings/3-0900-penis_cum_style_v1_4.png to drawings/3-0900-penis_cum_style_v1_4.png
+Uploaded fixtures/drawings/1-0600-penis_head_size_v1_2.png to drawings/1-0600-penis_head_size_v1_2.png
+Uploaded fixtures/drawings/1-1200-body_male_age_v1_8_fW0tB8F.png to drawings/1-1200-body_male_age_v1_8_fW0tB8F.png
+Uploaded fixtures/drawings/Recurso_1454.png to drawings/Recurso_1454.png
+Uploaded fixtures/drawings/1-1500-body_hair_color_v1_6.png to drawings/1-1500-body_hair_color_v1_6.png
+Uploaded fixtures/drawings/Recurso_1422.png to drawings/Recurso_1422.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_6_NCv27oV.png to drawings/5-0300-sex_duration_v1_6_NCv27oV.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_1_zwajLvE.png to drawings/5-0300-sex_duration_v1_1_zwajLvE.png
+Uploaded fixtures/drawings/3-0400-penis_head_shape_v1_1.png to drawings/3-0400-penis_head_shape_v1_1.png
+Uploaded fixtures/drawings/5-0200-sex_position_v1_3_VSEgthC.png to drawings/5-0200-sex_position_v1_3_VSEgthC.png
+Uploaded fixtures/drawings/3-0800-penis_cum_time_v1_6_h2l0lDI.png to drawings/3-0800-penis_cum_time_v1_6_h2l0lDI.png
+Uploaded fixtures/drawings/1-1600-body_male_butt_hair_v1_3.png to drawings/1-1600-body_male_butt_hair_v1_3.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_2.png to drawings/1-3300-body_female_bras_v1_2.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_7_lzKvJXX.png to drawings/5-0300-sex_duration_v1_7_lzKvJXX.png
+Uploaded fixtures/drawings/2-0800-vagina_wet_v2_2_1.png to drawings/2-0800-vagina_wet_v2_2_1.png
+Uploaded fixtures/drawings/1-0200-penis_curvature_v1_4.png to drawings/1-0200-penis_curvature_v1_4.png
+Uploaded fixtures/drawings/1-3000-body_female_butt_shape_v1_2.png to drawings/1-3000-body_female_butt_shape_v1_2.png
+Uploaded fixtures/drawings/1-2700-vagina_separation_v1_1.png to drawings/1-2700-vagina_separation_v1_1.png
+Uploaded fixtures/drawings/1-1700-body_male_armpit_hair_v1_1.png to drawings/1-1700-body_male_armpit_hair_v1_1.png
+Uploaded fixtures/drawings/12.png to drawings/12.png
+Uploaded fixtures/drawings/4-0300-vagina_clit_v1_3.png to drawings/4-0300-vagina_clit_v1_3.png
+Uploaded fixtures/drawings/3-0800-penis_cum_time_v1_4_O21Nssj.png to drawings/3-0800-penis_cum_time_v1_4_O21Nssj.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_13.png to drawings/1-2100-vagina_shape_v1_13.png
+Uploaded fixtures/drawings/1-0900-penis_hairy_v1_1.png to drawings/1-0900-penis_hairy_v1_1.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_3.png to drawings/1-0300-penis_length_v2_3.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_4_89mjhiS.png to drawings/5-0300-sex_duration_v1_4_89mjhiS.png
+Uploaded fixtures/drawings/3-0600-penis_hairy_style_v1_3.png to drawings/3-0600-penis_hairy_style_v1_3.png
+Uploaded fixtures/drawings/Recurso_1456.png to drawings/Recurso_1456.png
+Uploaded fixtures/drawings/3-1850-body_female_nipple_type_v1_6.png to drawings/3-1850-body_female_nipple_type_v1_6.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_9.png to drawings/1-3400-body_female_underwear_v1_9.png
+Uploaded fixtures/drawings/3-0900-penis_cum_style_v1_1.png to drawings/3-0900-penis_cum_style_v1_1.png
+Uploaded fixtures/drawings/1-1900-body_male_shape_v1_1.png to drawings/1-1900-body_male_shape_v1_1.png
+Uploaded fixtures/drawings/2-0300-vagina_labia_v3C_3.png to drawings/2-0300-vagina_labia_v3C_3.png
+Uploaded fixtures/drawings/1-0600-penis_head_size_v1_3.png to drawings/1-0600-penis_head_size_v1_3.png
+Uploaded fixtures/drawings/3-1850-body_female_nipple_type_v1_8.png to drawings/3-1850-body_female_nipple_type_v1_8.png
+Uploaded fixtures/drawings/3-1600-body_male_underwear_v1_11.png to drawings/3-1600-body_male_underwear_v1_11.png
+Uploaded fixtures/drawings/Recurso_1467.png to drawings/Recurso_1467.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_11.png to drawings/1-3300-body_female_bras_v1_11.png
+Uploaded fixtures/drawings/1-0600-penis_head_size_v1_4.png to drawings/1-0600-penis_head_size_v1_4.png
+Uploaded fixtures/drawings/7-01-looking-for-1.png to drawings/7-01-looking-for-1.png
+Uploaded fixtures/drawings/1-2700-vagina_separation_v1_4.png to drawings/1-2700-vagina_separation_v1_4.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_11.png to drawings/1-0300-penis_length_v2_11.png
+Uploaded fixtures/drawings/Recurso_1415.png to drawings/Recurso_1415.png
+Uploaded fixtures/drawings/1-1200-body_male_age_v1_5_YlkoVAx.png to drawings/1-1200-body_male_age_v1_5_YlkoVAx.png
+Uploaded fixtures/drawings/1-1500-body_hair_color_v1_3.png to drawings/1-1500-body_hair_color_v1_3.png
+Uploaded fixtures/drawings/3-0300-penis_girth_v2_9.png to drawings/3-0300-penis_girth_v2_9.png
+Uploaded fixtures/drawings/3-1000-penis_cum_length_v1_4_l6Jzn9C.png to drawings/3-1000-penis_cum_length_v1_4_l6Jzn9C.png
+Uploaded fixtures/drawings/15.png to drawings/15.png
+Uploaded fixtures/drawings/1-1600-body_male_butt_hair_v1_2.png to drawings/1-1600-body_male_butt_hair_v1_2.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_10.png to drawings/1-2100-vagina_shape_v1_10.png
+Uploaded fixtures/drawings/5-0200-sex_position_v1_18_PMrK2Og.png to drawings/5-0200-sex_position_v1_18_PMrK2Og.png
+Uploaded fixtures/drawings/1-0200-penis_curvature_v1_6.png to drawings/1-0200-penis_curvature_v1_6.png
+Uploaded fixtures/drawings/1-1800-body_male_leg_hair_v1_3.png to drawings/1-1800-body_male_leg_hair_v1_3.png
+Uploaded fixtures/drawings/5-0200-sex_position_v1_17_mmkxjng.png to drawings/5-0200-sex_position_v1_17_mmkxjng.png
+Uploaded fixtures/drawings/4-0100-kink_v1_22.png to drawings/4-0100-kink_v1_22.png
+Uploaded fixtures/drawings/4-0100-kink_v1_28.png to drawings/4-0100-kink_v1_28.png
+Uploaded fixtures/drawings/Recurso_1459.png to drawings/Recurso_1459.png
+Uploaded fixtures/drawings/1-0500-penis_pointing_v1_5.png to drawings/1-0500-penis_pointing_v1_5.png
+Uploaded fixtures/drawings/Recurso_1416.png to drawings/Recurso_1416.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_9.png to drawings/1-0300-penis_length_v2_9.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_16.png to drawings/1-3300-body_female_bras_v1_16.png
+Uploaded fixtures/drawings/1-1400-body_eye_color_v1_1.png to drawings/1-1400-body_eye_color_v1_1.png
+Uploaded fixtures/drawings/1-1800-body_male_leg_hair_v1_5.png to drawings/1-1800-body_male_leg_hair_v1_5.png
+Uploaded fixtures/drawings/4-0100-kink_v1_40.png to drawings/4-0100-kink_v1_40.png
+Uploaded fixtures/drawings/Recurso_1425.png to drawings/Recurso_1425.png
+Uploaded fixtures/drawings/1-0900-penis_hairy_v1_5.png to drawings/1-0900-penis_hairy_v1_5.png
+Uploaded fixtures/drawings/1-0900-penis_head_size_v2_2C.png to drawings/1-0900-penis_head_size_v2_2C.png
+Uploaded fixtures/drawings/3-0300-penis_girth_v2_8.png to drawings/3-0300-penis_girth_v2_8.png
+Uploaded fixtures/drawings/1-2400-vagina_hairy_v1_3.png to drawings/1-2400-vagina_hairy_v1_3.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_6.png to drawings/1-3400-body_female_underwear_v1_6.png
+Uploaded fixtures/drawings/17.png to drawings/17.png
+Uploaded fixtures/drawings/3-0700-penis_hair_color_v1_5.png to drawings/3-0700-penis_hair_color_v1_5.png
+Uploaded fixtures/drawings/Recurso_1385.png to drawings/Recurso_1385.png
+Uploaded fixtures/drawings/1-1900-body_male_shape_v1_6.png to drawings/1-1900-body_male_shape_v1_6.png
+Uploaded fixtures/drawings/Recurso_1444.png to drawings/Recurso_1444.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_19_m-m_lWDe35A.png to drawings/6-0200-sex_position_v1_19_m-m_lWDe35A.png
+Uploaded fixtures/drawings/1-0700-penis_balls_shape_v1_4.png to drawings/1-0700-penis_balls_shape_v1_4.png
+Uploaded fixtures/drawings/1-0200-penis_curvature_v1_5.png to drawings/1-0200-penis_curvature_v1_5.png
+Uploaded fixtures/drawings/3-0600-penis_hairy_style_v1_1.png to drawings/3-0600-penis_hairy_style_v1_1.png
+Uploaded fixtures/drawings/1-0800-penis_balls_hairy_v1_3.png to drawings/1-0800-penis_balls_hairy_v1_3.png
+Uploaded fixtures/drawings/3-0600-penis_hairy_style_v1_5.png to drawings/3-0600-penis_hairy_style_v1_5.png
+Uploaded fixtures/drawings/3-0500-penis_balls_size_v1_2.png to drawings/3-0500-penis_balls_size_v1_2.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_8.png to drawings/1-3400-body_female_underwear_v1_8.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_7.png to drawings/1-3400-body_female_underwear_v1_7.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_22_m-m_Aq8XLuG.png to drawings/6-0200-sex_position_v1_22_m-m_Aq8XLuG.png
+Uploaded fixtures/drawings/Recurso_1390.png to drawings/Recurso_1390.png
+Uploaded fixtures/drawings/Recurso_1424.png to drawings/Recurso_1424.png
+Uploaded fixtures/drawings/2-0800-vagina_wet_v2_4_1.png to drawings/2-0800-vagina_wet_v2_4_1.png
+Uploaded fixtures/drawings/1-1400-body_eye_color_v1_2.png to drawings/1-1400-body_eye_color_v1_2.png
+Uploaded fixtures/drawings/1-2800-body_female_age_v1_10_X5laQKG.png to drawings/1-2800-body_female_age_v1_10_X5laQKG.png
+Uploaded fixtures/drawings/1-0300-penis_curvature_v2_5B.png to drawings/1-0300-penis_curvature_v2_5B.png
+Uploaded fixtures/drawings/3-0800-penis_cum_time_v1_1_HuUQKzV.png to drawings/3-0800-penis_cum_time_v1_1_HuUQKzV.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_2.png to drawings/1-3400-body_female_underwear_v1_2.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_11_h5Vy4uR.png to drawings/5-0300-sex_duration_v1_11_h5Vy4uR.png
+Uploaded fixtures/drawings/Recurso_1392.png to drawings/Recurso_1392.png
+Uploaded fixtures/drawings/4-0900-body_female_leg_hair_v1_2.png to drawings/4-0900-body_female_leg_hair_v1_2.png
+Uploaded fixtures/drawings/3-1400-body_male_butt_shape_v1_1.png to drawings/3-1400-body_male_butt_shape_v1_1.png
+Uploaded fixtures/drawings/3-1850-body_female_nipple_type_v1_2.png to drawings/3-1850-body_female_nipple_type_v1_2.png
+Uploaded fixtures/drawings/4-0100-vagina_deep_v1_3.png to drawings/4-0100-vagina_deep_v1_3.png
+Uploaded fixtures/drawings/1-0100-penis_foreskin_v1_2.png to drawings/1-0100-penis_foreskin_v1_2.png
+Uploaded fixtures/drawings/7.png to drawings/7.png
+Uploaded fixtures/drawings/Recurso_1383.png to drawings/Recurso_1383.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_4.png to drawings/1-2100-vagina_shape_v1_4.png
+Uploaded fixtures/drawings/1-1500-body_hair_color_v1_4.png to drawings/1-1500-body_hair_color_v1_4.png
+Uploaded fixtures/drawings/Recurso_1455.png to drawings/Recurso_1455.png
+Uploaded fixtures/drawings/1-0400-penis_veins_v1_4.png to drawings/1-0400-penis_veins_v1_4.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_14.png to drawings/1-3300-body_female_bras_v1_14.png
+Uploaded fixtures/drawings/1-2000-body_male_chest_hair_v1_5.png to drawings/1-2000-body_male_chest_hair_v1_5.png
+Uploaded fixtures/drawings/4-0100-kink_v1_23.png to drawings/4-0100-kink_v1_23.png
+Uploaded fixtures/drawings/2-0300-vagina_labia_v3C_2.png to drawings/2-0300-vagina_labia_v3C_2.png
+Uploaded fixtures/drawings/13.png to drawings/13.png
+Uploaded fixtures/drawings/3-1600-body_male_underwear_v1_10.png to drawings/3-1600-body_male_underwear_v1_10.png
+Uploaded fixtures/drawings/10.png to drawings/10.png
+Uploaded fixtures/drawings/4-0100-kink_v1_26.png to drawings/4-0100-kink_v1_26.png
+Uploaded fixtures/drawings/2-0300-vagina_labia_v3C_6.png to drawings/2-0300-vagina_labia_v3C_6.png
+Uploaded fixtures/drawings/4-0100-kink_v1_35.png to drawings/4-0100-kink_v1_35.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_9_PjoTNLq.png to drawings/5-0300-sex_duration_v1_9_PjoTNLq.png
+Uploaded fixtures/drawings/1-0400-penis_color_v1_12.png to drawings/1-0400-penis_color_v1_12.png
+Uploaded fixtures/drawings/1-1400-body_eye_color_v1_10.png to drawings/1-1400-body_eye_color_v1_10.png
+Uploaded fixtures/drawings/1-1100-penis_cum_ropes_v2_1_mnZb1SU.png to drawings/1-1100-penis_cum_ropes_v2_1_mnZb1SU.png
+Uploaded fixtures/drawings/4-0900-body_female_leg_hair_v1_1.png to drawings/4-0900-body_female_leg_hair_v1_1.png
+Uploaded fixtures/drawings/7-01-privacy-3_rezl5wL.png to drawings/7-01-privacy-3_rezl5wL.png
+Uploaded fixtures/drawings/1-0300-penis_curvature_v2_1B.png to drawings/1-0300-penis_curvature_v2_1B.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_2.png to drawings/1-0300-penis_length_v2_2.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_13_HeuXxXP.png to drawings/5-0300-sex_duration_v1_13_HeuXxXP.png
+Uploaded fixtures/drawings/Recurso_1463.png to drawings/Recurso_1463.png
+Uploaded fixtures/drawings/1-2000-body_male_chest_hair_v1_3.png to drawings/1-2000-body_male_chest_hair_v1_3.png
+Uploaded fixtures/drawings/1-2800-body_female_age_v1_2_zQvBkY6.png to drawings/1-2800-body_female_age_v1_2_zQvBkY6.png
+Uploaded fixtures/drawings/4-0100-kink_v1_38.png to drawings/4-0100-kink_v1_38.png
+Uploaded fixtures/drawings/7-01-privacy-2.png to drawings/7-01-privacy-2.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_11.png to drawings/1-3400-body_female_underwear_v1_11.png
+Uploaded fixtures/drawings/1-1700-body_male_armpit_hair_v1_2.png to drawings/1-1700-body_male_armpit_hair_v1_2.png
+Uploaded fixtures/drawings/7-03-hiv-3.png to drawings/7-03-hiv-3.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_10_b8sl2NN.png to drawings/5-0300-sex_duration_v1_10_b8sl2NN.png
+Uploaded fixtures/drawings/3-1800-body_female_nipple_size_v2_3.png to drawings/3-1800-body_female_nipple_size_v2_3.png
+Uploaded fixtures/drawings/1-2400-vagina_hairy_v1_1.png to drawings/1-2400-vagina_hairy_v1_1.png
+Uploaded fixtures/drawings/3-0200-penis_color_v1_1.png to drawings/3-0200-penis_color_v1_1.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_12_5zYvH6q.png to drawings/5-0300-sex_duration_v1_12_5zYvH6q.png
+Uploaded fixtures/drawings/Recurso_1388.png to drawings/Recurso_1388.png
+Uploaded fixtures/drawings/Recurso_1453.png to drawings/Recurso_1453.png
+Uploaded fixtures/drawings/4-0100-kink_v1_37.png to drawings/4-0100-kink_v1_37.png
+Uploaded fixtures/drawings/4-0100-kink_v1_30.png to drawings/4-0100-kink_v1_30.png
+Uploaded fixtures/drawings/5-0200-sex_position_v1_23.png to drawings/5-0200-sex_position_v1_23.png
+Uploaded fixtures/drawings/4-0600-body_female_breast_pointing_v1_5.png to drawings/4-0600-body_female_breast_pointing_v1_5.png
+Uploaded fixtures/drawings/1-3100-body_female_breast_shape_v1_5.png to drawings/1-3100-body_female_breast_shape_v1_5.png
+Uploaded fixtures/drawings/4-0100-kink_v1_36.png to drawings/4-0100-kink_v1_36.png
+Uploaded fixtures/drawings/1-0150-penis_shape_v2_1.png to drawings/1-0150-penis_shape_v2_1.png
+Uploaded fixtures/drawings/1-2900-body_female_shape_v1_1.png to drawings/1-2900-body_female_shape_v1_1.png
+Uploaded fixtures/drawings/4-1000-body_female_armpit_hair_v1_2.png to drawings/4-1000-body_female_armpit_hair_v1_2.png
+Uploaded fixtures/drawings/1-1100-penis_cum_ropes_v2_1_cybSqrV.png to drawings/1-1100-penis_cum_ropes_v2_1_cybSqrV.png
+Uploaded fixtures/drawings/3-1600-body_male_underwear_v1_2.png to drawings/3-1600-body_male_underwear_v1_2.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_20_m-m_ffaLGIc.png to drawings/6-0200-sex_position_v1_20_m-m_ffaLGIc.png
+Uploaded fixtures/drawings/Recurso_1417.png to drawings/Recurso_1417.png
+Uploaded fixtures/drawings/3-1400-body_male_butt_shape_v1_3.png to drawings/3-1400-body_male_butt_shape_v1_3.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_8.png to drawings/1-0300-penis_length_v2_8.png
+Uploaded fixtures/drawings/1-1200-body_male_age_v1_2_lnZ2VjL.png to drawings/1-1200-body_male_age_v1_2_lnZ2VjL.png
+Uploaded fixtures/drawings/5-0200-sex_position_v1_2_SfRuAJp.png to drawings/5-0200-sex_position_v1_2_SfRuAJp.png
+Uploaded fixtures/drawings/3-0400-penis_head_shape_v1_2.png to drawings/3-0400-penis_head_shape_v1_2.png
+Uploaded fixtures/drawings/3-0400-penis_head_shape_v1_3.png to drawings/3-0400-penis_head_shape_v1_3.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_14_m-m_kZXJaWL.png to drawings/6-0200-sex_position_v1_14_m-m_kZXJaWL.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_5_m-m_shRqDaZ.png to drawings/6-0200-sex_position_v1_5_m-m_shRqDaZ.png
+Uploaded fixtures/drawings/Recurso_1451.png to drawings/Recurso_1451.png
+Uploaded fixtures/drawings/1-2000-body_male_chest_hair_v1_4.png to drawings/1-2000-body_male_chest_hair_v1_4.png
+Uploaded fixtures/drawings/3-1000-penis_cum_length_v1_2_hKZ95vd.png to drawings/3-1000-penis_cum_length_v1_2_hKZ95vd.png
+Uploaded fixtures/drawings/2-1200-vagina_squirt_v1_3_rDl4nyF.png to drawings/2-1200-vagina_squirt_v1_3_rDl4nyF.png
+Uploaded fixtures/drawings/1-3100-body_female_breast_shape_v1_4.png to drawings/1-3100-body_female_breast_shape_v1_4.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_15.png to drawings/1-3300-body_female_bras_v1_15.png
+Uploaded fixtures/drawings/1-1800-body_male_leg_hair_v1_1.png to drawings/1-1800-body_male_leg_hair_v1_1.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_13.png to drawings/1-3400-body_female_underwear_v1_13.png
+Uploaded fixtures/drawings/1-1000-penis_cum_strength_v1_6.png to drawings/1-1000-penis_cum_strength_v1_6.png
+Uploaded fixtures/drawings/3-1700-activity_male_v1_2.png to drawings/3-1700-activity_male_v1_2.png
+Uploaded fixtures/drawings/Recurso_1471.png to drawings/Recurso_1471.png
+Uploaded fixtures/drawings/4-0100-kink_v1_24.png to drawings/4-0100-kink_v1_24.png
+Uploaded fixtures/drawings/4-0100-kink_v1_33.png to drawings/4-0100-kink_v1_33.png
+Uploaded fixtures/drawings/1-1000-penis_cum_strength_v1_4.png to drawings/1-1000-penis_cum_strength_v1_4.png
+Uploaded fixtures/drawings/3-1850-body_female_nipple_type_v1_3.png to drawings/3-1850-body_female_nipple_type_v1_3.png
+Uploaded fixtures/drawings/1-2400-vagina_hairy_v1_4.png to drawings/1-2400-vagina_hairy_v1_4.png
+Uploaded fixtures/drawings/3-1000-penis_cum_length_v1_6_JwAWtXU.png to drawings/3-1000-penis_cum_length_v1_6_JwAWtXU.png
+Uploaded fixtures/drawings/1-2900-body_female_shape_v1_2.png to drawings/1-2900-body_female_shape_v1_2.png
+Uploaded fixtures/drawings/Recurso_1426.png to drawings/Recurso_1426.png
+Uploaded fixtures/drawings/2-0300-vagina_labia_v3C_1.png to drawings/2-0300-vagina_labia_v3C_1.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_13_m-m_DwLOKMA.png to drawings/6-0200-sex_position_v1_13_m-m_DwLOKMA.png
+Uploaded fixtures/drawings/3-0500-penis_balls_size_v1_3.png to drawings/3-0500-penis_balls_size_v1_3.png
+Uploaded fixtures/drawings/1-0900-penis_hairy_v1_2.png to drawings/1-0900-penis_hairy_v1_2.png
+Uploaded fixtures/drawings/3-0200-penis_color_v1_2.png to drawings/3-0200-penis_color_v1_2.png
+Uploaded fixtures/drawings/3-0700-penis_hair_color_v1_2.png to drawings/3-0700-penis_hair_color_v1_2.png
+Uploaded fixtures/drawings/2-0300-vagina_labia_v3C_5.png to drawings/2-0300-vagina_labia_v3C_5.png
+Uploaded fixtures/drawings/1-0300-penis_length_v2_5.png to drawings/1-0300-penis_length_v2_5.png
+Uploaded fixtures/drawings/3-0700-penis_hair_color_v1_3.png to drawings/3-0700-penis_hair_color_v1_3.png
+Uploaded fixtures/drawings/1-1700-body_male_armpit_hair_v1_4.png to drawings/1-1700-body_male_armpit_hair_v1_4.png
+Uploaded fixtures/drawings/1-2800-body_female_age_v1_8_5kTM864.png to drawings/1-2800-body_female_age_v1_8_5kTM864.png
+Uploaded fixtures/drawings/4-0300-vagina_clit_v1_2.png to drawings/4-0300-vagina_clit_v1_2.png
+Uploaded fixtures/drawings/1-0100-penis_foreskin_v1_3.png to drawings/1-0100-penis_foreskin_v1_3.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_14.png to drawings/1-2100-vagina_shape_v1_14.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_11_m-m_LwaiIMs.png to drawings/6-0200-sex_position_v1_11_m-m_LwaiIMs.png
+Uploaded fixtures/drawings/3-0700-penis_hair_color_v1_4.png to drawings/3-0700-penis_hair_color_v1_4.png
+Uploaded fixtures/drawings/3-0800-penis_cum_time_v1_3_PeMogg2.png to drawings/3-0800-penis_cum_time_v1_3_PeMogg2.png
+Uploaded fixtures/drawings/4-0300-vagina_clit_v1_4.png to drawings/4-0300-vagina_clit_v1_4.png
+Uploaded fixtures/drawings/1-0400-penis_veins_v1_3.png to drawings/1-0400-penis_veins_v1_3.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_16.png to drawings/1-2100-vagina_shape_v1_16.png
+Uploaded fixtures/drawings/1-2300-vagina_size_v2_1.png to drawings/1-2300-vagina_size_v2_1.png
+Uploaded fixtures/drawings/3-0900-penis_cum_style_v1_5.png to drawings/3-0900-penis_cum_style_v1_5.png
+Uploaded fixtures/drawings/3-0300-penis_girth_v2_6.png to drawings/3-0300-penis_girth_v2_6.png
+Uploaded fixtures/drawings/4-0200-vagina_color_v1_4.png to drawings/4-0200-vagina_color_v1_4.png
+Uploaded fixtures/drawings/1-2900-body_female_shape_v1_4.png to drawings/1-2900-body_female_shape_v1_4.png
+Uploaded fixtures/drawings/1-3400-body_female_underwear_v1_1.png to drawings/1-3400-body_female_underwear_v1_1.png
+Uploaded fixtures/drawings/1.png to drawings/1.png
+Uploaded fixtures/drawings/3-1600-body_male_underwear_v1_5.png to drawings/3-1600-body_male_underwear_v1_5.png
+Uploaded fixtures/drawings/1-0900-penis_head_size_v2_3C.png to drawings/1-0900-penis_head_size_v2_3C.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_21_m-m_cCfcMfY.png to drawings/6-0200-sex_position_v1_21_m-m_cCfcMfY.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_12_m-m_PiYSkrY.png to drawings/6-0200-sex_position_v1_12_m-m_PiYSkrY.png
+Uploaded fixtures/drawings/1-0200-penis_curvature_v1_8.png to drawings/1-0200-penis_curvature_v1_8.png
+Uploaded fixtures/drawings/1-3100-body_female_breast_shape_v1_2.png to drawings/1-3100-body_female_breast_shape_v1_2.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_18.png to drawings/1-3300-body_female_bras_v1_18.png
+Uploaded fixtures/drawings/1-3000-body_female_butt_shape_v1_4.png to drawings/1-3000-body_female_butt_shape_v1_4.png
+Uploaded fixtures/drawings/1-0200-penis_curvature_v1_3.png to drawings/1-0200-penis_curvature_v1_3.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_5_tHpiLbW.png to drawings/5-0300-sex_duration_v1_5_tHpiLbW.png
+Uploaded fixtures/drawings/1-3100-body_female_breast_shape_v1_3.png to drawings/1-3100-body_female_breast_shape_v1_3.png
+Uploaded fixtures/drawings/1-0100-penis_foreskin_v1_6.png to drawings/1-0100-penis_foreskin_v1_6.png
+Uploaded fixtures/drawings/1-1200-body_male_age_v1_1_tWFb5eJ.png to drawings/1-1200-body_male_age_v1_1_tWFb5eJ.png
+Uploaded fixtures/drawings/1-1000-penis_cum_strength_v1_5.png to drawings/1-1000-penis_cum_strength_v1_5.png
+Uploaded fixtures/drawings/1-2800-body_female_age_v1_3_gJzbO6M.png to drawings/1-2800-body_female_age_v1_3_gJzbO6M.png
+Uploaded fixtures/drawings/4-0200-vagina_color_v1_5.png to drawings/4-0200-vagina_color_v1_5.png
+Uploaded fixtures/drawings/1-0200-penis_curvature_v1_1.png to drawings/1-0200-penis_curvature_v1_1.png
+Uploaded fixtures/drawings/5-0300-sex_duration_v1_8_DNOgimG.png to drawings/5-0300-sex_duration_v1_8_DNOgimG.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_6.png to drawings/1-2100-vagina_shape_v1_6.png
+Uploaded fixtures/drawings/3-1600-body_male_underwear_v1_9.png to drawings/3-1600-body_male_underwear_v1_9.png
+Uploaded fixtures/drawings/1-2000-body_male_chest_hair_v1_1.png to drawings/1-2000-body_male_chest_hair_v1_1.png
+Uploaded fixtures/drawings/1-2400-vagina_hairy_v1_2.png to drawings/1-2400-vagina_hairy_v1_2.png
+Uploaded fixtures/drawings/4-0600-body_female_breast_pointing_v1_1.png to drawings/4-0600-body_female_breast_pointing_v1_1.png
+Uploaded fixtures/drawings/7-01-looking-for-2.png to drawings/7-01-looking-for-2.png
+Uploaded fixtures/drawings/2-0100-consumption_v1_3.png to drawings/2-0100-consumption_v1_3.png
+Uploaded fixtures/drawings/1-3000-body_female_butt_shape_v1_3.png to drawings/1-3000-body_female_butt_shape_v1_3.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_5.png to drawings/1-2100-vagina_shape_v1_5.png
+Uploaded fixtures/drawings/5-0200-sex_position_v1_1_t0SyZ6H.png to drawings/5-0200-sex_position_v1_1_t0SyZ6H.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_1.png to drawings/1-2100-vagina_shape_v1_1.png
+Uploaded fixtures/drawings/4-0200-vagina_color_v1_2.png to drawings/4-0200-vagina_color_v1_2.png
+Uploaded fixtures/drawings/Recurso_1448.png to drawings/Recurso_1448.png
+Uploaded fixtures/drawings/1-2100-vagina_shape_v1_2.png to drawings/1-2100-vagina_shape_v1_2.png
+Uploaded fixtures/drawings/Recurso_1450.png to drawings/Recurso_1450.png
+Uploaded fixtures/drawings/1-3300-body_female_bras_v1_6.png to drawings/1-3300-body_female_bras_v1_6.png
+Uploaded fixtures/drawings/3-0200-penis_color_v1_4.png to drawings/3-0200-penis_color_v1_4.png
+Skipping: fixtures/drawings/sheets is not a file
+Uploaded fixtures/drawings/Recurso_1458.png to drawings/Recurso_1458.png
+Uploaded fixtures/drawings/Recurso_1468.png to drawings/Recurso_1468.png
+Uploaded fixtures/drawings/Recurso_1460.png to drawings/Recurso_1460.png
+Uploaded fixtures/drawings/6.png to drawings/6.png
+Uploaded fixtures/drawings/3-0300-penis_girth_v2_2.png to drawings/3-0300-penis_girth_v2_2.png
+Uploaded fixtures/drawings/18.png to drawings/18.png
+Uploaded fixtures/drawings/2-0300-vagina_labia_v3C_4.png to drawings/2-0300-vagina_labia_v3C_4.png
+Uploaded fixtures/drawings/3-0500-penis_balls_size_v1_4.png to drawings/3-0500-penis_balls_size_v1_4.png
+Uploaded fixtures/drawings/3-1600-body_male_underwear_v1_1.png to drawings/3-1600-body_male_underwear_v1_1.png
+Uploaded fixtures/drawings/1-1000-penis_cum_strength_v1_3.png to drawings/1-1000-penis_cum_strength_v1_3.png
+Uploaded fixtures/drawings/7-03-hiv-1.png to drawings/7-03-hiv-1.png
+Uploaded fixtures/drawings/1-1100-penis_cum_ropes_v1_10_cFbCsJZ.png to drawings/1-1100-penis_cum_ropes_v1_10_cFbCsJZ.png
+Uploaded fixtures/drawings/7-03-hiv-2.png to drawings/7-03-hiv-2.png
+Uploaded fixtures/drawings/6-0200-sex_position_v1_9_m-m_Z645ZDE.png to drawings/6-0200-sex_position_v1_9_m-m_Z645ZDE.png
+Uploaded fixtures/drawings/Recurso_1464.png to drawings/Recurso_1464.png
+Uploaded fixtures/drawings/1-0400-penis_veins_v1_1.png to drawings/1-0400-penis_veins_v1_1.png
+Uploaded fixtures/drawings/14.png to drawings/14.png
+Uploaded fixtures/drawings/Recurso_1461.png to drawings/Recurso_1461.png
+Uploaded fixtures/drawings/1-0300-penis_curvature_v2_4B.png to drawings/1-0300-penis_curvature_v2_4B.png
+Uploaded fixtures/drawings/1-1400-body_eye_color_v1_8.png to drawings/1-1400-body_eye_color_v1_8.png
+Uploaded fixtures/drawings/2-0100-consumption_v1_2.png to drawings/2-0100-consumption_v1_2.png
+Uploaded fixtures/drawings/1-1900-body_male_shape_v1_5.png to drawings/1-1900-body_male_shape_v1_5.png
+Uploaded fixtures/drawings/4-0200-vagina_color_v1_1.png to drawings/4-0200-vagina_color_v1_1.png
+Uploaded fixtures/drawings/3-1700-activity_male_v1_1.png to drawings/3-1700-activity_male_v1_1.png
+Uploaded fixtures/drawings/8-0200-sex_position_v1_7_f-m_korKJSU.png to drawings/8-0200-sex_position_v1_7_f-m_korKJSU.png
+Uploaded fixtures/drawings/1-0900-penis_head_size_v2_1C.png to drawings/1-0900-penis_head_size_v2_1C.png
+Uploaded fixtures/drawings/4-1000-body_female_armpit_hair_v1_3.png to drawings/4-1000-body_female_armpit_hair_v1_3.png
+1 folders skipped
+498 files uploaded
+0 files exists
+Already exists: drawings/sheets/body_at_register_hwfnwoiqd1.png
+Already exists: drawings/sheets/body_profile_page_ea38010qq8.png
+Already exists: drawings/sheets/vagina_at_register_cg1qlrek6c.png
+Already exists: drawings/sheets/activities_profile_page_0ofrmatc6f.png
+Already exists: drawings/sheets/vagina_profile_page_8nitkvspb6.png
+Already exists: drawings/sheets/penis_at_register_0hfnhya5g3.png
+Already exists: drawings/sheets/penis_profile_page_2dd4lffwnm.png
+0 folders skipped
+0 files uploaded
+7 files exists
+Successfully uploaded all drawings.
+0 folders skipped
+0 files uploaded
+0 files exists
+Successfully uploaded all features icons.
+Installing fixtures/core_currency.json...
+Installed 11 object(s) from 1 fixture(s)
+Installing fixtures/core_country.json...
+Installed 250 object(s) from 1 fixture(s)
+Installing fixtures/core_translatedtext.json...
+Installed 191 object(s) from 1 fixture(s)
+Installing fixtures/subscriptions_paymentsystemaccount.json...
+Installed 6 object(s) from 1 fixture(s)
+Installing fixtures/subscriptions_feature.json...
+Installed 14 object(s) from 1 fixture(s)
+Installing fixtures/subscriptions_product.json...
+Installed 5 object(s) from 1 fixture(s)
+Installing fixtures/subscriptions_price.json...
+Installed 12 object(s) from 1 fixture(s)
+Installing fixtures/subscriptions_pricecurrency.json...
+Installed 48 object(s) from 1 fixture(s)
+Installing fixtures/subscriptions_productfeature.json...
+Installed 49 object(s) from 1 fixture(s)
+Installing fixtures/subscriptions_promotion.json...
+Installed 4 object(s) from 1 fixture(s)
+Installing fixtures/subscriptions_productitem.json...
+Installed 18 object(s) from 1 fixture(s)
+Installing fixtures/drawings_artist.json...
+Installed 4 object(s) from 1 fixture(s)
+Installing fixtures/drawings_drawingtext.json...
+Installed 156 object(s) from 1 fixture(s)
+Installing fixtures/drawings_drawingimage.json...
+Installed 498 object(s) from 1 fixture(s)
+Installing fixtures/drawings_drawingsheet.json...
+Installed 7 object(s) from 1 fixture(s)
+Installing fixtures/drawings_drawingsheetelement.json...
+Installed 498 object(s) from 1 fixture(s)
+Installing fixtures/drawings_drawinggroup.json...
+Installed 67 object(s) from 1 fixture(s)
+Installing fixtures/drawings_drawinggroupprivacydirtycode.json...
+Installed 100 object(s) from 1 fixture(s)
+Installing fixtures/drawings_drawinggroupversion_excluded.json...
+Installed 70 object(s) from 1 fixture(s)
+Installing fixtures/drawings_drawingoption.json...
+Installed 498 object(s) from 1 fixture(s)
+Installing fixtures/drawings_drawingoptiondirtycode.json...
+Installed 708 object(s) from 1 fixture(s)
+Installing fixtures/drawings_drawinggroupversion.json...
+Installed 70 object(s) from 1 fixture(s)
+Successfully installed all fixtures.
+Drawings cache cleared.
+=================================== FAILURES ===================================
+_____________________ TestETLUtils.test_filter_staff_users _____________________
+
+self = <apps.analytics.tests.test_etl.TestETLUtils testMethod=test_filter_staff_users>
+
+    def test_filter_staff_users(self) -> None:
+        """Test the filter_staff_users function"""
+    
+        profiles = Profile.objects.all()
+        messages = Message.objects.all()
+        drawings = DrawingPage.objects.all()
+        users = User.objects.all()
+    
+>       self.assertEqual(len(profiles), 10)
+E       AssertionError: 37 != 10
+
+apps/analytics/tests/test_etl.py:253: AssertionError
+__________________ TestAppMemoryProfiler.test_insert_into_db ___________________
+
+self = <apps.memory_usage.tests.test_memory_pofiler.TestAppMemoryProfiler testMethod=test_insert_into_db>
+
+    def test_insert_into_db(self):
+        """Test the insert_into_db method of AppMemoryProfiler."""
+        self.memory_profiler.insert_into_db()
+    
+        # Verify whether the objects are inserted into the database.
+        objects = MemoryUsage.objects.all()
+    
+>       self.assertEqual(objects.count(), OBJECTS)
+E       AssertionError: 35 != 10
+
+apps/memory_usage/tests/test_memory_pofiler.py:111: AssertionError
+_____________ TestMemoryUsageMiddleware.test_memory_usage_enabled ______________
+
+self = <apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware testMethod=test_memory_usage_enabled>
+mocktake_snapshot = <MagicMock name='take_snapshot' id='126384822552432'>
+
+    @patch('memory_usage.middlewares.AppMemoryProfiler.take_snapshot', return_value={'size_mb': 100})
+    def test_memory_usage_enabled(self, mocktake_snapshot: MagicMock) -> None:
+        """Test that a memory usage snapshot is taken when MEMORY_USAGE is enabled."""
+    
+        # Stub the environment variables MEMORY_USAGE
+        with self.settings(MEMORY_USAGE=True):
+            self.client.get('/')
+    
+            # This function is called twice.
+>           self.assertEqual(mocktake_snapshot.call_count, 1)
+E           AssertionError: 2 != 1
+
+apps/memory_usage/tests/test_middlewares.py:41: AssertionError
+______________ TestMemoryUsageMiddleware.test_memory_usage_no_env ______________
+
+self = <apps.memory_usage.tests.test_middlewares.TestMemoryUsageMiddleware testMethod=test_memory_usage_no_env>
+mock_take_snapshot = <MagicMock name='take_snapshot' id='126384820322576'>
+
+    @patch('memory_usage.middlewares.AppMemoryProfiler.take_snapshot', return_value={'size_mb': 100})
+    def test_memory_usage_no_env(self, mock_take_snapshot: MagicMock) -> None:
+        """Ensure that a memory usage snapshot is taken when MEMORY_USAGE is disabled."""
+    
+        with self.settings(MEMORY_USAGE=False):
+            self.client.get('/')
+    
+            # Not called.
+>           mock_take_snapshot.assert_called_once()
+
+apps/memory_usage/tests/test_middlewares.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='take_snapshot' id='126384820322576'>
+
+    def assert_called_once(self):
+        """assert that the mock was called only once.
+        """
+        if not self.call_count == 1:
+            msg = ("Expected '%s' to have been called once. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'take_snapshot' to have been called once. Called 0 times.
+
+/usr/local/lib/python3.12/unittest/mock.py:923: AssertionError
+_________________ TestProfileConfigMigration.test_idempotency __________________
+
+self = <apps.users.tests.test_profile_config.TestProfileConfigMigration testMethod=test_idempotency>
+
+    def test_idempotency(self) -> None:
+        """Test that running the config creation function twice does not create duplicate configs"""
+        # Run the function once
+        create_profile_config(apps, None)
+    
+>       self.assertEqual(ProfileConfig.objects.count(), 2)
+E       AssertionError: 29 != 2
+
+apps/users/tests/test_profile_config.py:95: AssertionError
+_______ TestProfileViews.test_fill_profiles_list_with_remaining_matches ________
+
+self = <apps.users.tests.test_profile_views.TestProfileViews testMethod=test_fill_profiles_list_with_remaining_matches>
+
+    def test_fill_profiles_list_with_remaining_matches(self) -> None:
+        """
+        Test the fill_profiles_list_with_remaining_matches method
+    
+        Consider the following behaviors:
+    
+        - The method should fill the profiles_list with the remaining matches
+        - The method should not return any None profiles
+        - The method should not add any profiles already in the profiles_list
+        """
+    
+        profiles_list: list[Profile | None] = [None] * profile_viewing.ProfilesView.PROFILES_PER_PAGE
+        profiles_to_insert = [103, 90, 125, 71, 100]
+    
+        # Test setup
+        profiles_view = profile_viewing.ProfilesView()
+>       profiles = [Profile.objects.get(id=profile_id) for profile_id in profiles_to_insert]
+
+apps/users/tests/test_profile_views.py:268: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/django/db/models/manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <QuerySet [<Profile: Richard>, <Profile: Kissy>, <Profile: Ron>, <Profile: Hermione>, <Profile: Giulia>, <Profile: Tro...amie>, <Profile: Dylan>, <Profile: Chella>, <Profile: SyzLab>, <Profile: Ada>, '...(remaining elements truncated)...']>
+args = (), kwargs = {'id': 103}, clone = <QuerySet []>, limit = 21, num = 0
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           users.models.Profile.DoesNotExist: Profile matching query does not exist.
+
+/usr/local/lib/python3.12/site-packages/django/db/models/query.py:649: DoesNotExist
+---------------------------- Captured stdout setup -----------------------------
+⌛ Creating new users.
+✅ Successfully created new users.
+_________________ TestUserBehavior.test_get_last_user_behavior _________________
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f242831430>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f242831430>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: ForeignKeyViolation
+
+The above exception was the direct cause of the following exception:
+
+self = <apps.users.tests.test_session.TestUserBehavior testMethod=test_get_last_user_behavior>
+result = <TestCaseFunction test_get_last_user_behavior>, debug = False
+
+    def _setup_and_call(self, result, debug=False):
+        """
+        Perform the following in order: pre-setup, run test, post-teardown,
+        skipping pre/post hooks if test is set to be skipped.
+    
+        If debug=True, reraise any errors in setup and use super().debug()
+        instead of __call__() to run the test.
+        """
+        testMethod = getattr(self, self._testMethodName)
+        skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+        )
+    
+        # Convert async test methods.
+        if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+    
+        if not skipped:
+            try:
+                self._pre_setup()
+            except Exception:
+                if debug:
+                    raise
+                result.addError(self, sys.exc_info())
+                return
+        if debug:
+            super().debug()
+        else:
+            super().__call__(result)
+        if not skipped:
+            try:
+>               self._post_teardown()
+
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+    self._fixture_teardown()
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in _fixture_teardown
+    connections[db_name].check_constraints()
+/usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in check_constraints
+    cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+    return self._execute_with_wrappers(
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+/usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f242831430>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f242831430>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError
+____________________ TestUserBehavior.test_new_user_action _____________________
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f242854ce0>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f242854ce0>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: ForeignKeyViolation
+
+The above exception was the direct cause of the following exception:
+
+self = <apps.users.tests.test_session.TestUserBehavior testMethod=test_new_user_action>
+result = <TestCaseFunction test_new_user_action>, debug = False
+
+    def _setup_and_call(self, result, debug=False):
+        """
+        Perform the following in order: pre-setup, run test, post-teardown,
+        skipping pre/post hooks if test is set to be skipped.
+    
+        If debug=True, reraise any errors in setup and use super().debug()
+        instead of __call__() to run the test.
+        """
+        testMethod = getattr(self, self._testMethodName)
+        skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+        )
+    
+        # Convert async test methods.
+        if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+    
+        if not skipped:
+            try:
+                self._pre_setup()
+            except Exception:
+                if debug:
+                    raise
+                result.addError(self, sys.exc_info())
+                return
+        if debug:
+            super().debug()
+        else:
+            super().__call__(result)
+        if not skipped:
+            try:
+>               self._post_teardown()
+
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+    self._fixture_teardown()
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in _fixture_teardown
+    connections[db_name].check_constraints()
+/usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in check_constraints
+    cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+    return self._execute_with_wrappers(
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+/usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f242854ce0>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f242854ce0>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError
+_____________________ TestUserBehavior.test_new_view_visit _____________________
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f2429165a0>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f2429165a0>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: ForeignKeyViolation
+
+The above exception was the direct cause of the following exception:
+
+self = <apps.users.tests.test_session.TestUserBehavior testMethod=test_new_view_visit>
+result = <TestCaseFunction test_new_view_visit>, debug = False
+
+    def _setup_and_call(self, result, debug=False):
+        """
+        Perform the following in order: pre-setup, run test, post-teardown,
+        skipping pre/post hooks if test is set to be skipped.
+    
+        If debug=True, reraise any errors in setup and use super().debug()
+        instead of __call__() to run the test.
+        """
+        testMethod = getattr(self, self._testMethodName)
+        skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+        )
+    
+        # Convert async test methods.
+        if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+    
+        if not skipped:
+            try:
+                self._pre_setup()
+            except Exception:
+                if debug:
+                    raise
+                result.addError(self, sys.exc_info())
+                return
+        if debug:
+            super().debug()
+        else:
+            super().__call__(result)
+        if not skipped:
+            try:
+>               self._post_teardown()
+
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+    self._fixture_teardown()
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in _fixture_teardown
+    connections[db_name].check_constraints()
+/usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in check_constraints
+    cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+    return self._execute_with_wrappers(
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+/usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f2429165a0>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f2429165a0>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError
+______________________ TestUserBehavior.test_set_end_time ______________________
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f242523230>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f242523230>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: ForeignKeyViolation
+
+The above exception was the direct cause of the following exception:
+
+self = <apps.users.tests.test_session.TestUserBehavior testMethod=test_set_end_time>
+result = <TestCaseFunction test_set_end_time>, debug = False
+
+    def _setup_and_call(self, result, debug=False):
+        """
+        Perform the following in order: pre-setup, run test, post-teardown,
+        skipping pre/post hooks if test is set to be skipped.
+    
+        If debug=True, reraise any errors in setup and use super().debug()
+        instead of __call__() to run the test.
+        """
+        testMethod = getattr(self, self._testMethodName)
+        skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+        )
+    
+        # Convert async test methods.
+        if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+    
+        if not skipped:
+            try:
+                self._pre_setup()
+            except Exception:
+                if debug:
+                    raise
+                result.addError(self, sys.exc_info())
+                return
+        if debug:
+            super().debug()
+        else:
+            super().__call__(result)
+        if not skipped:
+            try:
+>               self._post_teardown()
+
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+    self._fixture_teardown()
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in _fixture_teardown
+    connections[db_name].check_constraints()
+/usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in check_constraints
+    cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+    return self._execute_with_wrappers(
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+/usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f242523230>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f242523230>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError
+__________________ TestUserSession.test_get_last_user_session __________________
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f242878680>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f242878680>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: ForeignKeyViolation
+
+The above exception was the direct cause of the following exception:
+
+self = <apps.users.tests.test_session.TestUserSession testMethod=test_get_last_user_session>
+result = <TestCaseFunction test_get_last_user_session>, debug = False
+
+    def _setup_and_call(self, result, debug=False):
+        """
+        Perform the following in order: pre-setup, run test, post-teardown,
+        skipping pre/post hooks if test is set to be skipped.
+    
+        If debug=True, reraise any errors in setup and use super().debug()
+        instead of __call__() to run the test.
+        """
+        testMethod = getattr(self, self._testMethodName)
+        skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+        )
+    
+        # Convert async test methods.
+        if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+    
+        if not skipped:
+            try:
+                self._pre_setup()
+            except Exception:
+                if debug:
+                    raise
+                result.addError(self, sys.exc_info())
+                return
+        if debug:
+            super().debug()
+        else:
+            super().__call__(result)
+        if not skipped:
+            try:
+>               self._post_teardown()
+
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+    self._fixture_teardown()
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in _fixture_teardown
+    connections[db_name].check_constraints()
+/usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in check_constraints
+    cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+    return self._execute_with_wrappers(
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+/usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f242878680>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f242878680>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError
+____________________ TestUserSession.test_new_user_session _____________________
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f241e5fe90>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f241e5fe90>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: ForeignKeyViolation
+
+The above exception was the direct cause of the following exception:
+
+self = <apps.users.tests.test_session.TestUserSession testMethod=test_new_user_session>
+result = <TestCaseFunction test_new_user_session>, debug = False
+
+    def _setup_and_call(self, result, debug=False):
+        """
+        Perform the following in order: pre-setup, run test, post-teardown,
+        skipping pre/post hooks if test is set to be skipped.
+    
+        If debug=True, reraise any errors in setup and use super().debug()
+        instead of __call__() to run the test.
+        """
+        testMethod = getattr(self, self._testMethodName)
+        skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+        )
+    
+        # Convert async test methods.
+        if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+    
+        if not skipped:
+            try:
+                self._pre_setup()
+            except Exception:
+                if debug:
+                    raise
+                result.addError(self, sys.exc_info())
+                return
+        if debug:
+            super().debug()
+        else:
+            super().__call__(result)
+        if not skipped:
+            try:
+>               self._post_teardown()
+
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+    self._fixture_teardown()
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in _fixture_teardown
+    connections[db_name].check_constraints()
+/usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in check_constraints
+    cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+    return self._execute_with_wrappers(
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+/usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f241e5fe90>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f241e5fe90>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError
+______________________ TestUserSession.test_set_end_time _______________________
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f242d320c0>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f242d320c0>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               psycopg2.errors.ForeignKeyViolation: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: ForeignKeyViolation
+
+The above exception was the direct cause of the following exception:
+
+self = <apps.users.tests.test_session.TestUserSession testMethod=test_set_end_time>
+result = <TestCaseFunction test_set_end_time>, debug = False
+
+    def _setup_and_call(self, result, debug=False):
+        """
+        Perform the following in order: pre-setup, run test, post-teardown,
+        skipping pre/post hooks if test is set to be skipped.
+    
+        If debug=True, reraise any errors in setup and use super().debug()
+        instead of __call__() to run the test.
+        """
+        testMethod = getattr(self, self._testMethodName)
+        skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+        )
+    
+        # Convert async test methods.
+        if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+    
+        if not skipped:
+            try:
+                self._pre_setup()
+            except Exception:
+                if debug:
+                    raise
+                result.addError(self, sys.exc_info())
+                return
+        if debug:
+            super().debug()
+        else:
+            super().__call__(result)
+        if not skipped:
+            try:
+>               self._post_teardown()
+
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+    self._fixture_teardown()
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1333: in _fixture_teardown
+    connections[db_name].check_constraints()
+/usr/local/lib/python3.12/site-packages/django/db/backends/postgresql/base.py:385: in check_constraints
+    cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+    return self._execute_with_wrappers(
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+/usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f242d320c0>
+sql = 'SET CONSTRAINTS ALL IMMEDIATE', params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f242d320c0>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+E               DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: IntegrityError
+_________________________ TestMemoryUsageView.test_get _________________________
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f242a4c410>
+sql = 'TRUNCATE "auth_group_permissions", "memory_usage_memoryusage", "feedback_surveydismissal", "users_subprofile", "subsc...on_new_drawings", "auth_user", "drawings_drawingsheet", "subscriptions_pricecurrency", "drawings_drawinggroupprivacy";'
+params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f242a4c410>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               psycopg2.errors.FeatureNotSupported: cannot truncate a table referenced in a foreign key constraint
+E               DETAIL:  Table "users_userbehavior" references "users_profile".
+E               HINT:  Truncate table "users_userbehavior" at the same time, or use TRUNCATE ... CASCADE.
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: FeatureNotSupported
+
+The above exception was the direct cause of the following exception:
+
+self = <django.core.management.commands.flush.Command object at 0x72f242a435f0>
+options = {'allow_cascade': False, 'database': 'default', 'force_color': False, 'inhibit_post_migrate': False, ...}
+database = 'default'
+connection = <DatabaseWrapper vendor='postgresql' alias='default'>
+verbosity = 0, interactive = False, reset_sequences = False
+allow_cascade = False, inhibit_post_migrate = False
+
+        def handle(self, **options):
+            database = options["database"]
+            connection = connections[database]
+            verbosity = options["verbosity"]
+            interactive = options["interactive"]
+            # The following are stealth options used by Django's internals.
+            reset_sequences = options.get("reset_sequences", True)
+            allow_cascade = options.get("allow_cascade", False)
+            inhibit_post_migrate = options.get("inhibit_post_migrate", False)
+    
+            self.style = no_style()
+    
+            # Import the 'management' module within each installed app, to register
+            # dispatcher events.
+            for app_config in apps.get_app_configs():
+                try:
+                    import_module(".management", app_config.name)
+                except ImportError:
+                    pass
+    
+            sql_list = sql_flush(
+                self.style,
+                connection,
+                reset_sequences=reset_sequences,
+                allow_cascade=allow_cascade,
+            )
+    
+            if interactive:
+                confirm = input(
+                    """You have requested a flush of the database.
+    This will IRREVERSIBLY DESTROY all data currently in the "%s" database,
+    and return each table to an empty state.
+    Are you sure you want to do this?
+    
+        Type 'yes' to continue, or 'no' to cancel: """
+                    % connection.settings_dict["NAME"]
+                )
+            else:
+                confirm = "yes"
+    
+            if confirm == "yes":
+                try:
+>                   connection.ops.execute_sql_flush(sql_list)
+
+/usr/local/lib/python3.12/site-packages/django/core/management/commands/flush.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/django/db/backends/base/operations.py:461: in execute_sql_flush
+    cursor.execute(sql)
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:79: in execute
+    return self._execute_with_wrappers(
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+/usr/local/lib/python3.12/site-packages/django/db/utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.db.backends.utils.CursorWrapper object at 0x72f242a4c410>
+sql = 'TRUNCATE "auth_group_permissions", "memory_usage_memoryusage", "feedback_surveydismissal", "users_subprofile", "subsc...on_new_drawings", "auth_user", "drawings_drawingsheet", "subscriptions_pricecurrency", "drawings_drawinggroupprivacy";'
+params = None
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x72f242a4c410>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+>               return self.cursor.execute(sql)
+E               django.db.utils.NotSupportedError: cannot truncate a table referenced in a foreign key constraint
+E               DETAIL:  Table "users_userbehavior" references "users_profile".
+E               HINT:  Truncate table "users_userbehavior" at the same time, or use TRUNCATE ... CASCADE.
+
+/usr/local/lib/python3.12/site-packages/django/db/backends/utils.py:103: NotSupportedError
+
+The above exception was the direct cause of the following exception:
+
+self = <apps.memory_usage.tests.test_view.TestMemoryUsageView testMethod=test_get>
+result = <TestCaseFunction test_get>, debug = False
+
+    def _setup_and_call(self, result, debug=False):
+        """
+        Perform the following in order: pre-setup, run test, post-teardown,
+        skipping pre/post hooks if test is set to be skipped.
+    
+        If debug=True, reraise any errors in setup and use super().debug()
+        instead of __call__() to run the test.
+        """
+        testMethod = getattr(self, self._testMethodName)
+        skipped = getattr(self.__class__, "__unittest_skip__", False) or getattr(
+            testMethod, "__unittest_skip__", False
+        )
+    
+        # Convert async test methods.
+        if iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+    
+        if not skipped:
+            try:
+                self._pre_setup()
+            except Exception:
+                if debug:
+                    raise
+                result.addError(self, sys.exc_info())
+                return
+        if debug:
+            super().debug()
+        else:
+            super().__call__(result)
+        if not skipped:
+            try:
+>               self._post_teardown()
+
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1102: in _post_teardown
+    self._fixture_teardown()
+/usr/local/lib/python3.12/site-packages/django/test/testcases.py:1136: in _fixture_teardown
+    call_command(
+/usr/local/lib/python3.12/site-packages/django/core/management/__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+/usr/local/lib/python3.12/site-packages/django/core/management/base.py:459: in execute
+    output = self.handle(*args, **options)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <django.core.management.commands.flush.Command object at 0x72f242a435f0>
+options = {'allow_cascade': False, 'database': 'default', 'force_color': False, 'inhibit_post_migrate': False, ...}
+database = 'default'
+connection = <DatabaseWrapper vendor='postgresql' alias='default'>
+verbosity = 0, interactive = False, reset_sequences = False
+allow_cascade = False, inhibit_post_migrate = False
+
+        def handle(self, **options):
+            database = options["database"]
+            connection = connections[database]
+            verbosity = options["verbosity"]
+            interactive = options["interactive"]
+            # The following are stealth options used by Django's internals.
+            reset_sequences = options.get("reset_sequences", True)
+            allow_cascade = options.get("allow_cascade", False)
+            inhibit_post_migrate = options.get("inhibit_post_migrate", False)
+    
+            self.style = no_style()
+    
+            # Import the 'management' module within each installed app, to register
+            # dispatcher events.
+            for app_config in apps.get_app_configs():
+                try:
+                    import_module(".management", app_config.name)
+                except ImportError:
+                    pass
+    
+            sql_list = sql_flush(
+                self.style,
+                connection,
+                reset_sequences=reset_sequences,
+                allow_cascade=allow_cascade,
+            )
+    
+            if interactive:
+                confirm = input(
+                    """You have requested a flush of the database.
+    This will IRREVERSIBLY DESTROY all data currently in the "%s" database,
+    and return each table to an empty state.
+    Are you sure you want to do this?
+    
+        Type 'yes' to continue, or 'no' to cancel: """
+                    % connection.settings_dict["NAME"]
+                )
+            else:
+                confirm = "yes"
+    
+            if confirm == "yes":
+                try:
+                    connection.ops.execute_sql_flush(sql_list)
+                except Exception as exc:
+>                   raise CommandError(
+                        "Database %s couldn't be flushed. Possible reasons:\n"
+                        "  * The database isn't running or isn't configured correctly.\n"
+                        "  * At least one of the expected database tables doesn't exist.\n"
+                        "  * The SQL was invalid.\n"
+                        "Hint: Look at the output of 'django-admin sqlflush'. "
+                        "That's the SQL this command wasn't able to run."
+                        % (connection.settings_dict["NAME"],)
+                    ) from exc
+E                   django.core.management.base.CommandError: Database dirtystroke_dev couldn't be flushed. Possible reasons:
+E                     * The database isn't running or isn't configured correctly.
+E                     * At least one of the expected database tables doesn't exist.
+E                     * The SQL was invalid.
+E                   Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.
+
+/usr/local/lib/python3.12/site-packages/django/core/management/commands/flush.py:75: CommandError
+-------------- generated xml file: /tmp/pytest_report_docker.xml ---------------
+=========================== short test summary info ============================
+FAILED apps/analytics/tests/test_etl.py::TestETLUtils::test_filter_staff_users - AssertionError: 37 != 10
+FAILED apps/memory_usage/tests/test_memory_pofiler.py::TestAppMemoryProfiler::test_insert_into_db - AssertionError: 35 != 10
+FAILED apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_memory_usage_enabled - AssertionError: 2 != 1
+FAILED apps/memory_usage/tests/test_middlewares.py::TestMemoryUsageMiddleware::test_memory_usage_no_env - AssertionError: Expected 'take_snapshot' to have been called once. Called 0 times.
+FAILED apps/users/tests/test_profile_config.py::TestProfileConfigMigration::test_idempotency - AssertionError: 29 != 2
+FAILED apps/users/tests/test_profile_views.py::TestProfileViews::test_fill_profiles_list_with_remaining_matches - users.models.Profile.DoesNotExist: Profile matching query does not exist.
+FAILED apps/users/tests/test_session.py::TestUserBehavior::test_get_last_user_behavior - django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+FAILED apps/users/tests/test_session.py::TestUserBehavior::test_new_user_action - django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+FAILED apps/users/tests/test_session.py::TestUserBehavior::test_new_view_visit - django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+FAILED apps/users/tests/test_session.py::TestUserBehavior::test_set_end_time - django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+FAILED apps/users/tests/test_session.py::TestUserSession::test_get_last_user_session - django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+FAILED apps/users/tests/test_session.py::TestUserSession::test_new_user_session - django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+FAILED apps/users/tests/test_session.py::TestUserSession::test_set_end_time - django.db.utils.IntegrityError: update or delete on table "users_profile" violates foreign key constraint "users_userbehavior_profile_id_9ed767df_fk_users_profile_id" on table "users_userbehavior"
+DETAIL:  Key (id)=(37) is still referenced from table "users_userbehavior".
+FAILED apps/memory_usage/tests/test_view.py::TestMemoryUsageView::test_get - django.core.management.base.CommandError: Database dirtystroke_dev couldn't be flushed. Possible reasons:
+  * The database isn't running or isn't configured correctly.
+  * At least one of the expected database tables doesn't exist.
+  * The SQL was invalid.
+Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.
+ERROR apps/users/tests/test_profile_config.py::TestProfileReadReceiptsConfig::test_new_config - django.db.utils.IntegrityError: duplicate key value violates unique constraint "auth_user_username_key"
+DETAIL:  Key (username)=(syzlab) already exists.
+============== 14 failed, 24 passed, 1 skipped, 1 error in 36.38s ==============
