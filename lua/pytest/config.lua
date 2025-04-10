@@ -1,24 +1,24 @@
-local config = {}
-
 ---@class DockerConfig
----@field enabled boolean | function Enable/disable looking for docker container to locate pytest
----@field container string | function Container name or a callback for get it
----@field docker_path string | function Internal docker path or a callback for get it
----@field local_path_prefix string | function Prefix for matching in local environment from cwd, or a callback for get it
----@field enable_docker_compose boolean | function Enable/disable the docker compose usage for match the path
----@field docker_compose_file string | function Docker compose name, for locating and match the docker path and local path prefix or a callback for get it
----@field docker_compose_service string | function Name of the service inside docker compose, for locating the path or a callback for get it
+---@field enabled? boolean | function Enable/disable looking for docker container to locate pytest
+---@field container? string | function Container name or a callback for get it
+---@field docker_path? string | function Internal docker path or a callback for get it
+---@field local_path_prefix? string | function Prefix for matching in local environment from cwd, or a callback for get it
+---@field enable_docker_compose? boolean | function Enable/disable the docker compose usage for match the path
+---@field docker_compose_file? string | function Docker compose name, for locating and match the docker path and local path prefix or a callback for get it
+---@field docker_compose_service? string | function Name of the service inside docker compose, for locating the path or a callback for get it
 
 ---@class DjangoConfig
----@field enabled boolean | function Enable/diable django support
----@field django_settings_module string | function Set the DJANGO_SETTINGS_MODULE variable to pytest
+---@field enabled? boolean | function Enable/diable django support
+---@field django_settings_module? string | function Set the DJANGO_SETTINGS_MODULE variable to pytest
 
 ---@class PytestConfig
----@field docker DockerConfig
----@field django DjangoConfig
----@field add_args string[] | string | function Additional arguments to pass to pytest
----@field open_output_onfail boolean | function Open the buffer with output automatically if fails
----@field keymaps_callback function function for set the keymaps
+---@field docker? DockerConfig
+---@field django? DjangoConfig
+---@field add_args? string[] | string | function Additional arguments to pass to pytest
+---@field open_output_onfail? boolean | function Open the buffer with output automatically if fails
+---@field keymaps_callback? function function for set the keymaps
+
+local M = {}
 
 ---Update the callbacks into a table
 ---@param opts table
@@ -34,7 +34,7 @@ local function update_callbacks(opts)
 end
 
 ---@type PytestConfig
-config.defaults = {
+local _defaults = {
    docker = {
       enabled = false,
       container = 'app-1',
@@ -63,11 +63,17 @@ config.defaults = {
 -- This is used to retain the original user options
 -- and keep the callbacks for use
 -- when the command is executed
-config.opts = config.settings
+local _hard_opts = _defaults
+
+---Update the hard opts
+---@param opts PytestConfig
+local function update_hard_opts(opts)
+   _hard_opts = vim.tbl_deep_extend("force", _hard_opts, opts)
+end
 
 ---Update config and return config
 ---@param opts? PytestConfig
-config.update = function(opts)
+local function update(opts)
    opts = opts or {}
 
    if opts ~= nil and opts.docker ~= nil then
@@ -78,16 +84,23 @@ config.update = function(opts)
       opts.django = update_callbacks(opts.django)
    end
 
-   return vim.tbl_deep_extend('force', config.opts, opts)
+   return vim.tbl_deep_extend('force', _hard_opts, opts)
 end
 
 ---Get the config
 ---@param opts? table
 ---@return PytestConfig
-config.get = function(opts)
+local function get(opts)
    opts = opts or {}
 
-   return config.update(vim.tbl_deep_extend("force", config.opts, opts))
+   return update(vim.tbl_deep_extend("force", _hard_opts, opts))
 end
 
-return config
+M.hard_opts = _hard_opts
+M.defaults = _defaults
+M.update_callbacks = update_callbacks
+M.update_hard_opts = update_hard_opts
+M.update = update
+M.get = get
+
+return M

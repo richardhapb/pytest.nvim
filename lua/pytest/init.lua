@@ -5,14 +5,16 @@ local test = require('pytest.test')
 
 local M = {}
 
+local _settings = {}
+
 ---Main settings for pytest.nvim
 ---@param opts? PytestConfig
-M.setup = function(opts)
+local setup = function(opts)
    opts = opts or {}
    if opts then
-      config.opts = vim.tbl_deep_extend("force", config.defaults, opts)
+      config.update_hard_opts(opts)
    end
-   M.settings = config.get(opts)
+   _settings = config.get(opts)
 
    local group = vim.api.nvim_create_augroup('Pytest', { clear = true })
    local attach_id = nil
@@ -62,23 +64,25 @@ M.setup = function(opts)
          })
 
          vim.api.nvim_buf_create_user_command(bufnr, 'PytestEnableDocker', function()
-            config.opts = vim.tbl_deep_extend("force", config.opts, { docker = { enabled = true } })
+            config.update_hard_opts({ docker = { enabled = true } })
          end, {
             nargs = 0,
          })
 
          vim.api.nvim_buf_create_user_command(bufnr, 'PytestDisableDocker', function()
-            config.opts = vim.tbl_deep_extend("force", config.opts, { docker = { enabled = false } })
+            config.update_hard_opts({ docker = { enabled = false } })
          end, {
             nargs = 0,
          })
 
-         M.settings.keymaps_callback(bufnr)
+         _settings.keymaps_callback(bufnr)
       end
    })
 end
 
 -- API functions
 M.test_file = runner.test_file
+M.setup = setup
+M.settings = _settings
 
 return M

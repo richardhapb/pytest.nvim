@@ -34,7 +34,7 @@ local parse = require 'pytest.parse'
 
 local M = {}
 
-local test_state = {
+local _test_state = {
    bufnr = nil,
    filenames = nil,
    working = false,
@@ -42,34 +42,34 @@ local test_state = {
    has_sdout = false
 }
 
----Set the test_state
+---Set the _test_state
 ---@param state TestState
-function M.set_state(state)
-   test_state = vim.tbl_extend("force", test_state, state)
+local function set_state(state)
+   _test_state = vim.tbl_extend("force", _test_state, state)
 end
 
 ---Clear any results and reset state
 ---@param reset_buffer? boolean
-function M.reset_state(reset_buffer)
+local function reset_state(reset_buffer)
    local ns = parse.NS
 
-   if test_state.bufnr and vim.api.nvim_buf_is_valid(test_state.bufnr) then
-      vim.api.nvim_buf_clear_namespace(test_state.bufnr, ns, 0, -1)
-      vim.diagnostic.reset(ns, test_state.bufnr)
+   if _test_state.bufnr and vim.api.nvim_buf_is_valid(_test_state.bufnr) then
+      vim.api.nvim_buf_clear_namespace(_test_state.bufnr, ns, 0, -1)
+      vim.diagnostic.reset(ns, _test_state.bufnr)
    end
 
-   test_state.working = false
-   test_state.filenames = nil
-   test_state.has_stdout = false
+   _test_state.working = false
+   _test_state.filenames = nil
+   _test_state.has_stdout = false
 
    if reset_buffer then
-      test_state.bufnr = nil
+      _test_state.bufnr = nil
    end
 end
 
 ---Run a test
 ---@param test Test
-function M.run(test)
+local function run(test)
    -- Only update marks in current buffer
    local ok_dep, msg = utils.verify_dependencies()
    if not ok_dep then
@@ -78,13 +78,13 @@ function M.run(test)
    end
    local ns = parse.NS
 
-   if test_state.working then
+   if _test_state.working then
       M.cancel_test()
    end
    M.reset_state()
-   test_state.working = true
+   _test_state.working = true
 
-   local bufnr = test_state.bufnr or vim.api.nvim_get_current_buf()
+   local bufnr = _test_state.bufnr or vim.api.nvim_get_current_buf()
    utils.info("Running tests...")
 
    test.job_id = vim.fn.jobstart(
@@ -93,19 +93,19 @@ function M.run(test)
          stderr_buffered = true,
          on_stdout = function(_, stdout)
             if stdout then
-               test_state.has_stdout = true
+               _test_state.has_stdout = true
                M.update_last_output(stdout)
             end
          end,
          on_stderr = function(_, stderr)
-            if stderr and not test_state.has_stdout then
+            if stderr and not _test_state.has_stdout then
                M.update_last_output(stderr)
             end
          end,
          on_exit = function(_, exit_code)
             local failed = {}
             local i = 1
-            local parser = parse.XmlParser.new(test_state.last_output)
+            local parser = parse.XmlParser.new(_test_state.last_output)
 
             if not parser then
                utils.error("Error building the parser")
@@ -139,7 +139,7 @@ function M.run(test)
             local message = exit_code == 0 and 'Tests passed 👌' or 'Tests failed 😢'
             utils.info(message)
             vim.diagnostic.set(ns, bufnr, failed, {})
-            test_state.working = false
+            _test_state.working = false
             test.job_id = nil
 
             -- Show the output if fails
@@ -151,19 +151,19 @@ function M.run(test)
 end
 
 ---Display the last output (stdout or stderr) in a new buffer
-M.show_last_output = function()
-   if test_state.last_output then
+local function show_last_output()
+   if _test_state.last_output then
       local bufnr = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, test_state.last_output)
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, _test_state.last_output)
       vim.cmd.split()
       vim.api.nvim_set_current_buf(bufnr)
    end
 end
 
 ---Cancel a running test
-M.cancel_test = function()
-   if test_state.working and test_state.last_job_id then
-      local ok = pcall(vim.fn.jobstop, test_state.last_job_id)
+local function cancel_test()
+   if _test_state.working and _test_state.last_job_id then
+      local ok = pcall(vim.fn.jobstop, _test_state.last_job_id)
       if ok then
          utils.info("Pytest job cancelled, running the new test")
       end
@@ -174,14 +174,22 @@ end
 
 ---Update the last stdout state
 ---@param stdout string[]
-function M.update_last_output(stdout)
-   test_state.last_output = stdout
+local function update_last_output(stdout)
+   _test_state.last_output = stdout
 end
 
 ---Get the last stdout state
 ---@return string[] | nil
-function M.get_last_output()
-   return test_state.last_output
+local function get_last_output()
+   return _test_state.last_output
 end
+
+M.set_state = set_state
+M.reset_state = reset_state
+M.run = run
+M.show_last_output = show_last_output
+M.cancel_test = cancel_test
+M.update_last_output = update_last_output
+M.get_last_output = get_last_output
 
 return M

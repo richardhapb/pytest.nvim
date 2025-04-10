@@ -1,10 +1,10 @@
-local utils = {}
+local M = {}
 
 ---Extend a list with another list, from left to right
 ---@param list table
 ---@param extension table
 ---@return table
-function utils.list_extend(list, extension)
+local function list_extend(list, extension)
    local new_list = {}
    for _, value in ipairs(list) do
       table.insert(new_list, value)
@@ -15,7 +15,7 @@ function utils.list_extend(list, extension)
    return new_list
 end
 
-function utils.scape_special_chars(str)
+local function escape_special_chars(str)
    for _, char in ipairs({ '(', ')', '[', ']', '.', '*', '+', '-', '?', '^', '$' }) do
       str = str:gsub('%' .. char, '%%' .. char)
    end
@@ -25,7 +25,7 @@ end
 
 ---Verify if the dependencies are available
 ---@return boolean, string
-function utils.verify_dependencies()
+local function verify_dependencies()
    local ok = true
    local msg = ""
    local pytest = require 'pytest.pytest'
@@ -61,14 +61,14 @@ end
 
 ---Get the git root directory
 ---@return string
-function utils.get_git_root()
+local function get_git_root()
    local result = vim.system({ "git", "rev-parse", "--show-toplevel" }, { text = true }):wait()
    return (result.code == 0 and result.stdout:gsub("[\n\r]", "") or "")
 end
 
 ---Get current working directory safely (works in fast event contexts)
 ---@return string
-function utils.safe_getcwd()
+local function safe_getcwd()
    local ok, cwd = pcall(vim.uv.cwd)
    if ok and cwd then
       return cwd
@@ -80,7 +80,7 @@ end
 ---Get the buffer from the filepath
 ---@param filepath string
 ---@return nil | number
-function utils.get_buffer_from_filepath(filepath)
+local function get_buffer_from_filepath(filepath)
    local buffer = vim.fn.bufnr(filepath, true)
    if buffer == -1 then
       return nil
@@ -92,7 +92,7 @@ end
 ---split using comma or space
 ---@param args string | string[] | function List of args
 ---@return string[]
-function utils.validate_args(args)
+local function validate_args(args)
    if not args or args == "" then
       return {}
    end
@@ -126,28 +126,39 @@ end
 ---@param msg string
 ---@param log_level number
 ---@param opts table
-function utils.notify(msg, log_level, opts)
+local function notify(msg, log_level, opts)
    opts = opts or {}
-   opts = utils.list_extend(opts, { title = "Pytest.nvim" })
+   opts = list_extend(opts, { title = "Pytest.nvim" })
    vim.schedule(function() vim.notify(msg, log_level, opts) end)
 end
 
 ---Info logging
 ---@param msg string
-function utils.info(msg)
-   utils.notify(msg, vim.log.levels.INFO, { timeout = 3000 })
+local function info(msg)
+   notify(msg, vim.log.levels.INFO, { timeout = 3000 })
 end
 
 ---Warning logging
 ---@param msg string
-function utils.warn(msg)
-   utils.notify(msg, vim.log.levels.WARN, { timeout = 3000 })
+local function warn(msg)
+   notify(msg, vim.log.levels.WARN, { timeout = 3000 })
 end
 
 ---Error logging
 ---@param msg string
-function utils.error(msg)
-   utils.notify(msg, vim.log.levels.ERROR, { timeout = 3000 })
+local function error(msg)
+   notify(msg, vim.log.levels.ERROR, { timeout = 3000 })
 end
 
-return utils
+M.list_extend = list_extend
+M.escape_special_chars = escape_special_chars
+M.verify_dependencies = verify_dependencies
+M.get_git_root = get_git_root
+M.safe_getcwd = safe_getcwd
+M.get_buffer_from_filepath = get_buffer_from_filepath
+M.validate_args = validate_args
+M.info = info
+M.warn = warn
+M.error = error
+
+return M

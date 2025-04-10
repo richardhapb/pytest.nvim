@@ -7,10 +7,9 @@ local test = require 'pytest.test'
 local M = {}
 
 ---Main function to run the tests for the current file
----Test file with pytest
 ---@param file? string
 ---@param opts? PytestConfig
-function M.test_file(file, opts)
+local function test_file(file, opts)
    local current_file = file or vim.fn.expand('%:p')
    local new_test = {}
    local filenames = { current_file:match("[^/]+$") }
@@ -35,5 +34,7 @@ function M.test_file(file, opts)
    new_test.command = command
    test.run(new_test)
 end
+
+M.test_file = test_file
 
 return M

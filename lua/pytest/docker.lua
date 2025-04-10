@@ -1,12 +1,12 @@
 local utils = require 'pytest.utils'
 local pytest = require 'pytest.pytest'
 
-local docker = {}
+local M = {}
 
 
 ---Verify if the container is running
 ---@param callback function
-function docker.is_container_running(callback)
+local function is_container_running(callback)
    local settings = require('pytest.config').get()
 
    local command = { "docker", "ps", "--format", "{{.Names}}" }
@@ -37,7 +37,7 @@ end
 ---Search for the docker-compose file in the current directory
 ---@param path? string
 ---@return string
-function docker.find_docker_compose(path)
+local function find_docker_compose(path)
    local cwd = path or utils.safe_getcwd()
    local git_root = utils.get_git_root()
 
@@ -61,12 +61,12 @@ end
 ---Obtain the line number of the service in the docker-compose file
 ---@param path? string
 ---@return number
-function docker.get_docker_compose_service_line(path)
+local function get_docker_compose_service_line(path)
    local docker_compose_path = ''
    local settings = require('pytest.config').get()
 
    if not path or path == '' then
-      docker_compose_path = docker.find_docker_compose()
+      docker_compose_path = find_docker_compose()
    else
       docker_compose_path = path
    end
@@ -104,12 +104,12 @@ end
 ---Get the volume path from the docker-compose file
 ---@param path? string
 ---@return string
-function docker.get_docker_compose_volume(path)
+local function get_docker_compose_volume(path)
    local docker_compose_path = ''
    local settings = require('pytest.config').get()
 
    if not path or path == '' then
-      docker_compose_path = docker.find_docker_compose()
+      docker_compose_path = find_docker_compose()
    else
       docker_compose_path = path
    end
@@ -122,7 +122,7 @@ function docker.get_docker_compose_volume(path)
       return ''
    end
 
-   local service_line = docker.get_docker_compose_service_line(docker_compose_path)
+   local service_line = get_docker_compose_service_line(docker_compose_path)
    local volume = ''
 
    if service_line == -1 then
@@ -162,16 +162,40 @@ function docker.get_docker_compose_volume(path)
    return volume
 end
 
+---Parse a file or a list of files to docker internal path
+---@param docker_path string
+---@param path_prefix string
+---@param local_root string
+---@param files string | table
+---@return table
+local function parse_docker_files(docker_path, path_prefix, local_root, files)
+   local parsed = {}
+   if type(files) == "string" then
+      files = { files }
+   end
+
+   -- Transform each file to docker path format
+   for _, file in ipairs(files) do
+      local relative_file = file:match(utils.escape_special_chars(local_root) ..
+         utils.escape_special_chars(path_prefix) .. '[/\\](.*)')
+
+      local docker_file_path = docker_path .. relative_file
+      parsed = utils.list_extend(parsed, { docker_file_path })
+   end
+
+   return parsed
+end
+
 ---Build docker command to passed files
 ---@param settings table
 ---@param files table
 ---@return table
-function docker.build_docker_command(settings, files)
-   local docker_compose_path = docker.find_docker_compose()
+local function build_docker_command(settings, files)
+   local docker_compose_path = find_docker_compose()
    local docker_path = settings.docker.docker_path or ''
 
    if settings.docker.enable_docker_compose then
-      local volume = docker.get_docker_compose_volume(docker_compose_path)
+      local volume = get_docker_compose_volume(docker_compose_path)
       if volume == '' then
          utils.error('Docker compose / volume not found')
          return {}
@@ -187,7 +211,7 @@ function docker.build_docker_command(settings, files)
       path_prefix = path_char .. path_prefix
    end
 
-   local parsed_files = docker.parse_docker_files(docker_path, path_prefix, docker_compose_path, files)
+   local parsed_files = parse_docker_files(docker_path, path_prefix, docker_compose_path, files)
    local container = settings.docker.container
 
    local report_name = "pytest_report.xml"
@@ -201,28 +225,12 @@ function docker.build_docker_command(settings, files)
    return utils.list_extend({ 'docker', 'exec', '-i', container }, pytest_command)
 end
 
----Parse a file or a list of files to docker internal path
----@param docker_path string
----@param path_prefix string
----@param local_root string
----@param files string | table
----@return table
-function docker.parse_docker_files(docker_path, path_prefix, local_root, files)
-   local parsed = {}
-   if type(files) == "string" then
-      files = { files }
-   end
+M.is_container_running = is_container_running
+M.find_docker_compose = find_docker_compose
+M.get_docker_compose_service_line = get_docker_compose_service_line
+M.get_docker_compose_volume = get_docker_compose_volume
+M.build_docker_command = build_docker_command
+M.parse_docker_files = parse_docker_files
 
-   -- Transform each file to docker path format
-   for _, file in ipairs(files) do
-      local relative_file = file:match(utils.scape_special_chars(local_root) ..
-         utils.scape_special_chars(path_prefix) .. '[/\\](.*)')
 
-      local docker_file_path = docker_path .. relative_file
-      parsed = utils.list_extend(parsed, { docker_file_path })
-   end
-
-   return parsed
-end
-
-return docker
+return M

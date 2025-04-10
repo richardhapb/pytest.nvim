@@ -1,13 +1,13 @@
 local utils = require 'pytest.utils'
 local config = require 'pytest.config'
 
-local pytest = {}
+local M = {}
 
 ---Build pytest command
 ---@param args table | string
 ---@param output_file? string
 ---@return string[]
-function pytest.build_command(args, output_file)
+local function build_command(args, output_file)
    if type(args) == "string" then
       args = { args }
    end
@@ -28,13 +28,13 @@ function pytest.build_command(args, output_file)
    return utils.list_extend({ 'pytest', '-v', '--junit-xml=' .. output_file }, utils.list_extend(user_args, args))
 end
 
-function pytest.is_pytest_available()
+local function is_pytest_available()
    return vim.fn.executable("pytest") == 1
 end
 
 ---Verify if pytest is available in local or docker according to the settings
 ---@param callback function
-function pytest.is_pytest_django_available(callback)
+local function is_pytest_django_available(callback)
    local docker_command = {}
 
    local settings = require('pytest.config').get()
@@ -54,4 +54,8 @@ function pytest.is_pytest_django_available(callback)
    return job
 end
 
-return pytest
+M.build_command = build_command
+M.is_pytest_available = is_pytest_available
+M.is_pytest_django_available = is_pytest_django_available
+
+return M
