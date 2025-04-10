@@ -15,6 +15,7 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
 
 - Neovim 0.9.0 or later
 - `pytest` in your environment (pip install `pytest`)
+- `xml` and `python` Treessitter parsers
 
 ### Installation
 
@@ -25,18 +26,43 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
     ```lua
     {
       "richardhapb/pytest.nvim",
-      opts = {}
+      dependencies = { "nvim-treesitter/nvim-treesitter" },
+      opts = {}, -- Define the options here 
+      config = function(_, opts)
+        require('nvim-treesitter.configs').setup {
+          ensure_installed = { 'python', 'xml' },
+        }
+
+        require('pytest').setup(opts)
+      end
     }
     ```
 
-   Packer:
+    Packer:
 
     ```lua
     use {
       "richardhapb/pytest.nvim",
+      requires = { "nvim-treesitter/nvim-treesitter" },
+      config = function()
+        require('nvim-treesitter.configs').setup {
+          ensure_installed = { 'python', 'xml' },
+        }
+        
+        require('pytest').setup() -- Define the options here
+      end,
       opt = true
     }
     ```
+
+   Ensure the Treesitter dependencies:
+
+   ```lua
+   require('nvim-treesitter.configs').setup {
+     ensure_installed = { 'python', 'xml' },
+   }
+   ```
+
 
 ### Usage
 
