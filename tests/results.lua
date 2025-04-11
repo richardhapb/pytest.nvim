@@ -18,14 +18,14 @@ end
 
 
 describe("Get failed details", function()
-   local stdout_local = io.open(vim.fs.joinpath(vim.fn.getcwd(), 'tests', 'fixtures', 'pytest_stdout_local.txt'), "r")
+   local stdout_local = io.open(vim.fs.joinpath('tests', 'fixtures', 'pytest_stdout_local.txt'), "r")
    local output_local = ""
-   local stdout_docker = io.open(vim.fs.joinpath(vim.fn.getcwd(), 'tests', 'fixtures', 'pytest_stdout_docker.txt'), "r")
+   local stdout_docker = io.open(vim.fs.joinpath('tests', 'fixtures', 'pytest_stdout_docker.txt'), "r")
    local output_docker = ""
-   local report_local_file = vim.fs.joinpath(vim.fn.getcwd(), 'tests', 'fixtures', 'pytest_report_local.xml')
+   local report_local_file = vim.fs.joinpath('tests', 'fixtures', 'pytest_report_local.xml')
    local report_local = io.open(report_local_file, "r")
    local report_output_local = ""
-   local report_docker_file = vim.fs.joinpath(vim.fn.getcwd(), 'tests', 'fixtures', 'pytest_report_docker.xml')
+   local report_docker_file = vim.fs.joinpath('tests', 'fixtures', 'pytest_report_docker.xml')
    local report_docker = io.open(report_docker_file, "r")
    local report_output_docker = ""
    local test_results = {}

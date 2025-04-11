@@ -1,0 +1,198 @@
+============================= test session starts ==============================
+collecting ... collected 40 items
+
+<Dir app>
+  <Package apps>
+    <Package analytics>
+      <Package tests>
+        <Module test_etl.py>
+          <UnitTestCase TestMedian>
+            Test the median function using a model and test database
+            <TestCaseFunction test_median_even>
+              Test median calculation for even number of elements
+            <TestCaseFunction test_median_odd>
+              Test median calculation for odd number of elements
+          <UnitTestCase TestETLGenerics>
+            Test the ETL process
+            <TestCaseFunction test_calculate_metrics>
+              Test the calculate_metrics function
+            <TestCaseFunction test_filter_outliers>
+              Test the filter_outliers function
+          <UnitTestCase TestETLUtils>
+            Test the ETL utility functions
+            <TestCaseFunction test_filter_staff_users>
+              Test the filter_staff_users function
+          <UnitTestCase TestETL>
+            Test the ETL process
+            <TestCaseFunction test_load_data>
+              Test the load_data function; it should load data into the database
+              There are two types of insertions: bulk and single
+    <Package memory_usage>
+      <Package tests>
+        <Module test_memory_pofiler.py>
+          <UnitTestCase TestAppMemoryProfiler>
+            TestAppMemoryProfiler is a test case for the AppMemoryProfiler class.
+            <TestCaseFunction test_base_hour_from_timestamp>
+              Test the _get_base_hour_from_timestamp method; verify that the hour is correct while the minutes are set to 0.
+            <TestCaseFunction test_get_app_name>
+              Tests the _get_app_name method of AppMemoryProfiler.
+            <TestCaseFunction test_insert_into_db>
+              Test the insert_into_db method of AppMemoryProfiler.
+            <TestCaseFunction test_take_snapshot>
+              Tests the _take_snapshot method of AppMemoryProfiler.
+        <Module test_middlewares.py>
+          <UnitTestCase TestMemoryUsageMiddleware>
+            Tests for the AppMemoryMiddleware.
+            <TestCaseFunction test_memory_threshold>
+              Verify that a warning is logged when the memory threshold is exceeded; the condition is strictly greater than.
+            <TestCaseFunction test_memory_usage_disabled>
+              Test that a memory usage snapshot is taken when MEMORY_USAGE is disabled.
+            <TestCaseFunction test_memory_usage_enabled>
+              Test that a memory usage snapshot is taken when MEMORY_USAGE is enabled.
+            <TestCaseFunction test_memory_usage_no_env>
+              Ensure that a memory usage snapshot is taken when MEMORY_USAGE is disabled.
+            <TestCaseFunction test_save_interval>
+              Ensure that memory usage is recorded in the database after the save interval.
+              The first request should insert data into the database, while the second request should not.
+              
+              For the first request, 3 - 1 is greater than MEMORY_USAGE_SAVE_INTERVAL_SECONDS.
+              For the second request, 3 - 3 is less than MEMORY_USAGE_SAVE_INTERVAL_SECONDS.
+        <Module test_view.py>
+          <UnitTestCase TestMemoryUsageCaptureView>
+            Tests the Memory Usage view, verifies the data in the response, and ensures correct memory usage metrics.
+            <TestCaseFunction test_get>
+    <Package users>
+      <Package tests>
+        <Module test_authentication.py>
+          <UnitTestCase AuthenticationTests>
+            Test case for the authentication views
+            <TestCaseFunction test_login_redirects>
+            <TestCaseFunction test_sign_out_view>
+        <Module test_models.py>
+          <UnitTestCase ProfileMatchManagerTest>
+            Test ProfileMatchManager methods
+            <TestCaseFunction test_find_matches_for_profile>
+            <TestCaseFunction test_profile_exclusion_conditions>
+            <TestCaseFunction test_profile_exclusion_conditions_with_blocks>
+            <TestCaseFunction test_profile_exclusion_conditions_with_inactive_users>
+        <Module test_profile_config.py>
+          <UnitTestCase TestProfileConfig>
+            General tests for config creation
+            <TestCaseFunction test_profile_config_creation>
+          <UnitTestCase TestProfileConfigMigration>
+            Test the profile config creation logic
+            <TestCaseFunction test_idempotency>
+              Test that running the config creation function twice does not create duplicate configs
+          <UnitTestCase TestProfileReadReceiptsConfig>
+            Test the Profile config
+            <TestCaseFunction test_new_config>
+              Check that the configs are created correctly
+          <UnitTestCase TestRelatedViews>
+            Test the view that handles the switch in the read receipt feature
+            <TestCaseFunction test_read_receipts_update_view>
+        <Module test_profile_views.py>
+          <UnitTestCase TestProfileViews>
+            Test Profile
+            <TestCaseFunction test_fill_profiles_list_with_remaining_matches>
+              Test the fill_profiles_list_with_remaining_matches method
+              
+              Consider the following behaviors:
+              
+              - The method should fill the profiles_list with the remaining matches
+              - The method should not return any None profiles
+              - The method should not add any profiles already in the profiles_list
+            <TestCaseFunction test_get_profiles_sorting_with_filter_mixed>
+              Test the order and filtering of profiles, including valid values and next page detection
+              
+              Consider the following behaviors:
+              
+              - The order of profiles should follow the preset order in get_profiles_display_group_settings
+              - The filtering of profiles should adhere to the filters in get_profiles_display_group_settings
+              - The profile list should contain only Profile instances, excluding None
+              - The has_more_profiles should be True as there are more profiles to display in this test
+              - The next_page should be an integer as there are more profiles to display in this test
+            <TestCaseFunction test_paginate_profiles>
+              Test the paginate_profiles method
+              
+              Consider the following behaviors:
+              
+              - The method should return the correct profiles for the given page
+              - The method should return the correct next page
+              - The method should return the correct has_more_profiles value
+            <TestCaseFunction test_profile_view_complete_flow_0>
+              Test the complete profile view flow including all filters and search box [with profiles_per_page=60]
+            <TestCaseFunction test_profile_view_complete_flow_1>
+              Test the complete profile view flow including all filters and search box [with profiles_per_page=120]
+        <Module test_registration.py>
+          <UnitTestCase RegistrationTests>
+            Test case for the registration management
+            <TestCaseFunction test_create_user>
+        <Module test_session.py>
+          <UnitTestCase TestUserBehavior>
+            Test the capture and logic of user behavior
+            <TestCaseFunction test_get_last_user_behavior>
+              Test that the last UserBehavior is correctly retrieved.
+              
+              This test verifies that:
+              - The _get_last_user_behavior method returns the most recent behavior for a profile
+            <TestCaseFunction test_new_user_action>
+              Test UserBehavior.new_user_action method under different scenarios.
+              
+              Tests four cases:
+              1. With both profile and request (full user data)
+              2. Without any profile or request (guest with no IP)
+              3. With request only (guest with IP)
+              4. With profile only (authenticated user without IP)
+            <TestCaseFunction test_new_view_visit>
+              Test the creation of new view visits by users and guests.
+              
+              Tests two scenarios:
+              1. Time since last activity is less than threshold:
+                 - Should create a new UserBehavior record
+                 - Should not create a new UserSession
+              
+              2. Time since last activity exceeds threshold:
+                 - Should create a new UserBehavior record
+                 - Should create a new UserSession
+                 - Should close the previous behavior session
+            <TestCaseFunction test_set_end_time>
+              Test that the end time is properly set in the last behavior record.
+              
+              Tests two scenarios:
+              1. Time difference less than threshold:
+                 - End time should be set to the current time
+                 - End time should be different from start time
+              
+              2. Time difference greater than threshold:
+                 - End time should be set to the same as start time
+                 - A new UserSession should be created
+          <UnitTestCase TestUserSession>
+            Test the capture and logic of user session
+            <TestCaseFunction test_get_last_user_session>
+              Test that the last UserSession is correctly retrieved.
+              
+              This test verifies that:
+              - The _get_last_user_session method returns the most recent session for a profile
+              - The _get_last_guest_session_by_ip method returns the most recent session for a guest IP
+            <TestCaseFunction test_new_user_session>
+              Test the creation of new user sessions.
+              
+              This test verifies that:
+              - New user sessions are correctly created for registered users with proper parameters
+              - New guest sessions are correctly created with proper parameters
+              - The creation methods properly call the UserSession.objects.create method
+            <TestCaseFunction test_set_end_time>
+              Test that the end time is properly set in user sessions.
+              
+              This test verifies that:
+              - End times are properly set for both registered user and guest sessions
+              - The end time is correctly stored as a datetime object
+              - The end time is different from the start time
+    <Package memory_usage>
+      <Package tests>
+        <Module test_view.py>
+          <UnitTestCase TestMemoryUsageView>
+            Tests the Memory Usage view, verifies the data in the response, and ensures correct memory usage metrics.
+            <TestCaseFunction test_get>
+
+========================= 40 tests collected in 0.13s ==========================

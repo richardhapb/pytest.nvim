@@ -54,8 +54,26 @@ local function is_pytest_django_available(callback)
    return job
 end
 
+---Get tests collected by pytest
+---@return string
+local function collect_tests()
+   if is_pytest_available() then
+      local result = vim.system({ "pytest", "--collect-only", "--no-header" }, {text = true}):wait()
+      if result.code ~= 0 then
+         utils.error("Error running pytest: " .. result.stderr)
+         return ""
+      end
+
+      return result.stdout
+   end
+
+   utils.error("Pytest is not available, ensure the binary is in PATH")
+   return ""
+end
+
 M.build_command = build_command
 M.is_pytest_available = is_pytest_available
 M.is_pytest_django_available = is_pytest_django_available
+M.collect_tests = collect_tests
 
 return M
