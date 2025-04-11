@@ -13,7 +13,7 @@ local function build_command(args, output_file)
    end
 
    if not output_file then
-      output_file = require 'pytest.parse'.OUTPUT_FILE
+      output_file = require 'pytest.parse.xml'.OUTPUT_FILE
    end
 
    local settings = config.get()

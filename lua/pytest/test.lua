@@ -1,6 +1,7 @@
 local utils = require 'pytest.utils'
 local config = require 'pytest.config'
-local parse = require 'pytest.parse'
+local parse = require 'pytest.parse.utils'
+local xml = require 'pytest.parse.xml'
 
 ---@class Test
 ---@field command string[]
@@ -105,7 +106,7 @@ local function run(test)
          on_exit = function(_, exit_code)
             local failed = {}
             local i = 1
-            local parser = parse.XmlParser.new(_test_state.last_output)
+            local parser = xml.XmlParser.new(_test_state.last_output)
 
             if not parser then
                utils.error("Error building the parser")

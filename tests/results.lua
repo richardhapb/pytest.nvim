@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-field, duplicate-set-field
-local parse = require 'pytest.parse'
+local xml = require 'pytest.parse.xml'
 vim.opt.rtp:append(vim.fs.joinpath(vim.fn.stdpath("data"), "lazy", "nvim-treesitter"))
 
 require 'pytest'.setup()
@@ -51,8 +51,8 @@ describe("Get failed details", function()
    end
 
    it("Match local error results", function()
-      parse.set_output_file(report_local_file)
-      local parser = parse.XmlParser.new(vim.split(output_local, "\n", { plain = true }))
+      xml.set_output_file(report_local_file)
+      local parser = xml.XmlParser.new(vim.split(output_local, "\n", { plain = true }))
 
       if parser then
          test_results = parser:get_test_results()
@@ -71,7 +71,7 @@ describe("Get failed details", function()
          if test_result.state == 'failed' then
             assert.is.equal(expected_lnums[i], test_result.failed_test.lnum)
             assert.is.True(compare_texts(
-               vim.split(parse.decode_xml_entities(messages[i]:gsub("%s+", " ")), '\n', { plain = true }),
+               vim.split(xml.decode_xml_entities(messages[i]:gsub("%s+", " ")), '\n', { plain = true }),
                test_result.failed_test.message))
             i = i + 1
          end
@@ -79,8 +79,8 @@ describe("Get failed details", function()
    end)
 
    it("Match docker error results", function()
-      parse.set_output_file(report_docker_file)
-      local parser = parse.XmlParser.new(vim.split(output_docker, "\n", { plain = true }))
+      xml.set_output_file(report_docker_file)
+      local parser = xml.XmlParser.new(vim.split(output_docker, "\n", { plain = true }))
 
       if parser then
          test_results = parser:get_test_results()
@@ -99,7 +99,7 @@ describe("Get failed details", function()
          if test_result.state == 'failed' then
             assert.is.equal(expected_lnums[i], test_result.failed_test.lnum)
             assert.is.True(compare_texts(
-               vim.split(parse.decode_xml_entities(messages[i]:gsub("%s+", " ")), '\n', { plain = true }),
+               vim.split(xml.decode_xml_entities(messages[i]:gsub("%s+", " ")), '\n', { plain = true }),
                test_result.failed_test.message))
             i = i + 1
          end

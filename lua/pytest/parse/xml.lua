@@ -1,4 +1,5 @@
 local utils = require 'pytest.utils'
+local python = require 'pytest.parse.python'
 
 ---@class XmlParser
 ---@field query vim.treesitter.Query
@@ -10,26 +11,8 @@ local utils = require 'pytest.utils'
 ---@field get_function_name fun(self: XmlParser, source: string): string
 ---@field get_test_results fun(self: XmlParser): TestResult[]
 
----@class PythonParser
----@field query vim.treesitter.Query
----@field text string
----@field text_lines string[]
----@field bufnr number
----@field parser vim.treesitter.LanguageTree
----@field get_test_elements_lnum fun(self: PythonParser, class_name: string, function_name: string): number, number
-
-
 
 local M = {}
-
-local ns = vim.api.nvim_create_namespace('pytest_test')
-
-local PythonParser = {}
-PythonParser.__index = PythonParser
-
-local XmlParser = {}
-XmlParser.__index = XmlParser
-
 
 if vim.fn.has("win32") == 1 then
    OUTPUT_FILE = "C:\\tmp\\pytest_report.xml"
@@ -38,6 +21,9 @@ else
 end
 
 LOCAL_OUTPUT_FILE = OUTPUT_FILE
+
+local XmlParser = {}
+XmlParser.__index = XmlParser
 
 ---Set the environment variable `OUTPUT_FILE`
 ---@param output_file any
@@ -61,29 +47,6 @@ local function decode_xml_entities(text)
    return (text:gsub("(%&[^;]+%;)", function(entity)
       return entities[entity] or entity
    end))
-end
-
----Create a new PythonParser instance
----@param bufnr? number
----@return PythonParser?
-function PythonParser.new(bufnr)
-   if not bufnr then
-      bufnr = vim.api.nvim_get_current_buf()
-   end
-
-   local self = setmetatable({}, PythonParser)
-
-   self.text_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-   self.text = table.concat(self.text_lines, '\n')
-   self.parser = vim.treesitter.get_string_parser(self.text, "python")
-
-   self.query = vim.treesitter.query.get("python", "pytest")
-
-   if not self.query then
-      utils.error("Pytest query for Python not found. Make sure you have defined it in queries/python/pytest.scm")
-      return nil
-   end
-   return self
 end
 
 ---Create a new TSParser instance
@@ -154,45 +117,6 @@ function XmlParser:get_function_name(source)
    return source:match('%sname="([^"]*)"') or ""
 end
 
----Get the function line in the buffer using function name
----@param class_name string
----@param function_name string
----@return number, number
-function PythonParser:get_test_elements_lnum(class_name, function_name)
-   local root = self.parser:parse()[1]:root()
-   local has_class = class_name ~= ""
-   local function_lnum = 0
-   local class_lnum = 0
-
-   local function look_for_function(parent_node)
-      for _, child in parent_node:named_children() do
-         local identifier = vim.split(vim.treesitter.get_node_text(child, self.text), '\n')[1]
-         identifier = identifier:match("def%s+([^(]+)%(")
-
-         if identifier == function_name then
-            function_lnum = unpack(vim.treesitter.get_range(child, self.text))
-            return function_lnum
-         end
-      end
-      return 0
-   end
-
-   for id, node in self.query:iter_captures(root, self.text) do
-      local name = self.query.captures[id]
-      local identifier = vim.split(vim.treesitter.get_node_text(node, self.text), '\n')[1]
-      identifier = identifier:match("class%s+([^(]+)%(") or identifier:match("def%s+([^(]+)%(")
-
-      if has_class and name == "class" and identifier == class_name then
-         class_lnum = unpack(vim.treesitter.get_range(node, self.text))
-         function_lnum = look_for_function(node)
-      elseif name == "function" and identifier == function_name then
-         function_lnum = unpack(vim.treesitter.get_range(node, self.text))
-      end
-   end
-
-   return class_lnum, function_lnum
-end
-
 ---Get the lines of test functions for the current file
 ---@return TestResult[]?
 function XmlParser:get_test_results()
@@ -201,7 +125,7 @@ function XmlParser:get_test_results()
    end
 
    local test_results = {}
-   local python_parser = PythonParser.new()
+   local python_parser = python.PythonParser.new()
 
    local root = self.parser:parse()[1]:root()
    for id, node in self.query:iter_captures(root, self.text_lines) do
@@ -321,24 +245,9 @@ function XmlParser:get_error_detail(node, names)
    }
 end
 
-local function update_marks(bufnr, test_results)
-   for _, test_result in ipairs(test_results) do
-      if not test_result.function_lnum then
-         return
-      end
-      local text = test_result.state == 'passed' and '\t✅' or ''
-      text = test_result.state == 'skipped' and '\t💤' or text
-      text = test_result.state == 'failed' and '\t❌' or text
-      vim.api.nvim_buf_set_extmark(bufnr, ns, test_result.function_lnum, 1, { virt_text = { { text } } })
-   end
-end
-
 M.XmlParser = XmlParser
-M.PythonParser = PythonParser
-M.OUTPUT_FILE = OUTPUT_FILE
-M.NS = ns
 M.set_output_file = set_output_file
-M.update_marks = update_marks
 M.decode_xml_entities = decode_xml_entities
+M.OUTPUT_FILE = OUTPUT_FILE
 
 return M

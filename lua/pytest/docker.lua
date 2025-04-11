@@ -218,7 +218,7 @@ local function build_docker_command(settings, files)
 
    local output_file = vim.fs.joinpath(docker_compose_path, path_prefix, report_name)
 
-   require 'pytest.parse'.set_output_file(output_file)
+   require 'pytest.parse.xml'.set_output_file(output_file)
 
    -- In docker create the report in project's root
    local pytest_command = pytest.build_command(parsed_files, report_name)

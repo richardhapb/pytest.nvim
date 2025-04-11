@@ -21,7 +21,7 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
 
 1. Install the `pytest.nvim` plugin using your preferred plugin manager, (requires Treesitter as a dependency):
 
-    Lazyvim:
+    LazyVim:
 
     ```lua
     {

@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-field
-local parse = require 'pytest.parse'
+local python = require 'pytest.parse.python'
 
 vim.opt.rtp:append(vim.fs.joinpath(vim.fn.stdpath("data"), "lazy", "nvim-treesitter"))
 
@@ -29,7 +29,7 @@ describe("Get failed details", function()
    it("Assert class lnum and function lnum", function ()
       local buf = vim.api.nvim_create_buf(false, true)
       vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(python_test_class, '\n'))
-      local python_parser = parse.PythonParser.new(buf)
+      local python_parser = python.PythonParser.new(buf)
       if not python_parser then
          assert.is.False(true)
          return
@@ -44,7 +44,7 @@ describe("Get failed details", function()
    it("Assert function lnum", function ()
       local buf = vim.api.nvim_create_buf(false, true)
       vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(python_test_function, '\n'))
-      local python_parser = parse.PythonParser.new(buf)
+      local python_parser = python.PythonParser.new(buf)
       if not python_parser then
          assert.is.False(true)
          return
