@@ -163,21 +163,25 @@ end
 ---@param docker_path string
 ---@param path_prefix string
 ---@param local_root string
----@param files string | table
+---@param elements string | table
 ---@return table
-local function parse_docker_files(docker_path, path_prefix, local_root, files)
+local function parse_docker_elements(docker_path, path_prefix, local_root, elements)
    local parsed = {}
-   if type(files) == "string" then
-      files = { files }
+   if type(elements) == "string" then
+      elements = { elements }
    end
 
-   -- Transform each file to docker path format
-   for _, file in ipairs(files) do
-      local relative_file = file:match(utils.escape_special_chars(local_root) ..
-         utils.escape_special_chars(path_prefix) .. '[/\\](.*)')
+   -- Transform each element to docker path format
+   for _, element in ipairs(elements) do
+      if not element:find("::") and element:find(".*%.py$") then
+         local relative_file = element:match(utils.escape_special_chars(local_root) ..
+            utils.escape_special_chars(path_prefix) .. '[/\\](.*)')
 
-      local docker_file_path = docker_path .. relative_file
-      parsed = utils.list_extend(parsed, { docker_file_path })
+         local docker_file_path = docker_path .. relative_file
+         parsed = utils.list_extend(parsed, { docker_file_path })
+      else
+         parsed = utils.list_extend(parsed, { element })
+      end
    end
 
    return parsed
@@ -185,9 +189,9 @@ end
 
 ---Build docker command to passed files
 ---@param settings table
----@param files table
+---@param elements table
 ---@return table
-local function build_docker_command(settings, files)
+local function build_docker_command(settings, elements)
    local docker_compose_path = find_docker_compose()
    local docker_path = settings.docker.docker_path or ''
 
@@ -208,7 +212,7 @@ local function build_docker_command(settings, files)
       path_prefix = path_char .. path_prefix
    end
 
-   local parsed_files = parse_docker_files(docker_path, path_prefix, docker_compose_path, files)
+   local parsed_files = parse_docker_elements(docker_path, path_prefix, docker_compose_path, elements)
    local container = settings.docker.container
 
    local report_name = "pytest_report.xml"
@@ -228,5 +232,5 @@ return {
    get_docker_compose_service_line = get_docker_compose_service_line,
    get_docker_compose_volume = get_docker_compose_volume,
    build_docker_command = build_docker_command,
-   parse_docker_files = parse_docker_files,
+   parse_docker_files = parse_docker_elements,
 }

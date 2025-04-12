@@ -1,5 +1,9 @@
 local ns = vim.api.nvim_create_namespace('pytest_test')
 
+local function calculate_tab(line)
+   return #(line:match("^%s*") or "")
+end
+
 local function update_marks(bufnr, test_results)
    for _, test_result in ipairs(test_results) do
       if not test_result.function_lnum then
@@ -14,5 +18,6 @@ end
 
 return {
    NS = ns,
-   update_marks = update_marks
+   update_marks = update_marks,
+   calculate_tab = calculate_tab,
 }

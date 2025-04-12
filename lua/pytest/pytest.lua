@@ -55,9 +55,15 @@ end
 ---Get tests collected by pytest
 ---@param callback function
 local function collect_tests(callback)
+   local settings = require('pytest.config').get()
+   local docker_command = {}
    if is_pytest_available() then
+      if settings.docker.enabled then
+         docker_command = { "docker", "exec", settings.docker.container }
+      end
       return vim.system(
-         { "pytest", "--collect-only", "--no-header" }, {
+         utils.list_extend(docker_command,
+            { "pytest", "--collect-only", "--no-header" }), {
             text = true
          },
          function(out)

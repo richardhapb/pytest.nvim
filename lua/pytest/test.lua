@@ -118,7 +118,7 @@ local function run(test)
    reset_state()
    _test_state.working = true
 
-   local bufnr = _test_state.bufnr or vim.api.nvim_get_current_buf()
+   local bufnr = _test_state.bufnr
    utils.info("Running tests...")
 
    test.job_id = vim.fn.jobstart(
@@ -147,32 +147,34 @@ local function run(test)
             end
 
             test.results = parser:get_test_results()
-            parse.update_marks(bufnr, test.results)
-            for _, test_result in ipairs(test.results) do
-               if test_result.failed_test and test_result.state == 'failed' then
-                  local failed_test = test_result.failed_test or {}
+            if bufnr then
+               parse.update_marks(bufnr, test.results)
+               for _, test_result in ipairs(test.results) do
+                  if test_result.failed_test and test_result.state == 'failed' then
+                     local failed_test = test_result.failed_test or {}
 
-                  table.insert(failed, {
-                     bufnr = bufnr,
-                     lnum = failed_test.lnum,
-                     end_lnum = failed_test.lnum,
-                     col = 0,
-                     end_col = 0,
-                     text = 'Test failed',
-                     severity = vim.diagnostic.severity.ERROR,
-                     message = 'Test failed\n' .. table.concat(failed_test.message, "\n"),
-                     source = 'Django test',
-                     code = 'TestError',
-                     namespace = ns,
-                  })
-                  i = i + 1
+                     table.insert(failed, {
+                        bufnr = bufnr,
+                        lnum = failed_test.lnum,
+                        end_lnum = failed_test.lnum,
+                        col = 0,
+                        end_col = 0,
+                        text = 'Test failed',
+                        severity = vim.diagnostic.severity.ERROR,
+                        message = 'Test failed\n' .. table.concat(failed_test.message, "\n"),
+                        source = 'Django test',
+                        code = 'TestError',
+                        namespace = ns,
+                     })
+                     i = i + 1
+                  end
+                  test.job_id = nil
                end
-               test.job_id = nil
+               vim.diagnostic.set(ns, bufnr, failed, {})
             end
 
             local message = exit_code == 0 and 'Tests passed 👌' or 'Tests failed 😢'
             utils.info(message)
-            vim.diagnostic.set(ns, bufnr, failed, {})
             _test_state.working = false
             test.job_id = nil
 

@@ -1,4 +1,5 @@
 local pytest = require 'pytest.pytest'
+local putils = require 'pytest.parse.utils'
 
 ---@class TestRoot
 ---@field name string
@@ -59,11 +60,6 @@ local function create_element_instance(name, element_type)
    }
 end
 
-
-local function calculate_tab(line)
-   return #(line:match("^%s*") or "")
-end
-
 ---Insert a child into the parent in place
 ---@param parent TestRoot | TestPkg | TestModule | TestClass | TestFunction
 ---@param instance TestRoot | TestPkg | TestModule | TestClass | TestFunction | nil
@@ -92,7 +88,7 @@ local function parse_collect_section(lines, parent, spaces)
 
       for pattern, element_type in pairs(collect_kw) do
          if line:find(pattern) then
-            local line_spaces = calculate_tab(line)
+            local line_spaces = putils.calculate_tab(line)
 
             -- if the line is less indented than expected, return to let the caller insert as sibling
             if line_spaces < spaces then
@@ -106,10 +102,10 @@ local function parse_collect_section(lines, parent, spaces)
             i = i + 1
 
             -- Process potential children for this instance
-            if i <= #lines and calculate_tab(lines[i]) > line_spaces then
-               parse_collect_section(vim.list_slice(lines, i), instance, calculate_tab(lines[i]))
+            if i <= #lines and putils.calculate_tab(lines[i]) > line_spaces then
+               parse_collect_section(vim.list_slice(lines, i), instance, putils.calculate_tab(lines[i]))
                -- Skip lines belonging to children
-               while i <= #lines and calculate_tab(lines[i]) > line_spaces do
+               while i <= #lines and putils.calculate_tab(lines[i]) > line_spaces do
                   i = i + 1
                end
             end
