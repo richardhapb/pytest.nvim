@@ -155,6 +155,12 @@ local function write_buffer(tests_tree, opts)
 
    vim.api.nvim_buf_set_lines(opts.buf, 0, -1, false, tests)
 
+   -- Quit keys
+   local keys = { '<Esc>', 'q' }
+   for _, key in ipairs(keys) do
+      vim.keymap.set('n', key, '<Cmd>bd!<CR>', { noremap = true, buffer = opts.buf })
+   end
+
    -- Run selected test with <CR>
    vim.keymap.set('n', '<CR>', function()
       local row = unpack(vim.api.nvim_win_get_cursor(opts.win))
