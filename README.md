@@ -74,38 +74,15 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
 
 2. Use the `:Pytest` command to run the tests in the current buffer.
 
-    - To check the entire buffer:
-
-        ```vim
-        :Pytest
-        ```
-
-    - To check the output of the tests (`pytest` will be show the fail tests output by default)
-
-        ```vim
-        :PytestOutput
-        ```
-
-    - You can attach the test to the current buffer, this runs test on save in any Python file:
-      
-        ```vim
-        :PytestAttach
-        ```
-    - You can detach the test from the last attached buffer:
-      
-        ```vim
-        :PytestDetach
-        ```
-    - Docker enable on the way
-      
-        ```vim
-        :PytestEnableDocker
-        ```
-    - Docker disabled on the way
-      
-        ```vim
-        :PytestDisableDocker
-        ```
+| Command | Description |
+|---------|-------------|
+| `:Pytest` | Checks the entire buffer |
+| `:PytestOutput` | Shows the output of the tests (pytest will show failed tests output by default) |
+| `:PytestAttach` | Attaches the test to the current buffer - runs tests on save in any Python file |
+| `:PytestDetach` | Detaches the test from the last attached buffer |
+| `:PytestEnableDocker` | Enables Docker support |
+| `:PytestDisableDocker` | Disables Docker support |
+| `:PytestUI` | Centralized UI for running tests (in progress). Currently shows pass/fail message, with future UI integration planned |
 
 The default keybinding that runs `:Pytest` is `<leader>TT`.
 

@@ -73,6 +73,12 @@ local setup = function(opts)
             nargs = 0,
          })
 
+         vim.api.nvim_buf_create_user_command(bufnr, 'PytestUI', function()
+            require 'pytest.ui.buffer'.load_project()
+         end, {
+            nargs = 0,
+         })
+
          _settings.keymaps_callback(bufnr)
       end
    })
