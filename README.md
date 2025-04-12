@@ -82,7 +82,7 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
 | `:PytestDetach` | Detaches the test from the last attached buffer |
 | `:PytestEnableDocker` | Enables Docker support |
 | `:PytestDisableDocker` | Disables Docker support |
-| `:PytestUI` | Centralized UI for running tests (in progress). Currently shows pass/fail message, with future UI integration planned |
+| `:PytestUI` | Centralized UI for running tests (in progress). Currently shows pass/fail messages and marks; messages can be viewed with the `PytestOutput` command |
 
 The default keybinding that runs `:Pytest` is `<leader>TT`.
 

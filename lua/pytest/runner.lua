@@ -7,7 +7,8 @@ local test = require 'pytest.test'
 ---Main function to run the tests for the current file
 ---@param file? string
 ---@param opts? PytestConfig
-local function test_file(file, opts)
+---@param callback? function
+local function test_file(file, opts, callback)
    local current_file = file or vim.fn.expand('%:p')
    local new_test = {}
    local filenames = { current_file:match("[^/]+$") }
@@ -23,21 +24,22 @@ local function test_file(file, opts)
       local docker_command = docker.build_docker_command(settings, { current_file })
       if #docker_command > 0 then
          new_test.command = docker_command
-         test.run(new_test)
+         test.run(new_test, callback)
       end
       return
    end
 
    local command = pytest.build_command(current_file)
    new_test.command = command
-   test.run(new_test)
+   test.run(new_test, callback)
 end
 
 
 ---Main function to run the tests for the current file
 ---@param element? string
 ---@param opts? PytestConfig
-local function test_element(element, opts)
+---@param callback? function
+local function test_element(element, opts, callback)
    element = element or vim.fn.expand('%:p')
    local new_test = {}
 
@@ -51,14 +53,14 @@ local function test_element(element, opts)
       local docker_command = docker.build_docker_command(settings, { element })
       if #docker_command > 0 then
          new_test.command = docker_command
-         test.run(new_test)
+         test.run(new_test, callback)
       end
       return
    end
 
    local command = pytest.build_command(element)
    new_test.command = command
-   test.run(new_test)
+   test.run(new_test, callback)
 end
 
 return {

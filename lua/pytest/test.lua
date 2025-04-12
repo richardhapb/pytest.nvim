@@ -103,7 +103,8 @@ end
 
 ---Run a test
 ---@param test Test
-local function run(test)
+---@param callback? function
+local function run(test, callback)
    -- Only update marks in current buffer
    local ok_dep, msg = utils.verify_dependencies()
    if not ok_dep then
@@ -177,6 +178,10 @@ local function run(test)
             utils.info(message)
             _test_state.working = false
             test.job_id = nil
+
+            if callback then
+               callback(exit_code, test.results)
+            end
 
             -- Show the output if fails
             if exit_code == 1 and config.get().open_output_onfail then

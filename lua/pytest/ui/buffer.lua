@@ -159,8 +159,20 @@ local function write_buffer(tests_tree, opts)
    vim.keymap.set('n', '<CR>', function()
       local row = unpack(vim.api.nvim_win_get_cursor(opts.win))
       local test_path = build_test_path(tests, row)
-      runner.test_element(test_path)
+      runner.test_element(test_path, nil, function(_, results)
+         local state = "passed"
+         for _, result in ipairs(results) do
+            if state == "failed" then
+               break
+            end
 
+            if result.state ~= "passed" then
+               state = result.state
+            end
+         end
+
+         putils.update_marks(opts.buf, { { state = state, function_lnum = row - 1 } })
+      end)
    end, { noremap = true, buffer = opts.buf })
 end
 
