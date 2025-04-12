@@ -2,27 +2,30 @@ local pytest = require 'pytest.pytest'
 
 ---@class TestRoot
 ---@field name string
+---@field type string
 ---@field pkgs? TestPkg[]
 ---
 ---@class TestPkg
 ---@field name? string
+---@field type string
 ---@field pkgs? TestPkg[]
 ---@field modules? TestModule[]
 ---@field classes? TestClass[]
 
 ---@class TestModule
 ---@field name? string
+---@field type string
 ---@field modules? TestModule[]
 ---@field classes? TestClass[]
 
 ---@class TestClass
 ---@field name? string
+---@field type string
 ---@field functions? TestFunction[]
 
 ---@class TestFunction
 ---@field name? string
-
-local M = {}
+---@field type string
 
 ---Get the keywords used by `pytest` when it collects
 ---@return table
@@ -47,16 +50,18 @@ end
 
 ---Create an Test element instance of kind of element
 ---@param name string
+---@param element_type string
 ---@return TestRoot | TestPkg | TestModule | TestClass | TestFunction
-local function create_element_instance(name)
+local function create_element_instance(name, element_type)
    return {
       name = name,
+      type = element_type
    }
 end
 
 
 local function calculate_tab(line)
-    return #(line:match("^%s*") or "")
+   return #(line:match("^%s*") or "")
 end
 
 ---Insert a child into the parent in place
@@ -95,7 +100,7 @@ local function parse_collect_section(lines, parent, spaces)
             end
 
             local name = line:match("<[^>]+%s([^>]+)>")
-            local instance = create_element_instance(name)
+            local instance = create_element_instance(name, element_type)
             insert_child(parent, instance, element_type)
 
             i = i + 1
@@ -117,33 +122,36 @@ local function parse_collect_section(lines, parent, spaces)
    return parent
 end
 
-local function get_tests()
-   local collect = pytest.collect_tests()
-   -- Filter only lines that start with '<'
-   local lines = vim.split(collect, '\n', { plain = true })
+local function collect_tests(callback, opts)
+   return pytest.collect_tests(function(collect)
+      -- Filter only lines that start with '<'
+      local lines = vim.split(collect, '\n', { plain = true })
 
-   -- Filter only lines that start with '<'
-   local filtered = vim.tbl_filter(function(line)
-      return line:match("^%s*<")
-   end, lines)
+      -- Filter only lines that start with '<'
+      local filtered = vim.tbl_filter(function(line)
+         return line:match("^%s*<")
+      end, lines)
 
-   local root = {
-      name = "Root",
-      pkgs = {},
-      modules = {},
-      classes = {},
-      functions = {}
-   }
+      local root = {
+         name = "root",
+         type = "root",
+         pkgs = {},
+         modules = {},
+         classes = {},
+         functions = {}
+      }
 
-   for i, line in ipairs(filtered) do
-      if line:find("<Dir") then
-         return parse_collect_section(vim.list_slice(filtered, i + 1), root, 0)
+      for i, line in ipairs(filtered) do
+         if line:find("<Dir") then
+            root =  parse_collect_section(vim.list_slice(filtered, i + 1), root, 0)
+         end
       end
-   end
-   return root
+
+      vim.schedule(function() callback(root, opts) end)
+   end)
 end
 
-M.parse_collect_section = parse_collect_section
-M.get_tests = get_tests
-
-return M
+return {
+   parse_collect_section = parse_collect_section,
+   collect_tests = collect_tests,
+}

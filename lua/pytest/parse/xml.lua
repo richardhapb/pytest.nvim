@@ -12,8 +12,6 @@ local python = require 'pytest.parse.python'
 ---@field get_test_results fun(self: XmlParser): TestResult[]
 
 
-local M = {}
-
 if vim.fn.has("win32") == 1 then
    OUTPUT_FILE = "C:\\tmp\\pytest_report.xml"
 else
@@ -70,7 +68,7 @@ function XmlParser.new(stdout)
       tmp_file:close()
 
       -- If run in docker clean the volume
-      if require'pytest.config'.get().docker.enabled then
+      if require 'pytest.config'.get().docker.enabled then
          os.remove(OUTPUT_FILE)
          OUTPUT_FILE = LOCAL_OUTPUT_FILE
       end
@@ -245,9 +243,9 @@ function XmlParser:get_error_detail(node, names)
    }
 end
 
-M.XmlParser = XmlParser
-M.set_output_file = set_output_file
-M.decode_xml_entities = decode_xml_entities
-M.OUTPUT_FILE = OUTPUT_FILE
-
-return M
+return {
+   XmlParser = XmlParser,
+   set_output_file = set_output_file,
+   decode_xml_entities = decode_xml_entities,
+   OUTPUT_FILE = OUTPUT_FILE
+}

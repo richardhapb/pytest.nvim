@@ -1,9 +1,6 @@
 local utils = require 'pytest.utils'
 local pytest = require 'pytest.pytest'
 
-local M = {}
-
-
 ---Verify if the container is running
 ---@param callback function
 local function is_container_running(callback)
@@ -225,12 +222,11 @@ local function build_docker_command(settings, files)
    return utils.list_extend({ 'docker', 'exec', '-i', container }, pytest_command)
 end
 
-M.is_container_running = is_container_running
-M.find_docker_compose = find_docker_compose
-M.get_docker_compose_service_line = get_docker_compose_service_line
-M.get_docker_compose_volume = get_docker_compose_volume
-M.build_docker_command = build_docker_command
-M.parse_docker_files = parse_docker_files
-
-
-return M
+return {
+   is_container_running = is_container_running,
+   find_docker_compose = find_docker_compose,
+   get_docker_compose_service_line = get_docker_compose_service_line,
+   get_docker_compose_volume = get_docker_compose_volume,
+   build_docker_command = build_docker_command,
+   parse_docker_files = parse_docker_files,
+}

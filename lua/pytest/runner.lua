@@ -4,8 +4,6 @@ local docker = require 'pytest.docker'
 local pytest = require 'pytest.pytest'
 local test = require 'pytest.test'
 
-local M = {}
-
 ---Main function to run the tests for the current file
 ---@param file? string
 ---@param opts? PytestConfig
@@ -35,6 +33,6 @@ local function test_file(file, opts)
    test.run(new_test)
 end
 
-M.test_file = test_file
-
-return M
+return {
+   test_file = test_file
+}

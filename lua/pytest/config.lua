@@ -18,8 +18,6 @@
 ---@field open_output_onfail? boolean | function Open the buffer with output automatically if fails
 ---@field keymaps_callback? function function for set the keymaps
 
-local M = {}
-
 ---Update the callbacks into a table
 ---@param opts table
 ---@return table Updated table
@@ -96,11 +94,11 @@ local function get(opts)
    return update(vim.tbl_deep_extend("force", _hard_opts, opts))
 end
 
-M.hard_opts = _hard_opts
-M.defaults = _defaults
-M.update_callbacks = update_callbacks
-M.update_hard_opts = update_hard_opts
-M.update = update
-M.get = get
-
-return M
+return {
+   hard_opts = _hard_opts,
+   defaults = _defaults,
+   update_callbacks = update_callbacks,
+   update_hard_opts = update_hard_opts,
+   update = update,
+   get = get,
+}

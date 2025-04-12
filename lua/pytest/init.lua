@@ -3,8 +3,6 @@ local runner = require('pytest.runner')
 local utils = require('pytest.utils')
 local test = require('pytest.test')
 
-local M = {}
-
 local _settings = {}
 
 ---Main settings for pytest.nvim
@@ -80,9 +78,8 @@ local setup = function(opts)
    })
 end
 
--- API functions
-M.test_file = runner.test_file
-M.setup = setup
-M.settings = _settings
-
-return M
+return {
+   test_file = runner.test_file,
+   setup = setup,
+   settings = _settings,
+}

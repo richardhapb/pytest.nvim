@@ -8,8 +8,6 @@ local utils = require 'pytest.utils'
 ---@field parser vim.treesitter.LanguageTree
 ---@field get_test_elements_lnum fun(self: PythonParser, class_name: string, function_name: string): number, number
 
-local M = {}
-
 local PythonParser = {}
 PythonParser.__index = PythonParser
 
@@ -75,6 +73,6 @@ function PythonParser:get_test_elements_lnum(class_name, function_name)
    return class_lnum, function_lnum
 end
 
-M.PythonParser = PythonParser
-
-return M
+return {
+   PythonParser = PythonParser
+}

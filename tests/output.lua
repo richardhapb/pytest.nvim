@@ -16,7 +16,7 @@ describe("Ensure parsing of collect output", function()
       assert(type(collect) == "table", "Output must be a table")
 
       local root = {
-         name = "Root",
+         name = "root",
          pkgs = {},
          modules = {},
          classes = {},

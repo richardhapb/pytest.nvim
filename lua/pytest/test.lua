@@ -33,8 +33,6 @@ local xml = require 'pytest.parse.xml'
 ---@field function_lnum number
 ---@field failed_test? FailedTest
 
-local M = {}
-
 local _test_state = {
    bufnr = nil,
    filenames = nil,
@@ -47,6 +45,28 @@ local _test_state = {
 ---@param state TestState
 local function set_state(state)
    _test_state = vim.tbl_extend("force", _test_state, state)
+end
+
+---Display the last output (stdout or stderr) in a new buffer
+local function show_last_output()
+   if _test_state.last_output then
+      local bufnr = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, _test_state.last_output)
+      vim.cmd.split()
+      vim.api.nvim_set_current_buf(bufnr)
+   end
+end
+
+---Update the last stdout state
+---@param stdout string[]
+local function update_last_output(stdout)
+   _test_state.last_output = stdout
+end
+
+---Get the last stdout state
+---@return string[] | nil
+local function get_last_output()
+   return _test_state.last_output
 end
 
 ---Clear any results and reset state
@@ -68,6 +88,19 @@ local function reset_state(reset_buffer)
    end
 end
 
+---Cancel a running test
+local function cancel_test()
+   if _test_state.working and _test_state.last_job_id then
+      local ok = pcall(vim.fn.jobstop, _test_state.last_job_id)
+      if ok then
+         utils.info("Pytest job cancelled, running the new test")
+      end
+
+      reset_state()
+   end
+end
+
+
 ---Run a test
 ---@param test Test
 local function run(test)
@@ -80,9 +113,9 @@ local function run(test)
    local ns = parse.NS
 
    if _test_state.working then
-      M.cancel_test()
+      cancel_test()
    end
-   M.reset_state()
+   reset_state()
    _test_state.working = true
 
    local bufnr = _test_state.bufnr or vim.api.nvim_get_current_buf()
@@ -95,12 +128,12 @@ local function run(test)
          on_stdout = function(_, stdout)
             if stdout then
                _test_state.has_stdout = true
-               M.update_last_output(stdout)
+               update_last_output(stdout)
             end
          end,
          on_stderr = function(_, stderr)
             if stderr and not _test_state.has_stdout then
-               M.update_last_output(stderr)
+               update_last_output(stderr)
             end
          end,
          on_exit = function(_, exit_code)
@@ -145,52 +178,18 @@ local function run(test)
 
             -- Show the output if fails
             if exit_code == 1 and config.get().open_output_onfail then
-               M.show_last_output()
+               show_last_output()
             end
          end
       })
 end
 
----Display the last output (stdout or stderr) in a new buffer
-local function show_last_output()
-   if _test_state.last_output then
-      local bufnr = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, _test_state.last_output)
-      vim.cmd.split()
-      vim.api.nvim_set_current_buf(bufnr)
-   end
-end
-
----Cancel a running test
-local function cancel_test()
-   if _test_state.working and _test_state.last_job_id then
-      local ok = pcall(vim.fn.jobstop, _test_state.last_job_id)
-      if ok then
-         utils.info("Pytest job cancelled, running the new test")
-      end
-
-      M.reset_state()
-   end
-end
-
----Update the last stdout state
----@param stdout string[]
-local function update_last_output(stdout)
-   _test_state.last_output = stdout
-end
-
----Get the last stdout state
----@return string[] | nil
-local function get_last_output()
-   return _test_state.last_output
-end
-
-M.set_state = set_state
-M.reset_state = reset_state
-M.run = run
-M.show_last_output = show_last_output
-M.cancel_test = cancel_test
-M.update_last_output = update_last_output
-M.get_last_output = get_last_output
-
-return M
+return {
+   set_state = set_state,
+   reset_state = reset_state,
+   run = run,
+   show_last_output = show_last_output,
+   cancel_test = cancel_test,
+   update_last_output = update_last_output,
+   get_last_output = get_last_output,
+}

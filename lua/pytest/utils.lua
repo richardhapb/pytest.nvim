@@ -1,5 +1,3 @@
-local M = {}
-
 ---Extend a list with another list, from left to right
 ---@param list table
 ---@param extension table
@@ -150,15 +148,15 @@ local function error(msg)
    notify(msg, vim.log.levels.ERROR, { timeout = 3000 })
 end
 
-M.list_extend = list_extend
-M.escape_special_chars = escape_special_chars
-M.verify_dependencies = verify_dependencies
-M.get_git_root = get_git_root
-M.safe_getcwd = safe_getcwd
-M.get_buffer_from_filepath = get_buffer_from_filepath
-M.validate_args = validate_args
-M.info = info
-M.warn = warn
-M.error = error
-
-return M
+return {
+   list_extend = list_extend,
+   escape_special_chars = escape_special_chars,
+   verify_dependencies = verify_dependencies,
+   get_git_root = get_git_root,
+   safe_getcwd = safe_getcwd,
+   get_buffer_from_filepath = get_buffer_from_filepath,
+   validate_args = validate_args,
+   info = info,
+   warn = warn,
+   error = error,
+}

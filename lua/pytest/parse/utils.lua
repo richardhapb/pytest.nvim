@@ -1,4 +1,3 @@
-local M = {}
 local ns = vim.api.nvim_create_namespace('pytest_test')
 
 local function update_marks(bufnr, test_results)
@@ -13,7 +12,7 @@ local function update_marks(bufnr, test_results)
    end
 end
 
-M.NS = ns
-M.update_marks = update_marks
-
-return M
+return {
+   NS = ns,
+   update_marks = update_marks
+}

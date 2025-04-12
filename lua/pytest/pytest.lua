@@ -1,8 +1,6 @@
 local utils = require 'pytest.utils'
 local config = require 'pytest.config'
 
-local M = {}
-
 ---Build pytest command
 ---@param args table | string
 ---@param output_file? string
@@ -55,25 +53,27 @@ local function is_pytest_django_available(callback)
 end
 
 ---Get tests collected by pytest
----@return string
-local function collect_tests()
+---@param callback function
+local function collect_tests(callback)
    if is_pytest_available() then
-      local result = vim.system({ "pytest", "--collect-only", "--no-header" }, {text = true}):wait()
-      if result.code ~= 0 then
-         utils.error("Error running pytest: " .. result.stderr)
-         return ""
-      end
-
-      return result.stdout
+      return vim.system(
+         { "pytest", "--collect-only", "--no-header" }, {
+            text = true
+         },
+         function(out)
+            if out.code ~= 0 then
+               utils.error("Error running pytest: " .. out.stderr)
+               return
+            end
+            callback(out.stdout)
+         end
+      )
    end
-
-   utils.error("Pytest is not available, ensure the binary is in PATH")
-   return ""
 end
 
-M.build_command = build_command
-M.is_pytest_available = is_pytest_available
-M.is_pytest_django_available = is_pytest_django_available
-M.collect_tests = collect_tests
-
-return M
+return {
+   build_command = build_command,
+   is_pytest_available = is_pytest_available,
+   is_pytest_django_available = is_pytest_django_available,
+   collect_tests = collect_tests
+}
