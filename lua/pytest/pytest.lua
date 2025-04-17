@@ -27,7 +27,14 @@ local function build_command(args, output_file)
 end
 
 local function is_pytest_available()
-   return vim.fn.executable("pytest") == 1
+   local settings = config.get()
+   if not settings.docker.enabled then
+      return vim.fn.executable("pytest") == 1
+   end
+
+   local docker_command = { 'docker', 'exec', settings.docker.container, 'pytest', '--version' }
+
+   return vim.system(docker_command, { text = true }):wait().code == 0
 end
 
 ---Verify if pytest is available in local or docker according to the settings
