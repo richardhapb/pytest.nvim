@@ -177,6 +177,11 @@ local function parse_docker_elements(docker_path, path_prefix, local_root, eleme
          local relative_file = element:match(utils.escape_special_chars(local_root) ..
             utils.escape_special_chars(path_prefix) .. '[/\\](.*)')
 
+         -- Fallback in case the path is transformed.
+         if not relative_file then
+            relative_file = element
+         end
+
          local docker_file_path = docker_path .. relative_file
          parsed = utils.list_extend(parsed, { docker_file_path })
       else

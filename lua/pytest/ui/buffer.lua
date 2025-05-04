@@ -145,6 +145,22 @@ local function build_test_path(lines, index)
    return sanitize_string(vim.fs.joinpath(unpack(path_elements)) .. test_string)
 end
 
+---Get the state for an element from results
+---@param results TestResult[]
+---@param element string
+---@return string?
+local function get_state_result(results, element)
+   local state = nil
+   local element_name = vim.trim(element)
+   for _, result in ipairs(results) do
+      if result.function_name == element_name or result.class_name == element_name then
+         state = result.state
+      end
+   end
+
+   return state
+end
+
 ---Writes the test hierarchy to a buffer and sets up key mappings
 ---@param tests_tree table The tree structure of tests to display
 ---@param opts table Configuration options containing:
@@ -165,19 +181,33 @@ local function write_buffer(tests_tree, opts)
    vim.keymap.set('n', '<CR>', function()
       local row = unpack(vim.api.nvim_win_get_cursor(opts.win))
       local test_path = build_test_path(tests, row)
+      local max_tab, end_row = putils.get_section_info(tests, row)
+
       runner.test_element(test_path, nil, function(_, results)
-         local state = "passed"
-         for _, result in ipairs(results) do
-            if state == "failed" then
-               break
-            end
+         vim.api.nvim_buf_clear_namespace(opts.buf, putils.NS, 0, -1)
+         for i, element in ipairs(vim.list_slice(tests, row, end_row)) do
+            local state = "passed"
+            if putils.calculate_tab(element) < max_tab then
+               local _, element_end_row = putils.get_section_info(tests, row + i - 1)
 
-            if result.state ~= "passed" then
-               state = result.state
+               local new_state = nil
+               local j = 0
+               while new_state == nil or j <= row + i - element_end_row do
+                  for _, child in ipairs(vim.list_slice(tests, row + i, element_end_row)) do
+                     new_state = get_state_result(results, sanitize_string(child))
+                  end
+                  j = j + 1
+               end
+
+               state = new_state
+            else
+               local new_state = get_state_result(results, sanitize_string(element))
+               if new_state then
+                  state = new_state
+               end
             end
+            putils.update_marks(opts.buf, { { state = state, function_lnum = row + i - 2 } })
          end
-
-         putils.update_marks(opts.buf, { { state = state, function_lnum = row - 1 } })
       end)
    end, { noremap = true, buffer = opts.buf })
 end

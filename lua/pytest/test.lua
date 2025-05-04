@@ -10,7 +10,7 @@ local xml = require 'pytest.parse.xml'
 ---@field results TestResult[]
 
 ---@class TestState
----@field bufnr number
+---@field bufnr? number
 ---@field last_output? string[]
 ---@field has_stdout? boolean
 ---@field filenames? string[]
@@ -26,11 +26,11 @@ local xml = require 'pytest.parse.xml'
 
 ---@class TestResult
 ---@field state 'passed' | 'skipped' | 'failed'
----@field filename string
----@field class_name string
----@field class_lnum number
----@field function_name string
----@field function_lnum number
+---@field filename? string
+---@field class_name? string
+---@field class_lnum? number
+---@field function_name? string
+---@field function_lnum? number
 ---@field failed_test? FailedTest
 
 local _test_state = {
