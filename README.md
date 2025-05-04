@@ -2,6 +2,8 @@
 # Pytest.nvim
 
 <img width="885" alt="image" src="https://github.com/user-attachments/assets/4405219d-1c18-4086-9f84-a47dd60c67c5" />
+<img width="885" alt="image" src="https://github.com/user-attachments/assets/416623de-6409-490f-942c-a6136274ad28" />
+
 
 ## About the project
 
