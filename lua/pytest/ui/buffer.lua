@@ -37,6 +37,8 @@ local function build_buffer()
    local buf = vim.api.nvim_create_buf(false, true)
    local win = vim.api.nvim_open_win(buf, true, win_config)
 
+   vim.api.nvim_set_option_value("cursorline", true, { win = win })
+
    return win, buf
 end
 

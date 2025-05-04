@@ -201,7 +201,7 @@ require 'pytest'.setup {
 - [ ] Handle multiple files
 - [ ] Handle modules and project
 - [x] Integrate treesitter for parsing
-- [ ] Centralized UI
+- [x] Centralized UI
 - [x] Parse error lines from XML output of pytest, instead of relying on stdout 
 
 ## Contributing
