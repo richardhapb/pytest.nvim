@@ -55,6 +55,25 @@ local function find_docker_compose(path)
    return ''
 end
 
+---Obtain the text in the docker-compose file using `docker compose config` function
+---@return string[]
+local function get_docker_compose_lines()
+   local settings = require('pytest.config').get()
+
+   local docker_compose_name = settings.docker.docker_compose_file or 'docker-compose.yml'
+
+   if type(docker_compose_name) == "function" then
+      docker_compose_name = docker_compose_name()
+   end
+
+   local docker_compose_text = vim.system({ "docker", "compose", "-f", docker_compose_name, "config" }):wait().stdout
+   if not docker_compose_text then
+      return {}
+   end
+
+   return vim.split(docker_compose_text, '\n', { plain = true })
+end
+
 ---Obtain the line number of the service in the docker-compose file
 ---@param path? string
 ---@return number
@@ -73,10 +92,9 @@ local function get_docker_compose_service_line(path)
       return lineno
    end
 
-   local docker_compose_name = settings.docker.docker_compose_file or 'docker-compose.yml'
+   local docker_compose_lines = get_docker_compose_lines()
 
-   local docker_compose_file = io.open(vim.fs.joinpath(docker_compose_path, docker_compose_name), 'r')
-   if not docker_compose_file then
+   if #docker_compose_lines == 0 then
       return lineno
    end
 
@@ -86,16 +104,25 @@ local function get_docker_compose_service_line(path)
       return lineno
    end
 
-   for line in docker_compose_file:lines() do
+   local possibles = {}
+
+   for _, line in ipairs(docker_compose_lines) do
       lineno = lineno + 1
       if line:match('^%s*' .. service .. ':') then
-         docker_compose_file:close()
-         return lineno
+         local spaces = #line:match("(%s*)" .. service .. ":")
+         table.insert(possibles, { text = line, spaces = spaces, lineno = lineno })
       end
    end
 
-   docker_compose_file:close()
-   return -1
+   local temp_result = 100
+
+   for _, p in ipairs(possibles) do
+      if p.spaces < temp_result then
+         lineno = p.lineno
+      end
+   end
+
+   return lineno
 end
 
 ---Get the volume path from the docker-compose file
@@ -111,11 +138,9 @@ local function get_docker_compose_volume(path)
       docker_compose_path = path
    end
 
+   local docker_compose_lines = get_docker_compose_lines()
 
-   local docker_compose_name = settings.docker.docker_compose_file or 'docker-compose.yml'
-
-   local docker_compose_file = io.open(vim.fs.joinpath(docker_compose_path, docker_compose_name), 'r')
-   if not docker_compose_file then
+   if #docker_compose_lines == 0 then
       return ''
    end
 
@@ -129,15 +154,14 @@ local function get_docker_compose_volume(path)
    local path_prefix = settings.docker.local_path_prefix or ''
 
    if path_prefix and path_prefix ~= '' then
-      path_prefix = '/' .. path_prefix
+      path_prefix = vim.fs.joinpath(docker_compose_path, path_prefix)
    end
 
    local volume_match = false
-   for line in docker_compose_file:lines() do
+   for i, line in ipairs(docker_compose_lines) do
       if service_line < 0 then
          if line:match('^%s*volumes:') then
             if volume_match then
-               docker_compose_file:close()
                return volume
             end
 
@@ -148,14 +172,14 @@ local function get_docker_compose_volume(path)
       end
 
       if volume_match then
-         if line:match('^%s*-%s+%.' .. path_prefix .. '[\\/]:(.*)') then
-            volume = line:match('^%s*-%s+%.' .. path_prefix .. '[\\/]:(.*)')
+         if line:match('^%s*source:%s' .. path_prefix .. '$') then
+            -- There is on the next line
+            volume = docker_compose_lines[i+1]:match('^%s*target:%s(.*)')
             break
          end
       end
    end
 
-   docker_compose_file:close()
    return volume
 end
 
