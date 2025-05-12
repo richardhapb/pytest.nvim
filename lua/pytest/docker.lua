@@ -206,7 +206,7 @@ local function parse_docker_elements(docker_path, path_prefix, local_root, eleme
             relative_file = element
          end
 
-         local docker_file_path = docker_path .. relative_file
+         local docker_file_path = vim.fs.joinpath(docker_path, relative_file)
          parsed = utils.list_extend(parsed, { docker_file_path })
       else
          parsed = utils.list_extend(parsed, { element })
