@@ -172,7 +172,7 @@ local function get_docker_compose_volume(path)
       end
 
       if volume_match then
-         if line:match('^%s*source:%s' .. path_prefix .. '$') then
+         if line:match('^%s*source:%s' .. utils.escape_special_chars(path_prefix) .. '$') then
             -- There is on the next line
             volume = docker_compose_lines[i+1]:match('^%s*target:%s(.*)')
             break
