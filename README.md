@@ -7,7 +7,7 @@
 
 ## About the project
 
-Testing integrated in neovim with `pytest`. Include Docker support. This project is in progress, I will be adding more features in the future and I open to contributions.
+Testing integrated in neovim with `pytest`. Include Docker support.
 
 ## Getting Started
 
@@ -84,7 +84,7 @@ These instructions will help you set up and use `pytest.nvim` in your Neovim env
 | `:PytestDetach` | Detaches the test from the last attached buffer |
 | `:PytestEnableDocker` | Enables Docker support |
 | `:PytestDisableDocker` | Disables Docker support |
-| `:PytestUI` | Centralized UI for running tests (in progress). Currently shows pass/fail messages and marks; messages can be viewed with the `PytestOutput` command |
+| `:PytestUI` | Centralized UI for running tests. Shows pass/fail messages and marks; messages can be viewed with the `PytestOutput` command |
 
 The default keybinding that runs `:Pytest` is `<leader>TT`.
 
@@ -193,13 +193,12 @@ require 'pytest'.setup {
 
 - [x] Docker integration
 - [x] Path from docker compose file
-- [ ] Container name from docker compose file
 - [x] Tests for docker compose file
 - [x] Custom args for pytest command
 - [x] Pass function as settings
 - [x] Handle single file testing
-- [ ] Handle multiple files
-- [ ] Handle modules and project
+- [x] Handle multiple files
+- [x] Handle modules and project
 - [x] Integrate treesitter for parsing
 - [x] Centralized UI
 - [x] Parse error lines from XML output of pytest, instead of relying on stdout 
