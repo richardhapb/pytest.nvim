@@ -70,7 +70,7 @@ local function collect_tests(callback)
       end
       return vim.system(
          utils.list_extend(docker_command,
-            { "pytest", "--collect-only", "--no-header" }), {
+            { "pytest", "--collect-only", "--no-header", "--disable-warnings", "--no-summary" }), {
             text = true
          },
          function(out)

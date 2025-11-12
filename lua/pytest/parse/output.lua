@@ -85,35 +85,40 @@ local function parse_collect_section(lines, parent, spaces)
    local i = 1
    while i <= #lines do
       local line = lines[i]
+      local line_spaces = putils.calculate_tab(line)
+
+      -- if the line is less indented than expected, return to let the caller insert as sibling
+      if line_spaces < spaces then
+         return parent
+      end
 
       for pattern, element_type in pairs(collect_kw) do
          if line:find(pattern) then
-            local line_spaces = putils.calculate_tab(line)
-
-            -- if the line is less indented than expected, return to let the caller insert as sibling
-            if line_spaces < spaces then
-               return parent
-            end
-
             local name = line:match("<[^>]+%s([^>]+)>")
             local instance = create_element_instance(name, element_type)
             insert_child(parent, instance, element_type)
 
+            if i == #lines then
+               break
+            end
+
             i = i + 1
+            local next_spaces = putils.calculate_tab(lines[i])
 
             -- Process potential children for this instance
-            if i <= #lines and putils.calculate_tab(lines[i]) > line_spaces then
-               parse_collect_section(vim.list_slice(lines, i), instance, putils.calculate_tab(lines[i]))
+            if i <= #lines and next_spaces > line_spaces then
+               parse_collect_section(vim.list_slice(lines, i), instance, next_spaces)
                -- Skip lines belonging to children
                while i <= #lines and putils.calculate_tab(lines[i]) > line_spaces do
                   i = i + 1
                end
             end
-            goto continue
+            i = i - 1
+            break
          end
       end
+
       i = i + 1
-      ::continue::
    end
    return parent
 end
@@ -139,7 +144,8 @@ local function collect_tests(callback, opts)
 
       for i, line in ipairs(filtered) do
          if line:find("<Dir") then
-            root =  parse_collect_section(vim.list_slice(filtered, i + 1), root, 0)
+            root = parse_collect_section(vim.list_slice(filtered, i + 1), root, 0)
+            break -- Only process the first <Dir, there should only be one root
          end
       end
 
