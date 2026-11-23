@@ -1,6 +1,6 @@
-local parse_output = require 'pytest.parse.output'
-local putils = require 'pytest.parse.utils'
-local runner = require 'pytest.runner'
+local parse_output = require("pytest.parse.output")
+local putils = require("pytest.parse.utils")
+local runner = require("pytest.runner")
 
 TAB_SPACES = 1
 
@@ -23,15 +23,15 @@ local function build_buffer()
    local row = height * 0.5
 
    local win_config = {
-      relative = 'win',
-      border = 'rounded',
+      relative = "win",
+      border = "rounded",
       focusable = true,
       col = col,
       row = row,
       width = width,
       height = height,
-      style = 'minimal',
-      title = "Available tests"
+      style = "minimal",
+      title = "Available tests",
    }
 
    local buf = vim.api.nvim_create_buf(false, true)
@@ -59,7 +59,7 @@ end
 ---@param spaces integer length of tab
 ---@return string[] Deserialized objects as a hierarchy list
 local function check_for_childs(parent, lines, spaces)
-   local gap = string.rep(' ', spaces)
+   local gap = string.rep(" ", spaces)
    if parent.name then
       table.insert(lines, gap .. get_icon(parent.type) .. parent.name)
    end
@@ -119,7 +119,6 @@ local function build_test_path(lines, index)
       local tab = putils.calculate_tab(line)
       line = vim.trim(line)
 
-
       vim.trim(lines[index])
 
       if tab / TAB_SPACES < level then
@@ -143,7 +142,7 @@ local function build_test_path(lines, index)
    end
 
    -- Pytest uses :: to denote nested tests after the filename
-   local test_string = #test_elements > 0 and "::" .. table.concat(test_elements, '::') or ""
+   local test_string = #test_elements > 0 and "::" .. table.concat(test_elements, "::") or ""
    return sanitize_string(vim.fs.joinpath(unpack(path_elements)) .. test_string)
 end
 
@@ -162,7 +161,48 @@ local function get_state_result(results, element)
 
    return state
 end
+-- Results stay saved while Neovim is running
+local cached_results = {}
 
+local function cache_results(results)
+   for _, r in ipairs(results or {}) do
+      cached_results[(r.class_name or "") .. "::" .. (r.function_name or "")] = r
+   end
+end
+
+local function restore_marks(tests, buf)
+   local results = vim.tbl_values(cached_results)
+   if #results == 0 then
+      return
+   end
+
+   local marks = {}
+   for i, element in ipairs(tests) do
+      local tab = putils.calculate_tab(element)
+      local state
+
+      -- A container (module/class) is followed by lines with deeper indentation
+      local j = i + 1
+      if tests[j] and putils.calculate_tab(tests[j]) > tab then
+         while tests[j] and putils.calculate_tab(tests[j]) > tab do
+            local s = get_state_result(results, sanitize_string(tests[j]))
+            if s == "failed" then
+               state = "failed"
+            elseif s and not state then
+               state = s
+            end
+            j = j + 1
+         end
+      else
+         state = get_state_result(results, sanitize_string(element))
+      end
+
+      if state then
+         table.insert(marks, { state = state, function_lnum = i - 1 }) -- 0-based, same as the original row + i - 2
+      end
+   end
+   putils.update_marks(buf, marks)
+end
 ---Writes the test hierarchy to a buffer and sets up key mappings
 ---@param tests_tree table The tree structure of tests to display
 ---@param opts table Configuration options containing:
@@ -172,44 +212,23 @@ local function write_buffer(tests_tree, opts)
    local tests = check_for_childs(tests_tree, {}, 0)
 
    vim.api.nvim_buf_set_lines(opts.buf, 0, -1, false, tests)
-
+   restore_marks(tests, opts.buf)
    -- Quit keys
-   local keys = { '<Esc>', 'q' }
+   local keys = { "<Esc>", "q" }
    for _, key in ipairs(keys) do
-      vim.keymap.set('n', key, '<Cmd>bd!<CR>', { noremap = true, buffer = opts.buf })
+      vim.keymap.set("n", key, "<Cmd>bd!<CR>", { noremap = true, buffer = opts.buf })
    end
 
    -- Run selected test with <CR>
-   vim.keymap.set('n', '<CR>', function()
+   vim.keymap.set("n", "<CR>", function()
       local row = unpack(vim.api.nvim_win_get_cursor(opts.win))
       local test_path = build_test_path(tests, row)
       local max_tab, end_row = putils.get_section_info(tests, row)
 
       runner.test_element(test_path, nil, function(_, results)
+         cache_results(results)
          vim.api.nvim_buf_clear_namespace(opts.buf, putils.NS, 0, -1)
-         for i, element in ipairs(vim.list_slice(tests, row, end_row)) do
-            local state = "passed"
-            if putils.calculate_tab(element) < max_tab then
-               local _, element_end_row = putils.get_section_info(tests, row + i - 1)
-
-               local new_state = nil
-               local j = 0
-               while new_state == nil or j <= row + i - element_end_row do
-                  for _, child in ipairs(vim.list_slice(tests, row + i, element_end_row)) do
-                     new_state = get_state_result(results, sanitize_string(child))
-                  end
-                  j = j + 1
-               end
-
-               state = new_state
-            else
-               local new_state = get_state_result(results, sanitize_string(element))
-               if new_state then
-                  state = new_state
-               end
-            end
-            putils.update_marks(opts.buf, { { state = state, function_lnum = row + i - 2 } })
-         end
+         restore_marks(tests, opts.buf)
       end)
    end, { noremap = true, buffer = opts.buf })
 end
@@ -223,5 +242,5 @@ local function load_project()
 end
 
 return {
-   load_project = load_project
+   load_project = load_project,
 }
